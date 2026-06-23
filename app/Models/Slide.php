@@ -12,14 +12,12 @@ class Slide extends Model
         "company_id",
         "image_path",
         "order",
-        "requires_acknowledgement",
     ];
 
     protected function casts(): array
     {
         return [
             "order" => "integer",
-            "requires_acknowledgement" => "boolean"
         ];
     }
 
@@ -31,11 +29,6 @@ class Slide extends Model
     public function acknowledgements(): HasMany
     {
         return $this->hasMany(Acknowledgement::class);
-    }
-
-    public function requiresAcknowledgement(): bool
-    {
-        return $this->requires_acknowledgement === true;
     }
 
     public function isAcknowledgedBy(User $user): bool
