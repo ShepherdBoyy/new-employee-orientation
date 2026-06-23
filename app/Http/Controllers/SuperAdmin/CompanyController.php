@@ -70,11 +70,10 @@ class CompanyController extends Controller
 
     public function toggleStatus(Company $company): RedirectResponse
     {
-        $company->update([
-            "status" => $company->status === "active" ? "inactive" : "deactivated"
-        ]);
+        $newStatus = $company->status === "active" ? "inactive" : "active";
+        $label = $newStatus === "active" ? "activated" : "deactivated";
 
-        $label = $company->status === "active" ? "activateed" : "deactivdated";
+        $company->update(["status" => $newStatus]);
 
         return back()->with("success", "Company {$label} successfully");
     }
