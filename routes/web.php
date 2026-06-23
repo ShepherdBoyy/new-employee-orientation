@@ -4,7 +4,6 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\SuperAdmin\CompanyAdminController;
 use App\Http\Controllers\SuperAdmin\CompanyController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::middleware("guest")->group(function () {
     Route::get("/login", [AuthController::class, "showLogin"])->name("login");
