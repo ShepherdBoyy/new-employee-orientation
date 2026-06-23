@@ -38,6 +38,7 @@ export default function Login() {
                       <Label htmlFor="email">Email</Label>
                       <Input
                         id="email"
+                        name="email"
                         type="email"
                         placeholder="m@example.com"
                         required
@@ -48,7 +49,7 @@ export default function Login() {
                       <div className="flex items-center">
                         <Label htmlFor="password">Password</Label>
                       </div>
-                      <Input id="password" type="password" required/>
+                      <Input id="password" name="password" type="password" required/>
                       {errors['password'] && <div className="text-red-700">{errors['password']}</div>}
                     </div>
                   </div>
