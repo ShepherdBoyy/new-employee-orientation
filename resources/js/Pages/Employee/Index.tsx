@@ -3,3 +3,6 @@ export default function Index() {
     <div>Index</div>
   )
 }
+
+
+
