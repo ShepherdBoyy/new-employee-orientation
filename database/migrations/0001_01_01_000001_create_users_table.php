@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string("name");
             $table->string("email")->unique();
             $table->string("password");
-            $table->enum("role", ["super_admin", "company_admin", "employee"]);
+            $table->enum("role", ["admin", "employee"]);
             $table->enum("status", ['active', "locked"])->default("active");
             $table->timestamp("expires_at")->nullable();
             $table->rememberToken();

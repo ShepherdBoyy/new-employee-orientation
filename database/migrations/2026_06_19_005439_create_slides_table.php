@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId("company_id")->constrained()->cascadeOnDelete();
             $table->string("image_path");
             $table->unsignedInteger("order")->default(1);
-            $table->boolean("requires_acknowledgement")->default(false);
             $table->timestamps();
         });
     }
