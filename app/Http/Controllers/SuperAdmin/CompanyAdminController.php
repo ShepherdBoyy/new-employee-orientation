@@ -63,11 +63,10 @@ class CompanyAdminController extends Controller
 
     public function toggleStatus(User $user): RedirectResponse
     {
-        $user->update([
-            "status" => $user->status === "active" ? "locked" : "active"
-        ]);
+        $newStatus = $user->status === "active" ? "locked" : "active";
+        $label = $newStatus === "active" ? "activated" : "deactivated";
 
-        $label = $user->status === "active" ? "activated" : "deactivated";
+        $user->update(["status" => $newStatus]);
 
         return back()->with("success", "Company admin {$label} successfully");
     }
