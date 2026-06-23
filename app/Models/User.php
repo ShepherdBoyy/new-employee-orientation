@@ -51,14 +51,9 @@ class User extends Authenticatable
         return $this->hasMany(ExtensionRequest::class);
     }
 
-    public function isSuperAdmin(): bool
+    public function isAdmin(): bool
     {
-        return $this->role === "super_admin";
-    }
-
-    public function isCompanyAdmin(): bool
-    {
-        return $this->role === "company_admin";
+        return $this->role === "admin";
     }
 
     public function isEmployee(): bool
@@ -87,17 +82,14 @@ class User extends Authenticatable
             $this->load("company.slides");
         }
 
-        $requiredSlides = $this->company
-            ->slides
-            ->where("requires_acknowledgement", true)
-            ->pluck("id");
+        $totalSlides = $this->company->slides->pluck("id");
 
-        if ($requiredSlides->isEmpty()) {
+        if ($totalSlides->isEmpty()) {
             return false;
         }
 
         $acknowledged = $this->acknowledgements()->pluck("slide_id");
 
-        return $requiredSlides->diff($acknowledged)->isEmpty();
+        return $totalSlides->diff($acknowledged)->isEmpty();
     }
 }
