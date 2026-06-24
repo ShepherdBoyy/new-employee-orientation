@@ -176,7 +176,7 @@ class EmployeeController extends Controller
         $pendingExtensions = ExtensionRequest::where("status", "pending")->count();
 
         return Inertia::render("Admin/Dashboard", [
-            "status" => [
+            "stats" => [
                 "totalCompanies" => $totalCompanies,
                 "totalAdmins" => $totalAdmins,
                 "totalEmployees" => $totalEmployees,
