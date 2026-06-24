@@ -9,7 +9,6 @@ use App\Models\Slide;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -26,7 +25,7 @@ class EmployeeController extends Controller
         $companies = Company::where("status", "active")
             ->get(["id", "name"]);
         
-        return Inertia::render("Admins/Users/Admins", [
+        return Inertia::render("Admin/Users/Admins", [
             "admins" => $admins,
             "companies" => $companies
         ]);
