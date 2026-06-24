@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Slide;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,30 +16,42 @@ class SlideController extends Controller
 {
     public function index(): Response
     {
-        $slides = Slide::where("company_id", Auth::user()->company_id)
-            ->orderBy("order")
-            ->get();
-        
+        $companies = Company::where("status", "active")
+            ->get(["id", "name"]);
+
+        $slides = collect();
+        $selectedCompany = null;
+
+        if (request()->has("company_id")) {
+            $selectedCompany = Company::findOrFail(request("company_id"));
+            $slides = Slide::where("company_id", $selectedCompany->id)
+                ->orderBy("order")
+                ->get();
+        }
+
         return Inertia::render("Admin/Slides/Index", [
-            "slides" => $slides
+            "companies" => $companies,
+            "slides" => $slides,
+            "selectedCompany" => $selectedCompany
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
+            "company_id" => ["required", "exists:companies,id"],
             "images" => ["required", "array", "min:1"],
             "images.*" => ["required", "image", "max:5120"]
         ]);
 
-        $lastOrder = Slide::where("company_id", Auth::user()->company_id)
+        $lastOrder = Slide::where("company_id", $request->company_id)
             ->max("order") ?? 0;
 
         foreach ($request->file("images") as $index => $image) {
             $path = $image->store("slides", "public");
 
             Slide::create([
-                "company_id" => Auth::user()->company_id,
+                "company_id" => $request->company_id,
                 "image_path" => $path,
                 "order" => $lastOrder + $index + 1,
             ]);
@@ -57,7 +70,6 @@ class SlideController extends Controller
 
         foreach ($request->slides as $item) {
             Slide::where("id", $item["id"])
-                ->where("company_id", Auth::user()->company_id)
                 ->update(["order" => $item["order"]]);            
         }
 
@@ -66,8 +78,6 @@ class SlideController extends Controller
 
     public function destroy(Slide $slide): RedirectResponse
     {
-        abort_if($slide->company_id !== Auth::user()->company_id, 403);
-
         Storage::disk("public")->delete($slide->image_path);
         $slide->delete();
 

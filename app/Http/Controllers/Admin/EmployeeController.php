@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\ExtensionRequest;
 use App\Models\Slide;
 use App\Models\User;
@@ -16,28 +17,35 @@ use Inertia\Response;
 
 class EmployeeController extends Controller
 {
+    public function admins(): Response
+    {
+        $admins = User::where("role", "admin")
+            ->latest()
+            ->get();
+
+        $companies = Company::where("status", "active")
+            ->get(["id", "name"]);
+        
+        return Inertia::render("Admins/Users/Admins", [
+            "admins" => $admins,
+            "companies" => $companies
+        ]);
+    }
+
     public function index(): Response
     {
-        $companyId = Auth::user()->company_id;
-
-        $employees = User::where("company_id", $companyId)
-            ->where("role", "employee")
+        $employees = User::where("role", "employee")
+            ->with("company")
             ->withCount("acknowledgements")
-            ->with("extensionRequests")
             ->latest()
             ->get();
         
-        $totalSlides = Slide::where("company_id", $companyId)
-            ->count();
-        
-        $slides = Slide::where("company_id", $companyId)        
-            ->orderBy("order")
-            ->get();
+        $companies = Company::where("status", "active")        
+            ->get(["id", "name"]);
 
-        return Inertia::render("Admin/Employees/Index", [
+        return Inertia::render("Admin/Users/Employees", [
             "employees" => $employees,
-            "totalSlides" => $totalSlides,
-            "slides" => $slides
+            "companies" => $companies
         ]);
     }
 
@@ -45,82 +53,94 @@ class EmployeeController extends Controller
     {
         $validated = $request->validate([
             "name" => ["required", "string", "max:255"],
-            "email" => ["required", "email", "unique:users,email"]
+            "email" => ["required", "email", "unique:users,email"],
+            "role" => ["required", Rule::in(["admin", "employee"])],
+            "company_id" => [
+                Rule::requiredIf($request->role === "employee"),
+                "nullable",
+                "exists:companies,id"
+            ]
         ]);
 
         User::create([
-            ...$validated,
-            "company_id" => Auth::user()->company_id,
-            "password" => 'password',
-            "role" => "employee",
+            "name" => $validated["name"],
+            "email" => $validated["email"],
+            "role" => $validated["role"],
+            "company_id" => $validated["role"] === "admin" ? null : $validated["company_id"],
+            "password" => "password",
             "status" => "active",
-            "expires_at" => now()->addHours(24)
+            "expires_at" => $validated["role"] === "employee" ? now()->addHours(24) : null
         ]);
 
-        return back()->with("success", "Employee account created successfully");
+        return back()->with("success", "User created successfully");
     }
 
-    public function update(Request $request, User $employee): RedirectResponse
+    public function update(Request $request, User $user): RedirectResponse
     {
-        abort_if($employee->company_id !== Auth::user()->company_id, 403);
-
         $validated = $request->validate([
             "name" => ["required", "string", "max:255"],
-            "email" => ["required", "email", Rule::unique("users")->ignore($employee->id)]
+            "email" => ["required", "email", Rule::unique("users")->ignore($user->id)],
+            "company_id" => [
+                Rule::requiredIf($user->role === "employee"),
+                "nullable",
+                "exists:companies,id"
+            ]
         ]); 
 
-        $employee->update($validated);
+        $user->update([
+            "name" => $validated["name"],
+            "email" => $validated["email"],
+            "company_id" => $user->isAdmin() ? null : $validated["company_id"]
+        ]);
 
-        return back()->with("success", "Employee account updated successfully");
+        return back()->with("success", "User updated successfully");
     }
 
-    public function toggleStatus(User $employee): RedirectResponse
+    public function toggleStatus(User $user): RedirectResponse
     {
-        abort_if($employee->company_id !== Auth::user()->company_id, 403);
-
-        $newStatus = $employee->status === "active" ? "locked" : "active";
+        $newStatus = $user->status === "active" ? "locked" : "active";
         $label = $newStatus === "active" ? "activated" : "deactivated";
 
-        $employee->update(["status" => $newStatus]);
+        $user->update(["status" => $newStatus]);
 
-        return back()->with("success", "Employee {$label} successfully");
+        return back()->with("success", "User {$label} successfully");
     }
 
-    public function destroy(User $employee): RedirectResponse
+    public function destroy(User $user): RedirectResponse
     {
-        abort_if($employee->company_id !== Auth::user()->company_id, 403);
+        $user->delete();
 
-        $employee->delete();
-
-        return back()->with("success", "Employee deleted successfully");
+        return back()->with("success", "User deleted successfully");
     }
 
-    public function resetPassword(User $employee): RedirectResponse
+    public function resetPassword(User $user): RedirectResponse
     {
-        abort_if($employee->company_id !== Auth::user()->company_id, 403);
-
-        Password::sendResetLink(["email" => $employee->email]);
+        Password::sendResetLink(["email" => $user->email]);
 
         return back()->with("success", "Password reset link sent successfully");
     }
 
-    public function preview(): Response
+    public function preview(Request $request): Response
     {
-        $slides = Slide::where("company_id", Auth::user()->company_id)
+        $request->validate([
+            "company_id" => ["required", "exists:companies,id"]
+        ]);
+
+        $company = Company::findOrFail($request->company_id);
+
+        $slides = Slide::where("company_id", $company->id)
             ->orderBy("order")
             ->get();
 
         return Inertia::render("Admin/Slides/Preview", [
-            "slides" => $slides
+            "slides" => $slides,
+            "company" => $company
         ]);
     }
 
     public function extensionRequests(): Response
     {
-        $requests = ExtensionRequest::with("user")
-            ->whereHas("user", function ($query) {
-                $query->where("company_id", Auth::user()->company_id);
-            })
+        $requests = ExtensionRequest::with("user.company")
             ->where("status", "pending")
             ->latest("requested_at")
             ->get();
@@ -132,8 +152,6 @@ class EmployeeController extends Controller
 
     public function approveExtension(ExtensionRequest $extensionRequest): RedirectResponse
     {
-        abort_if($extensionRequest->user->company_id !== Auth::user()->company_id, 403);
-
         $extensionRequest->approve();
 
         return back()->with("success", "Extension approved. Employee account reactivated");
@@ -141,10 +159,31 @@ class EmployeeController extends Controller
 
     public function denyExtension(ExtensionRequest $extensionRequest): RedirectResponse
     {
-        abort_if($extensionRequest->user->company_id !== Auth::user()->company_id, 403);
-
         $extensionRequest->deny();
 
         return back()->with("success", "Extension request denied");
+    }
+
+    public function dashboard(): Response
+    {
+        $totalCompanies = Company::count();
+        $totalAdmins = User::where("role", "admin")->count();
+        $totalEmployees = User::where("role", "employee")->count();
+        $completedOrientation = User::where("role", "employee")
+            ->get()
+            ->filter(fn(User $user) => $user->hasCompletedOrientation())
+            ->count();
+        $pendingExtensions = ExtensionRequest::where("status", "pending")->count();
+
+        return Inertia::render("Admin/Dashboard", [
+            "status" => [
+                "totalCompanies" => $totalCompanies,
+                "totalAdmins" => $totalAdmins,
+                "totalEmployees" => $totalEmployees,
+                "completedOrientation" => $completedOrientation,
+                "pendingExtensions" => $pendingExtensions
+            ]
+        ]);
+
     }
 }
