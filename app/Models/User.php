@@ -78,6 +78,10 @@ class User extends Authenticatable
 
     public function hasCompletedOrientation(): bool
     {
+        if (!$this->isEmployee()) {
+            return false;
+        }
+
         if (!$this->relationLoaded("company")) {
             $this->load("company.slides");
         }
