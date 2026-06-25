@@ -1,5 +1,9 @@
+import Master from "../Layout/Master";
+
 export default function Dashboard() {
-  return (
-    <div>Dashboard</div>
-  )
+    return (
+        <Master>
+            <div>Dashboard</div>
+        </Master>
+    );
 }

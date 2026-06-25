@@ -1,5 +1,9 @@
+import Master from "@/Pages/Layout/Master";
+
 export default function Admins() {
-  return (
-    <div>Admins</div>
-  )
+    return (
+        <Master>
+            <div>Admins</div>
+        </Master>
+    );
 }
