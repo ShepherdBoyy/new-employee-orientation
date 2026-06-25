@@ -7,7 +7,6 @@ use App\Models\Company;
 use App\Models\Slide;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -33,6 +32,24 @@ class SlideController extends Controller
             "companies" => $companies,
             "slides" => $slides,
             "selectedCompany" => $selectedCompany
+        ]);
+    }
+
+    public function preview(Request $request): Response
+    {
+        $request->validate([
+            "company_id" => ["required", "exists:companies,id"]
+        ]);
+
+        $company = Company::findOrFail($request->company_id);
+
+        $slides = Slide::where("company_id", $company->id)
+            ->orderBy("order")
+            ->get();
+
+        return Inertia::render("Admin/Slides/Preview", [
+            "slides" => $slides,
+            "company" => $company
         ]);
     }
 

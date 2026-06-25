@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CompanyController;
-use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Controllers\Admin\ExtensionRequestController;
 use App\Http\Controllers\Admin\SlideController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,7 +17,7 @@ Route::middleware("auth")->group(function () {
     Route::post("/logout", [AuthController::class, "logout"])->name("logout");
     
     Route::middleware(["role:admin"])->prefix("admin")->name("admin.")->group(function () {
-        Route::get("/dashboard", fn() => inertia("Admin/Dashboard"))->name("dashboard");
+        Route::get("/dashboard", [AdminController::class, "index"])->name("dashboard");
 
         Route::get("/companies", [CompanyController::class, "index"])->name("companies.index");
         Route::post("/companies", [CompanyController::class, "store"])->name("companies.store");
@@ -23,24 +25,24 @@ Route::middleware("auth")->group(function () {
         Route::patch("/companies/{company}/toggle-status", [CompanyController::class, "toggleStatus"])->name("companies.toggle-status");
         Route::delete("/companies/{company}", [CompanyController::class, "destroy"])->name("companies.destroy");
 
-        Route::get("/slides/preview", [EmployeeController::class, "preview"])->name("slides.preview");
+        Route::get("/slides/preview", [SlideController::class, "preview"])->name("slides.preview");
         Route::get("/slides", [SlideController::class, "index"])->name("slides.index");
         Route::post("/slides", [SlideController::class, "store"])->name("slides.store");
         Route::patch("/slides/reorder", [SlideController::class, "reorder"])->name("slides.reorder");
         Route::delete("/slides/{slide}", [SlideController::class, "destroy"])->name("slides.destroy");
         
-        Route::get("/users/admins", [EmployeeController::class, "admins"])->name("users.admins");
-        Route::get("/users/employees", [EmployeeController::class, "index"])->name("users.employees");
+        Route::get("/users/admins", [UserController::class, "admins"])->name("users.admins");
+        Route::get("/users/employees", [UserController::class, "index"])->name("users.employees");
 
-        Route::post("/users", [EmployeeController::class, "store"])->name("users.store");
-        Route::put("/users/{user}", [EmployeeController::class, "update"])->name("users.update");
-        Route::patch("/users/{user}/toggle-status", [EmployeeController::class, "toggleStatus"])->name("users.toggle-status");
-        Route::delete("/users/{user}", [EmployeeController::class, "destroy"])->name("users.destroy");
-        Route::post("/users/{user}/reset-password", [EmployeeController::class, "resetPassword"])->name("users.reset-password");
+        Route::post("/users", [UserController::class, "store"])->name("users.store");
+        Route::put("/users/{user}", [UserController::class, "update"])->name("users.update");
+        Route::patch("/users/{user}/toggle-status", [UserController::class, "toggleStatus"])->name("users.toggle-status");
+        Route::delete("/users/{user}", [UserController::class, "destroy"])->name("users.destroy");
+        Route::post("/users/{user}/reset-password", [UserController::class, "resetPassword"])->name("users.reset-password");
         
-        Route::get("/extension-requests", [EmployeeController::class, "extensionRequests"])->name("extension-requests.index");
-        Route::patch("/extension-requests/{extensionRequests}/approve", [EmployeeController::class, "approveExtension"])->name("extension-requests.approve");
-        Route::patch("/extension-requests/{extensionRequests}/deny", [EmployeeController::class, "denyExtension"])->name("extension-requests.deny");
+        Route::get("/extension-requests", [ExtensionRequestController::class, "extensionRequests"])->name("extension-requests.index");
+        Route::patch("/extension-requests/{extensionRequests}/approve", [ExtensionRequestController::class, "approveExtension"])->name("extension-requests.approve");
+        Route::patch("/extension-requests/{extensionRequests}/deny", [ExtensionRequestController::class, "denyExtension"])->name("extension-requests.deny");
     });
 
     Route::middleware(["role:employee", "expiry"])->prefix("orientation")->name("employee.")->group(function () {
