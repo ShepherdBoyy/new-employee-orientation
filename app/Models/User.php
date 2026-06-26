@@ -83,17 +83,18 @@ class User extends Authenticatable
         }
 
         if (!$this->relationLoaded("company")) {
-            $this->load("company.slides");
+            $this->load("company");
         }
 
-        $totalSlides = $this->company->slides->pluck("id");
+        $allSlides = $this->company->orientationSlides();
 
-        if ($totalSlides->isEmpty()) {
+        if ($allSlides->isEmpty()) {
             return false;
         }
 
+        $allSlidesIds = $allSlides->pluck("id");
         $acknowledged = $this->acknowledgements()->pluck("slide_id");
 
-        return $totalSlides->diff($acknowledged)->isEmpty();
+        return $allSlidesIds->diff($acknowledged)->isEmpty();
     }
 }
