@@ -13,6 +13,8 @@ import {
     UsersRound,
     SwatchBook,
     BriefcaseBusiness,
+    Projector,
+    CalendarRange,
 } from "lucide-react";
 import SidebarNavItem from "./SideBarNav/SidebarNavItem";
 import SidebarNavGroup from "./SideBarNav/SidebarNavGroup";
@@ -31,6 +33,18 @@ export function AppSidebar() {
             title: "Companies",
             path: "/admin/companies",
             icon: <BriefcaseBusiness absoluteStrokeWidth />,
+        },
+        {
+            type: "link",
+            title: "Slides",
+            path: "/admin/slides",
+            icon: <Projector absoluteStrokeWidth />,
+        },
+        {
+            type: "link",
+            title: "Requests",
+            path: "/admin/extension-requests",
+            icon: <CalendarRange absoluteStrokeWidth />,
         },
         {
             type: "group",
