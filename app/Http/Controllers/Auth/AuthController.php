@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
-use Redirect;
 
 class AuthController extends Controller
 {
@@ -49,7 +48,7 @@ class AuthController extends Controller
     {
         return match($role) {
             "admin" => redirect()->route("admin.dashboard"),
-            "employee" => redirect()->route("employee.dashboard"),
+            "employee" => redirect()->route("employee.orientation"),
             default => redirect()->route("login")
         };
     }
