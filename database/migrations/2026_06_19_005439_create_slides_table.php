@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('slides', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("company_id")->constrained()->cascadeOnDelete();
-            $table->string("image_path");
+            $table->foreignId("company_id")->nullable()->constrained()->nullOnDelete();
+            $table->enum("type", ["image", "video"]);
+            $table->string("file_path");
             $table->unsignedInteger("order")->default(1);
+            $table->boolean("is_global")->default(false);
             $table->timestamps();
         });
     }
