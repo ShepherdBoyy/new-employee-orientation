@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm, router, Head } from "@inertiajs/react";
-import Master from "@/Pages/Layout/Master";
+import Master from "@/Layout/Master";
 interface Company {
     id: number;
     name: string;
@@ -53,7 +53,7 @@ export default function CompaniesIndex({ companies }: Props) {
         <>
             <Head title="Companies" />
             <Master>
-                <div className="max-w-5xl mx-auto p-8 space-y-8">
+                <div className="max-w-7xl mx-auto p-8 space-y-8">
                     <h1 className="text-2xl font-semibold text-gray-800">
                         Companies
                     </h1>

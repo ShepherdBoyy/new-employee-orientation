@@ -1,4 +1,4 @@
-import Master from "@/Pages/Layout/Master";
+import Master from "@/Layout/Master";
 
 export default function Admins() {
     return (
