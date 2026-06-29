@@ -48,8 +48,8 @@ Route::middleware("auth")->group(function () {
         Route::post("/users/{user}/reset-password", [UserController::class, "resetPassword"])->name("users.reset-password");
         
         Route::get("/extension-requests", [ExtensionRequestController::class, "extensionRequests"])->name("extension-requests.index");
-        Route::patch("/extension-requests/{extensionRequests}/approve", [ExtensionRequestController::class, "approveExtension"])->name("extension-requests.approve");
-        Route::patch("/extension-requests/{extensionRequests}/deny", [ExtensionRequestController::class, "denyExtension"])->name("extension-requests.deny");
+        Route::patch("/extension-requests/{extensionRequest}/approve", [ExtensionRequestController::class, "approveExtension"])->name("extension-requests.approve");
+        Route::patch("/extension-requests/{extensionRequest}/deny", [ExtensionRequestController::class, "denyExtension"])->name("extension-requests.deny");
     });
 
     Route::middleware(["role:employee", "expiry"])->prefix("orientation")->name("employee.")->group(function () {
