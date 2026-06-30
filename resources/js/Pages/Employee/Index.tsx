@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/stepper";
 import { Button } from "@/components/ui/button";
 
-export default function Index({ maxFileCount }) {
+export default function Index({ maxFileCount, path }) {
   const steps = Array.from({ length: maxFileCount }, (_, i) => i + 1)
   const [currentStep, setCurrentStep] = useState(1)
   return (
@@ -22,7 +22,7 @@ export default function Index({ maxFileCount }) {
             currentStep === step && (
               <img
                 key={step}
-                src={`/Assets/Images/PMC_NEO/Slide${step}.JPG`}
+                src={ `${path}/Slide${step}.JPG` }
                 alt={`Slide ${step}`}
                 className="rounded-md object-cover w-full"
               />
@@ -42,23 +42,29 @@ export default function Index({ maxFileCount }) {
       </Stepper>
 
       {/* Navigation buttons */}
-      <div className="mt-4 flex  gap-4">
-        
-        <Button
-          variant="secondary"
-          disabled={currentStep === 1}
-          onClick={() => setCurrentStep((s) => s - 1)}
-          size="lg"
-        >
-          Back
-        </Button>
-        <Button
-          disabled={currentStep === steps.length}
-          onClick={() => setCurrentStep((s) => s + 1)}
-          size="lg"
-        >
-          Next
-        </Button>
+      
+
+      <div className="mt-4 flex justify-between">
+        <div className="">
+          <Button>Acknowledgement</Button>
+        </div>
+        <div className="flex gap-4">
+          <Button
+            variant="secondary"
+            disabled={currentStep === 1}
+            onClick={() => setCurrentStep((s) => s - 1)}
+            size="lg"
+          >
+            Back
+          </Button>
+          <Button
+            disabled={currentStep === steps.length}
+            onClick={() => setCurrentStep((s) => s + 1)}
+            size="lg"
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   )

@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\ExtensionRequestController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Employee\OrientationController;
+use App\Http\Controllers\Employee\EmployeeController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware("guest")->group(function () {
@@ -26,17 +26,11 @@ Route::middleware("auth")->group(function () {
         Route::patch("/companies/{company}/toggle-status", [CompanyController::class, "toggleStatus"])->name("companies.toggle-status");
         Route::delete("/companies/{company}", [CompanyController::class, "destroy"])->name("companies.destroy");
 
-        Route::get("/slides/library", [SlideController::class, "library"])->name("slides.library");
-        Route::post("/slides", [SlideController::class, "store"])->name("slides.store");
-        Route::patch("/slides/reorder-library", [SlideController::class, "reorderLibrary"])->name("slides.reorder-library");
-        Route::delete("/slides/{slide}", [SlideController::class, "destroy"])->name("slides.destroy");
-
-        Route::get("/slides/builder", [SlideController::class, "builder"])->name("slides.builder");
-        Route::post("/slides/assign", [SlideController::class, "assignSlide"])->name("slides.assign");
-        Route::post("/slides/unassign", [SlideController::class, "unassignSlide"])->name("slides.unassign");
-        Route::patch("/slides/reorder-company", [SlideController::class, "reorderCompanySlides"])->name("slides.reorder-company");
-
         Route::get("/slides/preview", [SlideController::class, "preview"])->name("slides.preview");
+        Route::get("/slides", [SlideController::class, "index"])->name("slides.index");
+        Route::post("/slides", [SlideController::class, "store"])->name("slides.store");
+        Route::patch("/slides/reorder", [SlideController::class, "reorder"])->name("slides.reorder");
+        Route::delete("/slides/{slide}", [SlideController::class, "destroy"])->name("slides.destroy");
         
         Route::get("/users/admins", [UserController::class, "admins"])->name("users.admins");
         Route::get("/users/employees", [UserController::class, "index"])->name("users.employees");
@@ -48,18 +42,17 @@ Route::middleware("auth")->group(function () {
         Route::post("/users/{user}/reset-password", [UserController::class, "resetPassword"])->name("users.reset-password");
         
         Route::get("/extension-requests", [ExtensionRequestController::class, "extensionRequests"])->name("extension-requests.index");
-        Route::patch("/extension-requests/{extensionRequest}/approve", [ExtensionRequestController::class, "approveExtension"])->name("extension-requests.approve");
-        Route::patch("/extension-requests/{extensionRequest}/deny", [ExtensionRequestController::class, "denyExtension"])->name("extension-requests.deny");
+        Route::patch("/extension-requests/{extensionRequests}/approve", [ExtensionRequestController::class, "approveExtension"])->name("extension-requests.approve");
+        Route::patch("/extension-requests/{extensionRequests}/deny", [ExtensionRequestController::class, "denyExtension"])->name("extension-requests.deny");
     });
 
-    Route::middleware(["role:employee", "expiry"])->prefix("orientation")->name("employee.")->group(function () {
-        Route::get("/", [OrientationController::class, "index"])->name("orientation");
-        Route::post("/acknowledge", [OrientationController::class, "acknowledge"])->name("acknowledge");
-        Route::get("/completed", [OrientationController::class, "completed"])->name("completed");
-    });
+    // Route::middleware(["role:employee", "expiry"])->prefix("orientation")->name("employee.")->group(function () {
+    //     Route::get("/", fn() => inertia("Employee/Orientation"))->name("orientation");
+    //     Route::get("/locked", fn() => inertia("Employee/AccountLocked"))->name("account-locked");
+    // });
 
-    Route::middleware(['role:employee'])->prefix("orientation")->name("employee.")->group(function () {
-        Route::get("/locked", [OrientationController::class, "locked"])->name("account-locked");
-        Route::post("/extension-request", [OrientationController::class, "requestExtension"])->name("extension-request");
-    });
+    
+});
+Route::controller(EmployeeController::class)->group( function () {
+    Route::get('/orientation', 'Index');
 });
