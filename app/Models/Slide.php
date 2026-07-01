@@ -50,7 +50,7 @@ class Slide extends Model
 
     public function scopeLibrary($query)
     {
-        return $query->where("is_global", true)
+        return $query->where("is_global", false)
             ->whereNull("company_id");
     }
 
