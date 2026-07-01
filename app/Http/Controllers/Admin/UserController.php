@@ -53,20 +53,24 @@ class UserController extends Controller
                 Rule::requiredIf($request->role === "employee"),
                 "nullable",
                 "exists:companies,id"
-            ]
+            ],
+            "job_title" => 'required', // No column yet...
+            "field_type" => 'required', // No column yet...
         ]);
 
-        User::create([
-            "name" => $validated["name"],
-            "email" => $validated["email"],
-            "role" => $validated["role"],
-            "company_id" => $validated["role"] === "admin" ? null : $validated["company_id"],
-            "password" => "password",
-            "status" => "active",
-            "expires_at" => $validated["role"] === "employee" ? now()->addHours(24) : null
-        ]);
+        dd($request->all());
 
-        return back()->with("success", "User created successfully");
+        // User::create([
+        //     "name" => $validated["name"],
+        //     "email" => $validated["email"],
+        //     "role" => $validated["role"],
+        //     "company_id" => $validated["role"] === "admin" ? null : $validated["company_id"],
+        //     "password" => "password",
+        //     "status" => "active",
+        //     "expires_at" => $validated["role"] === "employee" ? now()->addHours(24) : null
+        // ]);
+
+        // return back()->with("success", "User created successfully");
     }
 
     public function update(Request $request, User $user): RedirectResponse

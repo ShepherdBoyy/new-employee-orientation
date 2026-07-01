@@ -2,6 +2,38 @@ import { useState } from 'react'
 import { useForm, router, Head } from '@inertiajs/react'
 import Master from '@/Layout/Master'
 
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+
+
+
 interface Company {
     id: number
     name: string
@@ -25,8 +57,30 @@ interface Props {
 export default function Employees({ employees, companies }: Props) {
     const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null)
 
-    const createForm = useForm({ name: '', email: '', role: 'employee', company_id: '' })
+    const createForm = useForm({ name: '', email: '', role: 'employee', company_id: '', job_title: '', field_type: '' })
     const editForm   = useForm({ name: '', email: '', company_id: '' })
+
+    const [open, setOpen] = useState<boolean>(false);
+    const [value, setValue] = useState<string>("");
+
+    const jobs = [
+        {
+            label: "Graphics Artist",
+            value: "ga",
+        },
+        {
+            label: "Information Technology",
+            value: "it",
+        },
+        {
+            label: "Regulatory",
+            value: "reg",
+        },
+        {
+            label: "Sales",
+            value: "sa",
+        }
+    ];
 
     function handleCreate(e: React.FormEvent) {
         e.preventDefault()
@@ -82,7 +136,7 @@ export default function Employees({ employees, companies }: Props) {
                         <form onSubmit={handleCreate} className="grid grid-cols-3 gap-3 items-end">
                             <div>
                                 <label className="block text-sm text-gray-600 mb-1">Name</label>
-                                <input
+                                <Input
                                     type="text"
                                     value={createForm.data.name}
                                     onChange={e => createForm.setData('name', e.target.value)}
@@ -93,7 +147,7 @@ export default function Employees({ employees, companies }: Props) {
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-600 mb-1">Email</label>
-                                <input
+                                <Input
                                     type="email"
                                     value={createForm.data.email}
                                     onChange={e => createForm.setData('email', e.target.value)}
@@ -104,17 +158,83 @@ export default function Employees({ employees, companies }: Props) {
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-600 mb-1">Company</label>
-                                <select
-                                    value={createForm.data.company_id}
-                                    onChange={e => createForm.setData('company_id', e.target.value)}
-                                    className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-                                >
-                                    <option value="">Select company</option>
-                                    {companies.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                </select>
+                                <Select value={createForm.data.company_id} onValueChange={value => createForm.setData('company_id', value)}>
+                                    <SelectTrigger className="w-full max-w-48">
+                                    <SelectValue placeholder="Select a company" />
+                                    </SelectTrigger>
+                                    <SelectContent position="popper">
+                                        <SelectGroup>
+                                            {companies.map((c) => (
+                                                // Ensure value is cast to a string for Shadcn compatibility
+                                                <SelectItem key={c.id} value={String(c.id)}>
+                                                    {c.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
                                 {createForm.errors.company_id && <p className="text-red-500 text-xs mt-1">{createForm.errors.company_id}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm text-gray-600 mb-1">Job Title</label>
+                                <Popover onOpenChange={setOpen} open={open}>
+                                    <PopoverTrigger asChild>
+                                    <Button
+                                        aria-expanded={open}
+                                        className="w-full justify-between border-input bg-background px-3 font-normal outline-none outline-offset-0 hover:bg-background focus-visible:outline-[3px]"
+                                        role="combobox"
+                                        variant="outline"
+                                    >
+                                        <span className={cn("truncate", !value && "text-muted-foreground")}>
+                                        {value
+                                            ? jobs.find((jobs) => jobs.value === value)
+                                                ?.label
+                                            : "Select job title"}
+                                        </span>
+                                    </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent
+                                    align="start"
+                                    className="w-full min-w-[var(--radix-popper-anchor-width)] border-input p-0"
+                                    >
+                                    <Command>
+                                        <CommandInput placeholder="Search job title..." />
+                                        <CommandList>
+                                        <CommandEmpty>No job title found.</CommandEmpty>
+                                        <CommandGroup>
+                                            {jobs.map((jobs) => (
+                                            <CommandItem
+                                                key={jobs.value}
+                                                onSelect={(currentValue) => {
+                                                setValue(currentValue === value ? "" : currentValue);
+                                                setOpen(false);
+                                                }}
+                                                value={jobs.value}
+                                            >
+                                                {jobs.label}
+                                            </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                        </CommandList>
+                                    </Command>
+                                    </PopoverContent>
+                                </Popover>
+                                {createForm.errors.job_title && <p className="text-red-500 text-xs mt-1">{createForm.errors.job_title}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm text-gray-600 mb-1">Field Type</label>
+                                <Select>
+                                    <SelectTrigger className="w-full max-w-48">
+                                        <SelectValue placeholder="Select employee field" />
+                                    </SelectTrigger>
+                                    <SelectContent position="popper">
+                                        <SelectGroup>
+                                            <SelectItem value="1">Field Base</SelectItem>
+                                            <SelectItem value="2">Non Field Base</SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                                {createForm.errors.field_type && <p className="text-red-500 text-xs mt-1">{createForm.errors.field_type}</p>}
                             </div>
                             <div className="col-span-3 flex justify-end">
                                 <button
