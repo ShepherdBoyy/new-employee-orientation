@@ -1,4 +1,4 @@
-import { Company } from "../Index";
+import { Company, COMPANY_THEMES } from "../Index";
 import CompanyCardActions from "./CompanyCardActions";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
@@ -14,16 +14,11 @@ export default function CompanyCard({
     onDelete,
 }: CompanyCardProps) {
     return (
-        <Card className="overflow-hidden">
+        <Card className="">
             {/* Header Area */}
-            <CardHeader className="relative h-32 border-b ">
-                <div
-                    className="absolute inset-0"
-                    style={{
-                        backgroundColor: company.header_color,
-                    }}
-                />
-
+            <CardHeader
+                className={`relative h-32 border-b ${COMPANY_THEMES[company.header_theme]}`}
+            >
                 <div className="absolute top-1 right-2 z-10">
                     <CompanyCardActions
                         company={company}
