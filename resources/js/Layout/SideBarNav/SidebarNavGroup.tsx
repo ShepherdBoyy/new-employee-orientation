@@ -68,7 +68,7 @@ export default function SidebarNavGroup({ item }: SidebarGroupNavProps) {
                         </TooltipContent>
                     )}
                 </Tooltip>
-                <CollapsibleContent className="ml-5 border-l">
+                <CollapsibleContent className="ml-5 border-l group-data-[collapsible=icon]:border-l-0">
                     {item.items.map((child, i) => {
                         const isActive = url.startsWith(child.path);
                         return (

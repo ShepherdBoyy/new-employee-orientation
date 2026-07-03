@@ -5,11 +5,15 @@ import {
     SidebarTrigger,
     SidebarInset,
 } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import { usePage } from "@inertiajs/react";
+
 type MasterProps = {
     children: React.ReactNode;
 };
 
 export default function Master({ children }: MasterProps) {
+    const url = usePage();
     return (
         <>
             <TooltipProvider>
@@ -17,15 +21,14 @@ export default function Master({ children }: MasterProps) {
                     <SidebarProvider>
                         <AppSidebar />
                         <SidebarInset className="">
-                            <div className="w-full">
-                                <header>
-                                    <div className="h-14 px-4 py-6 flex items-center border-b w-full">
-                                        <SidebarTrigger />
-                                    </div>
-                                </header>
+                            <header className="flex h-14 px-4 border-b shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+                                <div className="flex items-center gap-2 mt-2">
+                                    <SidebarTrigger />
+                                    <Separator orientation="vertical" />
+                                </div>
+                            </header>
 
-                                <main className="flex-1 p-6">{children}</main>
-                            </div>
+                            <main className="flex-1 p-6">{children}</main>
                         </SidebarInset>
                     </SidebarProvider>
                 </div>

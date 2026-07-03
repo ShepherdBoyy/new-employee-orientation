@@ -14,7 +14,7 @@ class Company extends Model
         "slug",
         "logo_path",
         "status",
-        "header_color"
+        "header_theme"
     ];
 
     protected function casts(): array
