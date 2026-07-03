@@ -34,12 +34,7 @@ export function AppSidebar() {
             path: "/admin/companies",
             icon: <BriefcaseBusiness absoluteStrokeWidth />,
         },
-        {
-            type: "link",
-            title: "Slides",
-            path: "/admin/slides",
-            icon: <Projector absoluteStrokeWidth />,
-        },
+
         {
             type: "link",
             title: "Requests",
@@ -48,14 +43,25 @@ export function AppSidebar() {
         },
         {
             type: "group",
+            title: "Slides",
+            icon: <Projector absoluteStrokeWidth />,
+            items: [
+                {
+                    title: "Library",
+                    path: "/admin/slides/library",
+                },
+            ],
+        },
+        {
+            type: "group",
             title: "Users",
             items: [
                 {
-                    title: "Admins",
+                    title: "Admin",
                     path: "/admin/users/admins",
                 },
                 {
-                    title: "Employees",
+                    title: "Employee",
                     path: "/admin/users/employees",
                 },
             ],
