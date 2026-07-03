@@ -17,7 +17,7 @@ Route::middleware("guest")->group(function () {
 Route::middleware("auth")->group(function () {
     Route::post("/logout", [AuthController::class, "logout"])->name("logout");
     
-    Route::middleware(["role:admin"])->prefix("admin")->name("admin.")->group(function () {
+    Route::middleware("role:admin")->prefix("admin")->name("admin.")->group(function () {
         Route::get("/dashboard", [AdminController::class, "index"])->name("dashboard");
 
         Route::get("/companies", [CompanyController::class, "index"])->name("companies.index");
@@ -25,12 +25,6 @@ Route::middleware("auth")->group(function () {
         Route::put("/companies/{company}", [CompanyController::class, "update"])->name("companies.update");
         Route::patch("/companies/{company}/toggle-status", [CompanyController::class, "toggleStatus"])->name("companies.toggle-status");
         Route::delete("/companies/{company}", [CompanyController::class, "destroy"])->name("companies.destroy");
-
-        Route::get("/slides/preview", [SlideController::class, "preview"])->name("slides.preview");
-        Route::get("/slides", [SlideController::class, "index"])->name("slides.index");
-        Route::post("/slides", [SlideController::class, "store"])->name("slides.store");
-        Route::patch("/slides/reorder", [SlideController::class, "reorder"])->name("slides.reorder");
-        Route::delete("/slides/{slide}", [SlideController::class, "destroy"])->name("slides.destroy");
         
         Route::get("/users/admins", [UserController::class, "admins"])->name("users.admins");
         Route::get("/users/employees", [UserController::class, "index"])->name("users.employees");
@@ -46,12 +40,9 @@ Route::middleware("auth")->group(function () {
         Route::patch("/extension-requests/{extensionRequests}/deny", [ExtensionRequestController::class, "denyExtension"])->name("extension-requests.deny");
     });
 
-    // Route::middleware(["role:employee", "expiry"])->prefix("orientation")->name("employee.")->group(function () {
-    //     Route::get("/", fn() => inertia("Employee/Orientation"))->name("orientation");
-    //     Route::get("/locked", fn() => inertia("Employee/AccountLocked"))->name("account-locked");
-    // });
-
-    
+    Route::middleware(["role:employee", "expiry"])->prefix("orientation")->name("employee.")->group(function () {
+        Route::get("/locked", fn() => inertia("Employee/AccountLocked"))->name("account-locked");
+    });
 });
 Route::controller(EmployeeController::class)->group( function () {
     Route::get('/orientation', 'Index');
