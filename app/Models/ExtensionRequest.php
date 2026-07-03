@@ -26,11 +26,6 @@ class ExtensionRequest extends Model
         ];
     }
 
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public function isPending(): bool
     {
         return $this->status === "pending";
@@ -70,5 +65,10 @@ class ExtensionRequest extends Model
             "status" => "denied",
             "resolved_at" => now()
         ]);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

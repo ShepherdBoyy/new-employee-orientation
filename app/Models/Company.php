@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class Company extends Model
 {
@@ -21,32 +22,44 @@ class Company extends Model
         return ["status" => "string"];
     }
 
+    public function supportsType(string $employeeType): bool
+    {
+        return $this->employeeTypes()
+                    ->where("employee_type", $employeeType)
+                    ->exists();
+    }
+
+    public function foldersForEmployee(User $user): Collection
+    {
+        $targetedFolderIds = FolderTarget::forEmployee($user)
+            ->orderBy("order")
+            ->pluck("folder_id");
+        
+        return Folder::whereIn("id", $targetedFolderIds)
+            ->get()
+            ->sortBy(function ($folder) use ($targetedFolderIds) {
+                return array_search($folder->id, $targetedFolderIds->toArray());
+            })
+            ->values();
+    }
+
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }
 
-    public function companySlides(): BelongsToMany
+    public function employeeTypes(): HasMany
     {
-        return $this->belongsToMany(Slide::class, "company_slides")
-            ->withPivot("order")
-            ->withTimestamps()
-            ->orderByPivot("order");
+        return $this->hasMany(CompanyEmployeeType::class);
     }
 
-    public function ownSlides(): HasMany
+    public function jobPositions(): HasMany
     {
-        return $this->hasMany(Slide::class)->orderBy("order");
+        return $this->hasMany(JobPosition::class);
     }
 
-    public function orientationSlides()
+    public function folderTargets(): HasMany
     {
-        $companySlides = $this->companySlides;
-
-        $globalSlides = Slide::global()
-            ->orderBy("order")
-            ->get();
-        
-        return $companySlides->concat($globalSlides);
+        return $this->hasMany(FolderTarget::class);
     }
 }
