@@ -27,7 +27,8 @@ class CompanyController extends Controller
     {
         $validated = $request->validate([
             "name" => ["required", "string", "max:255"],
-            "logo_path" => ["nullable", "image", "max:2048"]
+            "logo_path" => ["nullable", "image", "max:3048"],
+            "header_color" => ["required", "string"]
         ]);
 
         $logoPath = null;
@@ -40,7 +41,8 @@ class CompanyController extends Controller
             "name" => $validated["name"],
             "slug" => Str::slug($validated["name"]),
             "logo_path" => $logoPath,
-            "status" => "active"
+            "status" => "active",
+            "header_color" => $validated["header_color"]
         ]);
 
         return back()->with("success", "Company created successfully");
@@ -50,7 +52,8 @@ class CompanyController extends Controller
     {
         $validated = $request->validate([
             "name" => ["required", "string", "max:255"],
-            "logo_path" => ["nullable", "image", "max:2048"]
+            "logo_path" => ["nullable", "image", "max:3048"],
+            "header_color" => ["required", "string"]
         ]);
 
         $logoPath = $company->logoPath;
@@ -62,7 +65,8 @@ class CompanyController extends Controller
         $company->update([
             "name" => $validated["name"],
             "slug" => Str::slug($validated["name"]),
-            "logo_path" => $logoPath
+            "logo_path" => $logoPath,
+            "header_color" => $validated["header_color"]
         ]);
 
         return back()->with("success", "Company updated successfully");

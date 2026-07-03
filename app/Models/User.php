@@ -95,6 +95,6 @@ class User extends Authenticatable
         $allSlidesIds = $allSlides->pluck("id");
         $acknowledged = $this->acknowledgements()->pluck("slide_id");
 
-        return $allSlidesIds->diff($acknowledged)->isEmpty();
+        return $allSlidesIds->diff($acknowledged)->isEmpty();   
     }
 }
