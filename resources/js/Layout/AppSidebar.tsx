@@ -15,6 +15,7 @@ import {
     BriefcaseBusiness,
     Projector,
     CalendarRange,
+    ToolCase,
 } from "lucide-react";
 import SidebarNavItem from "./SideBarNav/SidebarNavItem";
 import SidebarNavGroup from "./SideBarNav/SidebarNavGroup";
@@ -28,24 +29,27 @@ export function AppSidebar() {
             path: "/admin/dashboard",
             icon: <LayoutDashboard absoluteStrokeWidth />,
         },
-        {
-            type: "link",
-            title: "Job Position",
-            path: "/admin/job-positions",
-            icon: <BriefcaseBusiness absoluteStrokeWidth />,
-        },
-        {
-            type: "link",
-            title: "Companies",
-            path: "/admin/companies",
-            icon: <BriefcaseBusiness absoluteStrokeWidth />,
-        },
 
         {
             type: "link",
             title: "Requests",
             path: "/admin/extension-requests",
             icon: <CalendarRange absoluteStrokeWidth />,
+        },
+        {
+            type: "group",
+            title: "Organization",
+            icon: <BriefcaseBusiness absoluteStrokeWidth />,
+            items: [
+                {
+                    title: "Companies",
+                    path: "/admin/companies",
+                },
+                {
+                    title: "Job Positions",
+                    path: "/admin/job-positions",
+                },
+            ],
         },
         {
             type: "group",
