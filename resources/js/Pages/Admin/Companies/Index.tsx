@@ -16,6 +16,7 @@ import EditCompanyDialog from "./component/EditCompanyDialog";
 import CompanyCard from "./component/CompanyCard";
 
 export const COMPANY_THEMES = {
+    default :"#2563eb",
     lush_fields: "bg-gradient-to-r from-[#5DA92F] to-[#9BD46A]",
 
     ocean_dust: "bg-gradient-to-r from-[#9BB2E5] to-[#698CBF]",
@@ -51,12 +52,12 @@ export default function CompaniesIndex({ companies }: Props) {
     const createForm = useForm({
         name: "",
         logo_path: null as File | null,
-        header_theme: "#2563eb",
+        header_theme: null,
     });
     const editForm = useForm({
         name: "",
         logo_path: null as File | null,
-        header_theme: "#2563eb",
+        header_theme: null,
     });
 
     function handleCreate(e: React.FormEvent) {

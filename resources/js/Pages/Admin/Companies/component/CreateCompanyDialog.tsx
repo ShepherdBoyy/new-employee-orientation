@@ -115,6 +115,9 @@ export default function CreateCompanyDialog({
                                     Choose a distinct color for your company
                                 </FieldDescription>
                             </Field>
+                            {form.errors.header_theme && (
+                                <FieldError>{form.errors.header_theme}</FieldError>
+                            )}
                         </FieldGroup>
 
                         <DialogFooter>

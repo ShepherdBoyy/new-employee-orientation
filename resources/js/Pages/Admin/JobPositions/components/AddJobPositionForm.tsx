@@ -25,7 +25,6 @@ interface Props {
 export default function AddJobPositionForm({ companies }: Props) {
     const form = useForm({
         company_ids: [] as number[],
-        employee_type: "",
         name: "",
     });
 

@@ -22,6 +22,7 @@ class JobPositionController extends Controller
             ->get();
 
         $companies = Company::where("status", "active")
+            ->with("jobs")
             ->get(["id", "name"]);
         
         return Inertia::render("Admin/JobPositions/Index", [
@@ -33,11 +34,12 @@ class JobPositionController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            "company_id" => ["required", "exists:companies,id"],
             "name" => ["required", "string", "max:255"]
         ]);
 
-        JobPosition::create($validated);
+        $jobPosition = JobPosition::create($validated);
+
+        $jobPosition->companies()->sync($request->company_ids);
 
         return back()->with("success", "Job position created successfully");
     }

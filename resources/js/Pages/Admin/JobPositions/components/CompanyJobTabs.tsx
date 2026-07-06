@@ -23,14 +23,14 @@ export default function CompanyJobTabs({ companies }: Props) {
         <Tabs defaultValue={companies[0].slug} className="w-full">
             <TabsList>
                 {companies.map((company) => (
-                    <TabsTrigger key={company.id} value={company.slug}>
+                    <TabsTrigger key={company.id} value={String(company.id)}>
                         {company.name}
                     </TabsTrigger>
                 ))}
             </TabsList>
 
             {companies.map((company) => (
-                <TabsContent key={company.id} value={company.slug}>
+                <TabsContent key={company.id} value={String(company.id)}>
                     <div className="space-y-2">
                         {company.jobs?.length ? (
                             company.jobs.map((job) => (
