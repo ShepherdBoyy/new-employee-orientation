@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useForm, router, Head } from '@inertiajs/react'
+import Master from '@/Layout/Master'
+
 
 interface EmployeeType {
     id: number
@@ -95,8 +97,8 @@ export default function JobPositionsIndex({ companies }: Props) {
 
     return (
         <>
-            <Head title="Job Positions" />
-            <div className="max-w-6xl mx-auto p-8 space-y-8">
+           <Master>
+<div className="max-w-6xl mx-auto p-8 space-y-8">
                 <h1 className="text-2xl font-semibold text-gray-800">Job Positions</h1>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -306,6 +308,8 @@ export default function JobPositionsIndex({ companies }: Props) {
                     </div>
                 </div>
             )}
+           </Master>
+            
         </>
     )
 }
