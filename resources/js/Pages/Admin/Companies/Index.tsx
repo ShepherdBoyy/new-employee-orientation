@@ -9,16 +9,7 @@ import {
     EmptyMedia,
     EmptyTitle,
 } from "@/components/ui/empty";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogDescription,
-    DialogTitle,
-    DialogFooter,
-} from "@/components/ui/dialog";
+import { BrushCleaning } from "lucide-react";
 import DeleteCompanyDialog from "./component/DeleteCompanyDialog";
 import CreateCompanyDialog from "./component/CreateCompanyDialog";
 import EditCompanyDialog from "./component/EditCompanyDialog";
@@ -161,10 +152,15 @@ export default function CompaniesIndex({ companies }: Props) {
                     <>
                         <Empty className="h-full">
                             <EmptyHeader>
-                                <EmptyMedia variant="icon"></EmptyMedia>
-                                <EmptyTitle>Company is Empty</EmptyTitle>
+                                <EmptyMedia variant="icon">
+                                    <BrushCleaning className="" />
+                                </EmptyMedia>
+                                <EmptyTitle className="text-3xl">
+                                    No companies found
+                                </EmptyTitle>
                                 <EmptyDescription>
-                                    Add companies here to get started
+                                    Add your first company to start setting up
+                                    your workspace.
                                 </EmptyDescription>
                             </EmptyHeader>
                             <EmptyContent>
