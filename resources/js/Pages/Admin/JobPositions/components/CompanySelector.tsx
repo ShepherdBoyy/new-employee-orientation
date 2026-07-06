@@ -3,11 +3,7 @@ import {
     Field,
     FieldContent,
     FieldDescription,
-    FieldError,
-    FieldGroup,
     FieldLabel,
-    FieldLegend,
-    FieldSet,
     FieldTitle,
 } from "@/components/ui/field";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -62,7 +58,7 @@ export default function CompanySelector({
                     <Field orientation="horizontal">
                         <FieldContent>
                             <div className="flex items-center gap-3">
-                                <Avatar>
+                                <Avatar className="h-10 w-10">
                                     <AvatarImage
                                         src={`/storage/${company.logo_path}`}
                                     />
