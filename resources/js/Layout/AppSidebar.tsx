@@ -30,6 +30,12 @@ export function AppSidebar() {
         },
         {
             type: "link",
+            title: "Job Position",
+            path: "/admin/job-positions",
+            icon: <BriefcaseBusiness absoluteStrokeWidth />,
+        },
+        {
+            type: "link",
             title: "Companies",
             path: "/admin/companies",
             icon: <BriefcaseBusiness absoluteStrokeWidth />,

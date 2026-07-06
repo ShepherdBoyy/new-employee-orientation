@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\ExtensionRequestController;
+use App\Http\Controllers\Admin\JobPositionController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
@@ -25,6 +26,8 @@ Route::middleware("auth")->group(function () {
         Route::put("/companies/{company}", [CompanyController::class, "update"])->name("companies.update");
         Route::patch("/companies/{company}/toggle-status", [CompanyController::class, "toggleStatus"])->name("companies.toggle-status");
         Route::delete("/companies/{company}", [CompanyController::class, "destroy"])->name("companies.destroy");
+
+        Route::get("/job-positions", [JobPositionController::class, "index"])->name("job-positions.index");
         
         Route::get("/users/admins", [UserController::class, "admins"])->name("users.admins");
         Route::get("/users/employees", [UserController::class, "index"])->name("users.employees");
