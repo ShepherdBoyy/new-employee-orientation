@@ -17,70 +17,24 @@ class JobPositionController extends Controller
 {
     public function index(): Response
     {
-        $companies = Company::where("status", "active")
-            ->with(["employeeTypes", "jobPositions"])
+        $positions = JobPosition::orderBy("name")
+            ->with("companies")
             ->get();
+
+        $companies = Company::where("status", "active")
+            ->get(["id", "name"]);
         
         return Inertia::render("Admin/JobPositions/Index", [
-            "companies" => $companies
+            "companies" => $companies,
+            "positions" => $positions
         ]);
-    }
-
-    public function storeEmployeeType(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            "company_id" => ["required", "exists:companies,id"],
-            "employee_type" => ["required", Rule::in(["office", "field"])]
-        ]);
-
-        $alreadyExists = CompanyEmployeeType::where("company_id", $validated["company_id"])
-            ->where("employee_type", $validated["employee_type"])
-            ->exists();
-        
-        if ($alreadyExists) {
-            return back()->withErrors([
-                "employee_type" => "This employee type already exists for this company"
-            ]);
-        }
-
-        CompanyEmployeeType::create($validated);
-
-        return back()->with("success", "Employee type added successfully");
-    }
-
-    public function destroyEmployeeType(CompanyEmployeeType $employeeType): RedirectResponse
-    {
-        $employeeType->delete();
-
-        return back()->with("success", "Employee type removed successfully");
     }
 
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             "company_id" => ["required", "exists:companies,id"],
-            "employee_type" => [
-                "required",
-                Rule::in(["office", "field"]),
-                function ($attribute, $value, $fail) use ($request) {
-                    $typeExists = CompanyEmployeeType::where("company_id", $request->company_id)
-                        ->where("employee_type", $value)
-                        ->exists();
-                    
-                    if (!$typeExists) {
-                        $fail("This employee type is not configured for the selected company");
-                    }
-                }
-            ],
-            "name" => [
-                "required",
-                "string",
-                "max:255",
-                Rule::unique("job_positions")->where(function ($query) use ($request) {
-                    return $query->where("company_id", $request->company_id)
-                                 ->where("employee_type", $request->employee_type);
-                })
-            ]
+            "name" => ["required", "string", "max:255"]
         ]);
 
         JobPosition::create($validated);
@@ -91,16 +45,7 @@ class JobPositionController extends Controller
     public function update(Request $request, JobPosition $jobPosition): RedirectResponse
     {
         $validated = $request->validate([
-            "name" => [
-                "required",
-                "string",
-                "max:255",
-                Rule::unique("job_positions")
-                    ->where(function ($query) use ($jobPosition) {
-                        return $query->where("company_id", $jobPosition->company_id)
-                                     ->where("employee_type", $jobPosition->employee_type);
-                    })->ignore($jobPosition->id)
-            ]
+            "name" => ["required", "string", "max:255"]
         ]);
 
         $jobPosition->update(["name" => $validated["name"]]);
@@ -119,20 +64,14 @@ class JobPositionController extends Controller
     {
         $validated = $request->validate([
             "company_id" => ["required", "exists:companies,id"],
-            "employee_type" => ["required", Rule::in(["office", "field"])]
         ]);
 
         $positions = JobPosition::forCompany($validated["company_id"])
-            ->forType($validated["employee_type"])
             ->orderBy("name")
             ->get(["id", "name"]);
         
-        $types = CompanyEmployeeType::where("company_id", $validated["company_id"])
-            ->get(['employee_type']);
-        
         return response()->json([
             "positions" => $positions,
-            "types" => $types
         ]);
     }
 }

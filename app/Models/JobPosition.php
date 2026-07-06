@@ -11,25 +11,12 @@ class JobPosition extends Model
 {
     protected $fillable = [
         "company_id",
-        "employee_type",
         "name"
     ];
-
-    protected function casts(): array
-    {
-        return [
-            "employee_type" => "string"
-        ];
-    }
 
     public function scopeForCompany($query, int $companyId): void
     {
         $query->where("company_id", $companyId);
-    }
-
-    public function scopeForType($query, string $employeeType): void
-    {
-        $query->where("employee_type", $employeeType);
     }
 
     public function company(): BelongsTo
