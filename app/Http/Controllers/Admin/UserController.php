@@ -30,7 +30,6 @@ class UserController extends Controller
     {
         $employees = User::where("role", "employee")
             ->with("company")
-            ->withCount("acknowledgements")
             ->latest()
             ->get();
         

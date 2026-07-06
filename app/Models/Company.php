@@ -22,13 +22,6 @@ class Company extends Model
         return ["status" => "string"];
     }
 
-    public function supportsType(string $employeeType): bool
-    {
-        return $this->employeeTypes()
-                    ->where("employee_type", $employeeType)
-                    ->exists();
-    }
-
     public function foldersForEmployee(User $user): Collection
     {
         $targetedFolderIds = FolderTarget::forEmployee($user)
@@ -48,23 +41,18 @@ class Company extends Model
         return $this->hasMany(User::class);
     }
 
-    public function employeeTypes(): HasMany
+    public function jobPositions(): BelongsToMany
     {
-        return $this->hasMany(CompanyEmployeeType::class);
-    }
-
-    public function jobPositions(): HasMany
-    {
-        return $this->hasMany(JobPosition::class);
+        return $this->belongsToMany(
+            JobPosition::class,
+            "company_jobs",
+            "company_id",
+            "job_id"
+        )->withTimestamps();
     }
 
     public function folderTargets(): HasMany
     {
         return $this->hasMany(FolderTarget::class);
-    }
-
-    public function jobs(): BelongsToMany
-    {
-        return $this->belongsToMany(JobPosition::class);
     }
 }

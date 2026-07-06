@@ -10,7 +10,6 @@ class FolderTarget extends Model
     protected $fillable = [
         "folder_id",
         "company_id",
-        "employee_type",
         "job_position_id",
         "order"
     ];
@@ -19,7 +18,6 @@ class FolderTarget extends Model
     {
         return [
             'order' => "integer",
-            "employee_type" => "string"
         ];
     }
     
@@ -30,10 +28,6 @@ class FolderTarget extends Model
                 ->orWhereNull("company_id");
         })
         ->where(function ($q) use ($user) {
-            $q->where("employee_type", $user->employee_type)
-                ->orWhereNull("job_position_id");
-        })
-        ->where(function ($q) use ($user) {
             $q->where("job_position_id", $user->job_position_id)
                 ->orWhereNull("job_position_id");
         });
@@ -42,14 +36,12 @@ class FolderTarget extends Model
     public function scopeGlobal($query): void
     {
         $query->whereNull("company_id")
-              ->whereNull("employee_type")
               ->whereNull("job_position_id");
     }
 
     public function isGlobal(): bool
     {
         return $this->company_id === null
-            && $this->employee_type === null
             && $this->job_position_id === null;
     }
 
@@ -65,12 +57,6 @@ class FolderTarget extends Model
             $parts[] = $this->company?->name ?? "Unknown company";
         } else {
             $parts[] = "All companies";
-        }
-
-        if ($this->employee_type) {
-            $parts[] = ucfirst($this->employee_type) . "-based";
-        } else {
-            $parts[] = "All types";
         }
 
         if ($this->job_position_id) {

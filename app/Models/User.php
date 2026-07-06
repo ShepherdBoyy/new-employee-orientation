@@ -19,7 +19,6 @@ class User extends Authenticatable
         "password",
         "role",
         "status",
-        "employee_type",
         "job_position_id",
         "expires_at"
     ];
@@ -36,7 +35,6 @@ class User extends Authenticatable
             "expires_at" => "datetime",
             "status" => "string",
             "role" => "string",
-            "employee_type" => "string"
         ];
     }
 
@@ -48,16 +46,6 @@ class User extends Authenticatable
     public function isEmployee(): bool
     {
         return $this->role === "employee";
-    }
-
-    public function isOfficeBased(): bool
-    {
-        return $this->employee_type === "office";
-    }
-
-    public function isFieldBased(): bool
-    {
-        return $this->employee_type === "field";
     }
 
     public function isActive(): bool

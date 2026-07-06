@@ -12,15 +12,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId("folder_id")->constrained()->cascadeOnDelete();
             $table->foreignId("company_id")->nullable()->constrained()->cascadeOnDelete();
-            $table->enum("employee_type", ["office", "field"])->nullable();
             $table->foreignId("job_position_id")->nullable()->constrained()->nullOnDelete();
             $table->unsignedInteger("order")->default(1);
             $table->timestamps();
 
-            $table->unique(
-                ["folder_id", "company_id", "employee_type", "job_position_id"],
-                "folder_targets_unique"
-            );
+            $table->unique(["folder_id", "company_id", "job_position_id"]);
         });
     }
     

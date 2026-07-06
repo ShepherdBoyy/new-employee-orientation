@@ -15,7 +15,6 @@ return new class extends Migration
             $table->string("email")->unique();
             $table->string("password");
             $table->enum("role", ["admin", "employee"]);
-            $table->enum("employee_type", ["office", "field"])->nullable();
             $table->foreignId("job_position_id")->nullable()->constrained()->nullOnDelete();
             $table->enum("status", ['active', "locked"])->default("active");
             $table->timestamp("expires_at")->nullable();
