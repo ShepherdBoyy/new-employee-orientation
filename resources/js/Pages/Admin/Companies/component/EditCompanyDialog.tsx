@@ -2,7 +2,7 @@ import type { Company } from "../Index";
 import { COMPANY_THEMES } from "../Index";
 import { UseFormReturn } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import {
     Field,
     FieldDescription,
@@ -138,23 +138,28 @@ export default function EditCompanyDialog({
                                 </div>
                             </Field>
                         </FieldGroup>
-                        <Field orientation="horizontal" className="justify-end">
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                type="button"
-                                onClick={onClose}
+                        <DialogFooter>
+                            <Field
+                                orientation="horizontal"
+                                className="justify-end"
                             >
-                                Cancel
-                            </Button>
-                            <Button
-                                size="lg"
-                                type="submit"
-                                disabled={form.processing}
-                            >
-                                Save Changes
-                            </Button>
-                        </Field>
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    type="button"
+                                    onClick={onClose}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    size="lg"
+                                    type="submit"
+                                    disabled={form.processing}
+                                >
+                                    Save Changes
+                                </Button>
+                            </Field>
+                        </DialogFooter>
                     </form>
                 </FieldSet>
             </DialogContent>

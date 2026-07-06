@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -40,7 +41,7 @@ export default function CreateCompanyDialog({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
-                <Button size="lg">Add Company</Button>
+                <Button size="lg">New Company</Button>
             </DialogTrigger>
             <DialogContent>
                 <FieldSet className="">
@@ -83,11 +84,10 @@ export default function CreateCompanyDialog({
                                             e.target.files?.[0] ?? null,
                                         )
                                     }
-                                    className=""
                                 />
                             </Field>
                             <Field className="space-y-2">
-                                <FieldLabel>Header Color</FieldLabel>
+                                <FieldLabel>Theme</FieldLabel>
 
                                 <div className="flex gap-3">
                                     {Object.entries(COMPANY_THEMES).map(
@@ -104,7 +104,7 @@ export default function CreateCompanyDialog({
                                                 className={`h-12 w-12 rounded-full border transition ${classes}${
                                                     form.data.header_theme ===
                                                     key
-                                                        ? "ring-2 ring-primary scale-110"
+                                                        ? "ring-2 ring-primary scale-120"
                                                         : ""
                                                 }`}
                                             />
@@ -117,23 +117,28 @@ export default function CreateCompanyDialog({
                             </Field>
                         </FieldGroup>
 
-                        <Field orientation="horizontal" className="justify-end">
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                type="button"
-                                onClick={onClose}
+                        <DialogFooter>
+                            <Field
+                                orientation="horizontal"
+                                className="justify-end"
                             >
-                                Cancel
-                            </Button>
-                            <Button
-                                size="lg"
-                                type="submit"
-                                disabled={form.processing}
-                            >
-                                {form.processing ? "Creating" : "Submit"}
-                            </Button>
-                        </Field>
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    type="button"
+                                    onClick={onClose}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    size="lg"
+                                    type="submit"
+                                    disabled={form.processing}
+                                >
+                                    {form.processing ? "Creating" : "Submit"}
+                                </Button>
+                            </Field>
+                        </DialogFooter>
                     </form>
                 </FieldSet>
             </DialogContent>
