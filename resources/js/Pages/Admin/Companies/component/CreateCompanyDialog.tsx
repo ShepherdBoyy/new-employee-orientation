@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -43,12 +44,15 @@ export default function CreateCompanyDialog({
             <DialogTrigger asChild>
                 <Button size="lg">New Company</Button>
             </DialogTrigger>
+
             <DialogContent>
-                <FieldSet className="">
-                    <FieldLegend>New Company</FieldLegend>
-                    <FieldDescription>
+                <DialogHeader>
+                    <DialogTitle>New Company</DialogTitle>
+                    <DialogDescription>
                         Provide the basic details of your company.
-                    </FieldDescription>
+                    </DialogDescription>
+                </DialogHeader>
+                <FieldSet className="">
                     <form onSubmit={onSubmit} className="space-y-4">
                         <FieldGroup>
                             <Field>
@@ -101,7 +105,7 @@ export default function CreateCompanyDialog({
                                                         key,
                                                     )
                                                 }
-                                                className={`h-12 w-12 rounded-full border transition ${classes}${
+                                                className={`h-10 w-10 rounded-full border transition ${classes}${
                                                     form.data.header_theme ===
                                                     key
                                                         ? "ring-2 ring-primary scale-120"
@@ -116,7 +120,9 @@ export default function CreateCompanyDialog({
                                 </FieldDescription>
                             </Field>
                             {form.errors.header_theme && (
-                                <FieldError>{form.errors.header_theme}</FieldError>
+                                <FieldError>
+                                    {form.errors.header_theme}
+                                </FieldError>
                             )}
                         </FieldGroup>
 

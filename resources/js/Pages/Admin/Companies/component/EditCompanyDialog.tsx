@@ -2,7 +2,14 @@ import type { Company } from "../Index";
 import { COMPANY_THEMES } from "../Index";
 import { UseFormReturn } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import {
     Field,
     FieldDescription,
@@ -44,8 +51,13 @@ export default function EditCompanyDialog({
             }}
         >
             <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Edit Company</DialogTitle>
+                    <DialogDescription>
+                        Edit company details and click save
+                    </DialogDescription>
+                </DialogHeader>
                 <FieldSet>
-                    <FieldLegend>Edit Company</FieldLegend>
                     <form onSubmit={onSubmit} className="space-y-4">
                         <FieldGroup>
                             <Field>

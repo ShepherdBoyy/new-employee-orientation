@@ -16,7 +16,7 @@ export default function CompanyCard({
     return (
         <Card className="">
             {/* Header Area */}
-            <CardHeader
+            <div
                 className={`relative h-32 border-b ${COMPANY_THEMES[company.header_theme]}`}
             >
                 <div className="absolute top-1 right-2 z-10">
@@ -38,13 +38,15 @@ export default function CompanyCard({
                     alt={company.name}
                     className="absolute -bottom-8 right-6 h-16 w-16 rounded-full border-4 border-background object-cover bg-background z-10"
                 />
+            </div>
+            <CardHeader>
+                <CardContent className="pt-12">
+                    <p className="text-sm text-muted-foreground">
+                        New Employee Orientation
+                    </p>
+                </CardContent>
             </CardHeader>
             {/* Body */}
-            <CardContent className="pt-12">
-                <p className="text-sm text-muted-foreground">
-                    New Employee Orientation
-                </p>
-            </CardContent>
         </Card>
     );
 }
