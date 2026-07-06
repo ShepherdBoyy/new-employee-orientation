@@ -28,6 +28,12 @@ Route::middleware("auth")->group(function () {
         Route::delete("/companies/{company}", [CompanyController::class, "destroy"])->name("companies.destroy");
 
         Route::get("/job-positions", [JobPositionController::class, "index"])->name("job-positions.index");
+        Route::post('/job-positions', [JobPositionController::class, 'store'])->name('job-positions.store');
+        Route::put('/job-positions/{jobPosition}', [JobPositionController::class, 'update'])->name('job-positions.update');
+        Route::delete('/job-positions/{jobPosition}', [JobPositionController::class, 'destroy'])->name('job-positions.destroy');
+        Route::post('/employee-types', [JobPositionController::class, 'storeEmployeeType'])->name('employee-types.store');
+        Route::delete('/employee-types/{employeeType}', [JobPositionController::class, 'destroyEmployeeType'])->name('employee-types.destroy');
+        Route::get('/job-positions/by-company-type', [JobPositionController::class, 'getByCompanyAndType'])->name('job-positions.by-company-type');
         
         Route::get("/users/admins", [UserController::class, "admins"])->name("users.admins");
         Route::get("/users/employees", [UserController::class, "index"])->name("users.employees");
