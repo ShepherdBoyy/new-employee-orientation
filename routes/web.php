@@ -40,10 +40,10 @@ Route::middleware("auth")->group(function () {
         Route::patch("/folders/reorder", [FolderController::class, "reorder"])->name("folders.reorder");
         Route::delete("/folders/{folder}", [FolderController::class, "destroy"])->name("folders.destroy");
 
-        Route::get("/folders/{folder}", [FolderController::class, "show"])->name("folders.show");
-        Route::post("/folders/{folder}/slides", [FolderController::class, "storeSlide"])->name("folders.slide.store");
-        Route::patch("/folders/{folder}/slides/reorder", [FolderController::class, "reorderSlides"])->name("folders.slides.reorder");
-        Route::delete("/folders/{folder}/slides/{slide}", [FolderController::class, "destroySlides"])->name("folders.slides.destroy");
+        Route::get("/folders/{folder}", [SlideController::class, "index"])->name("folders.slide.index");
+        Route::post("/folders/{folder}/slides", [SlideController::class, "store"])->name("folders.slide.store");
+        Route::patch("/folders/{folder}/slides/reorder", [SlideController::class, "reorder"])->name("folders.slides.reorder");
+        Route::delete("/folders/{folder}/slides/{slide}", [SlideController::class, "destroy"])->name("folders.slides.destroy");
 
         Route::get("/folder-targets", [FolderTargetController::class, "index"])->name("folder-targets.index");
         Route::post("/folder-targets", [FolderTargetController::class, "store"])->name("folder-targets.store");

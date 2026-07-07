@@ -53,13 +53,17 @@ export function AppSidebar() {
         },
         {
             type: "group",
-            title: "Slides",
+            title: "Presentation",
             icon: <Projector absoluteStrokeWidth />,
             items: [
                 {
-                    title: "Library",
-                    path: "/admin/slides/library",
+                    title: "Folder",
+                    path: "/admin/folders",
                 },
+                {
+                    title: "Assignment",
+                    path: "/admin/folder-targets"
+                }
             ],
         },
         {
