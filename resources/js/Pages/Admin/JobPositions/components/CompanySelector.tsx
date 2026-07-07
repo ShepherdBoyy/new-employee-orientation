@@ -57,7 +57,7 @@ export default function CompanySelector({
             <FieldDescription>
                 Assign this position to one or more companies.
             </FieldDescription>
-            <FieldLabel className="p-2">
+            <FieldLabel>
                 <Field orientation="horizontal">
                     <FieldContent>
                         <FieldTitle>Select All Companies</FieldTitle>
@@ -75,7 +75,7 @@ export default function CompanySelector({
             </FieldLabel>
 
             {companies.map((company) => (
-                <FieldLabel key={company.id} className="p-2">
+                <FieldLabel key={company.id} className="">
                     <Field orientation="horizontal">
                         <FieldContent>
                             <div className="flex items-center gap-3">

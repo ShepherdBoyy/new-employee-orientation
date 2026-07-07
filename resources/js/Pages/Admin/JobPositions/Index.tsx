@@ -45,23 +45,9 @@ export default function JobPositionsIndex({ companies }: Props) {
     return (
         <>
             <Master>
-                <div className="space-y-6">
+                <div className="grid lg:grid-cols-[420px_1fr] gap-3 items-start">
                     <AddJobPositionForm companies={companies} />
                     <CompanyJobTabs companies={companies} />
-                    {/*  <div className="space-y-4">
-                        {companies.map((company) => (
-                            <CompanyPositionsCard
-                                key={company.id}
-                                company={company}
-                                onEditPosition={setEditingPosition}
-                            />
-                        ))}
-                        {companies.length === 0 && (
-                            <p className="text-sm text-slate-400 text-center py-8">
-                                No companies found. Create a company first.
-                            </p>
-                        )}
-                    </div> */}
                 </div>
             </Master>
 
