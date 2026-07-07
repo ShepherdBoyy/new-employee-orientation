@@ -156,7 +156,7 @@ export default function CompaniesIndex({ companies }: Props) {
                                 <EmptyMedia variant="icon">
                                     <BrushCleaning className="" />
                                 </EmptyMedia>
-                                <EmptyTitle className="text-3xl">
+                                <EmptyTitle className="text-2xl">
                                     No companies found
                                 </EmptyTitle>
                                 <EmptyDescription>
