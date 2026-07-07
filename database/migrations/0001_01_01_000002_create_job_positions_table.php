@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('job_positions', function (Blueprint $table) {
             $table->id();
-            $table->string("name")->unique();
-            $table->timestamps();
+            $table->foreignId('company_id')->references('id')->on('companies')->onCascade('delete');
+            $table->string("name");
         });
     }
 

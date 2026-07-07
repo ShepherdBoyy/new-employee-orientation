@@ -9,8 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class JobPosition extends Model
 {
+    public $timestamps = false;
+    
     protected $fillable = [
+        "company_id",
         "name"
+    ];
+
+    protected $casts = [
+        'company_id' => 'array',
     ];
 
     public function users(): HasMany
@@ -21,9 +28,5 @@ class JobPosition extends Model
     public function folderTargets(): HasMany
     {
         return $this->hasMany(FolderTarget::class);
-    }
-    public function companies(): BelongsToMany
-    {
-        return $this->belongsToMany(Company::class);
     }
 }

@@ -12,13 +12,12 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
-
+use Illuminate\Support\Facades\DB;
 class JobPositionController extends Controller
 {
     public function index(): Response
     {
         $positions = JobPosition::orderBy("name")
-            ->with("companies")
             ->get();
 
         $companies = Company::where("status", "active")
@@ -33,15 +32,35 @@ class JobPositionController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $duplicateCheck = false;
         $validated = $request->validate([
+            "company_ids" => "required",
             "name" => ["required", "string", "max:255"]
         ]);
 
-        $jobPosition = JobPosition::create($validated);
+        // 1. Pull the array of company IDs out of the validated data
+        $companyIds = $validated['company_ids'];
 
-        $jobPosition->companies()->sync($request->company_ids);
+        // 2. Loop through each company ID and create a separate database row
+        foreach ($companyIds as $id) {
+            if (DB::table('job_positions')->where('company_id', $id)->where('name', $validated['name'])->doesntExist()) {
+                JobPosition::create([
+                    'name'       => $validated['name'],
+                    'company_id' => $id, // Assigns the single ID for this row
+                ]);
+            } else {
+                $duplicateCheck = true;
+                break;
+            }
+        }
 
-        return back()->with("success", "Job position created successfully");
+        if($duplicateCheck){
+            return back()->withErrors("Job position failed successfully");
+        } else {
+            return back()->with("success", "Job position created successfully");
+        }
+
+        
     }
 
     public function update(Request $request, JobPosition $jobPosition): RedirectResponse
