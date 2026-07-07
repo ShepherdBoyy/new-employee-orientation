@@ -138,7 +138,7 @@ export default function EditCompanyDialog({
                                                         key,
                                                     )
                                                 }
-                                                className={`h-12 w-12 rounded-full border transition ${classes}${
+                                                className={`h-10 w-10 rounded-full border transition ${classes}${
                                                     form.data.header_theme ===
                                                     key
                                                         ? "ring-2 ring-primary scale-110"
