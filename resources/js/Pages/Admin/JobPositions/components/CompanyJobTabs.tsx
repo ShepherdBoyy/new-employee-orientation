@@ -18,7 +18,7 @@ type Props = {
 
 export default function CompanyJobTabs({ companies }: Props) {
     if (!companies.length) return null;
-
+    console.log(companies);
     return (
         <Tabs defaultValue={companies[0].slug} className="w-full">
             <TabsList>

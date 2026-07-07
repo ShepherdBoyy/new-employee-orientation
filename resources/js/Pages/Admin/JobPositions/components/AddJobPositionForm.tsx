@@ -2,7 +2,15 @@ import { useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FieldDescription, FieldLegend, FieldSet } from "@/components/ui/field";
+import { Badge } from "@/components/ui/badge";
+import {
+    FieldDescription,
+    FieldLegend,
+    FieldSet,
+    Field,
+    FieldLabel,
+    FieldError,
+} from "@/components/ui/field";
 import CompanySelector from "./CompanySelector";
 
 interface Company {
@@ -27,7 +35,6 @@ export default function AddJobPositionForm({ companies }: Props) {
         company_ids: [] as number[],
         name: "",
     });
-
     const selectedCompany = companies.filter((company) =>
         form.data.company_ids.includes(company.id),
     );
@@ -43,14 +50,6 @@ export default function AddJobPositionForm({ companies }: Props) {
         );
     }
 
-    /*   function handleCompanyChange(value: string) {
-        form.setData({
-            company_ids: value,
-            employee_type: "",
-            name: "",
-        });
-    } */
-
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         form.post("/admin/job-positions", {
@@ -65,12 +64,13 @@ export default function AddJobPositionForm({ companies }: Props) {
         >
             <div className="space-y-1">
                 <FieldSet>
-                    <FieldLegend>Add Job Position</FieldLegend>
+                    <FieldLegend>New Job Position</FieldLegend>
                     <FieldDescription>
-                        This appears on invoices and emails.
+                        Create a reusable job position and assign it to one or
+                        more companies.
                     </FieldDescription>
-                    <div className="space-y-1">
-                        <Label>Position Name</Label>
+                    <Field className="space-y-1">
+                        <FieldLabel>Position Name</FieldLabel>
                         <Input
                             value={form.data.name}
                             onChange={(e) =>
@@ -78,12 +78,9 @@ export default function AddJobPositionForm({ companies }: Props) {
                             }
                             placeholder="e.g. Software Engineer"
                         />
-                        {form.errors.name && (
-                            <p className="text-xs text-red-500">
-                                {form.errors.name}
-                            </p>
-                        )}
-                    </div>
+
+                        <FieldError>{form.errors.name}</FieldError>
+                    </Field>
 
                     <CompanySelector
                         companies={companies}
@@ -91,9 +88,18 @@ export default function AddJobPositionForm({ companies }: Props) {
                         onChange={(ids) => form.setData("company_ids", ids)}
                     />
                 </FieldSet>
-                <Button type="submit" disabled={form.processing}>
-                    {form.processing ? "Adding..." : "Add Position"}
-                </Button>
+                <Field>
+                    <Button
+                        type="submit"
+                        disabled={
+                            form.processing ||
+                            !form.data.name.trim() ||
+                            form.data.company_ids.length === 0
+                        }
+                    >
+                        {form.processing ? "Adding..." : "Add Position"}
+                    </Button>
+                </Field>
             </div>
         </form>
     );

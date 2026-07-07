@@ -28,6 +28,19 @@ export default function CompanySelector({
     selected,
     onChange,
 }: CompanySelectorProps) {
+    const allCompanyIds = companies.map((company) => company.id);
+
+    const allSelected =
+        companies.length > 0 && selected.length === companies.length;
+
+    const someSelected = selected.length > 0 && !allSelected;
+    function toggleAll() {
+        if (allSelected) {
+            onChange([]);
+        } else {
+            onChange(allCompanyIds);
+        }
+    }
     function toggle(companyId: number) {
         const exists = selected.includes(companyId);
 
@@ -39,22 +52,30 @@ export default function CompanySelector({
     }
 
     return (
-        <Field orientation="vertical" className="w-full">
+        <Field orientation="vertical" className="w-full ">
             <FieldLabel>Select Companies</FieldLabel>
             <FieldDescription>
                 Assign this position to one or more companies.
             </FieldDescription>
+            <FieldLabel className="p-2">
+                <Field orientation="horizontal">
+                    <FieldContent>
+                        <FieldTitle>Select All Companies</FieldTitle>
+                        <FieldDescription>
+                            {selected.length} of {companies.length} companies
+                            selected.
+                        </FieldDescription>
+                    </FieldContent>
+
+                    <Checkbox
+                        checked={allSelected}
+                        onCheckedChange={toggleAll}
+                    />
+                </Field>
+            </FieldLabel>
+
             {companies.map((company) => (
-                <FieldLabel
-                    key={company.id}
-                    className="
-                        rounded-lg
-                        border
-                        p-3
-                        hover:bg-muted/50
-                        cursor-pointer
-                    "
-                >
+                <FieldLabel key={company.id} className="p-2">
                     <Field orientation="horizontal">
                         <FieldContent>
                             <div className="flex items-center gap-3">
