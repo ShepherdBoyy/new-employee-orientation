@@ -41,9 +41,9 @@ class Company extends Model
         return $this->hasMany(User::class);
     }
 
-    public function jobs(): hasMany
+    public function jobs(): BelongsToMany
     {
-        return $this->hasMany(JobPosition::class);
+        return $this->belongsToMany(JobPosition::class);
     }
 
     public function folderTargets(): HasMany

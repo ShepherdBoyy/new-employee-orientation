@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class JobPosition extends Model
 {
     public $timestamps = false;
-    
+
     protected $fillable = [
         "company_id",
         "name"
@@ -28,5 +29,10 @@ class JobPosition extends Model
     public function folderTargets(): HasMany
     {
         return $this->hasMany(FolderTarget::class);
+    }
+
+    public function companies(): BelongsToMany
+    {
+        return $this->belongsToMany(Company::class);
     }
 }
