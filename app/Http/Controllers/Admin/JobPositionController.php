@@ -21,10 +21,10 @@ class JobPositionController extends Controller
             ->get();
 
         $companies = Company::where("status", "active")
-            ->with("jobs")
-            ->get(["id", "name"]);
+            ->with('jobs')
+            ->get(["id", "name", "logo_path"]);
         
-        return Inertia::render("Admin/JobPositions/Index", [
+        return Inertia::render("Admin/JobPositions/Assignment/Index", [
             "companies" => $companies,
             "positions" => $positions
         ]);
@@ -93,5 +93,10 @@ class JobPositionController extends Controller
         return response()->json([
             "positions" => $positions,
         ]);
+    }
+
+    public function allJobsIndex(): Response
+    {
+        return Inertia::render("Admin/JobPositions/AllJobs/Index");
     }
 }
