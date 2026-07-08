@@ -6,34 +6,23 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
     Empty,
     EmptyHeader,
-    EmptyMedia,
     EmptyTitle,
     EmptyDescription,
     EmptyContent,
 } from "@/components/ui/empty";
-import { BrushCleaning } from "lucide-react";
-import CreateCompanyDialog from "../../Companies/component/CreateCompanyDialog";
-
-type Job = {
-    id: number;
-    name: string;
-};
-
-type Company = {
-    id: number;
-    name: string;
-    slug: string;
-    jobs?: Job[];
-};
+import type { CompanyWithJobs } from "../../../Types/company";
+import type { JobPosition } from "../../../Types/job-position";
 
 type Props = {
-    companies: Company[];
+    companies: CompanyWithJobs[];
+    onEdit: (job: JobPosition) => void;
 };
 
-export default function CompanyJobTabs({ companies }: Props) {
+export default function CompanyJobTabs({ companies, onEdit }: Props) {
     if (!companies.length) return null;
     console.log(companies);
     return (
@@ -65,23 +54,28 @@ export default function CompanyJobTabs({ companies }: Props) {
                             key={company.id}
                             value={String(company.id)}
                         >
-                            <div className="space-y-3">
+                            <div className="space-y-2">
                                 {company.jobs?.length ? (
                                     company.jobs.map((job) => (
                                         <Card key={job.id} className="mt-4">
-                                            <CardContent className="flex items-center justify-between p-3">
-                                                <div>
-                                                    <p className="font-medium">
-                                                        {job.name}
-                                                    </p>
-
+                                            <CardHeader>
+                                                <CardTitle>
+                                                    {job.name}
+                                                </CardTitle>
+                                                <CardDescription>
                                                     <p className="text-sm text-muted-foreground">
                                                         Employee Position
                                                     </p>
-                                                </div>
+                                                </CardDescription>
 
-                                                {/* JobActions goes here later */}
-                                            </CardContent>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => onEdit(job)}
+                                                >
+                                                    Edit
+                                                </Button>
+                                            </CardHeader>
                                         </Card>
                                     ))
                                 ) : (

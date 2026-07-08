@@ -1,40 +1,13 @@
 import { useState } from "react";
-import { Head } from "@inertiajs/react";
 import AddJobPositionForm from "./components/AddJobPositionForm";
-import CompanyPositionsCard from "./components/CompanyPositionsCard";
 import CompanyJobTabs from "./components/CompanyJobTabs";
 import EditJobPositionDialog from "./components/EditJobPositionDialog";
 import Master from "@/Layout/Master";
-
-interface Company {
-    id: number;
-    name: string;
-    slug: string;
-    logo_path: string | null;
-    status: "active" | "inactive";
-    users_count?: number;
-}
-
-interface JobPosition {
-    id: number;
-    company_id: number;
-    employee_type: "office" | "field";
-    name: string;
-}
-
-interface CompanyEmployeeType {
-    id: number;
-    company_id: number;
-    employee_type: "office" | "field";
-}
-
-interface CompanyWithData extends Company {
-    employee_types: CompanyEmployeeType[];
-    job_positions: JobPosition[];
-}
+import type { JobPosition } from "../../Types/job-position";
+import type { CompanyWithJobs } from "../../Types/company";
 
 interface Props {
-    companies: CompanyWithData[];
+    companies: CompanyWithJobs[];
 }
 
 export default function JobPositionsIndex({ companies }: Props) {
@@ -47,12 +20,16 @@ export default function JobPositionsIndex({ companies }: Props) {
             <Master>
                 <div className="grid lg:grid-cols-[420px_1fr] gap-3 items-start">
                     <AddJobPositionForm companies={companies} />
-                    <CompanyJobTabs companies={companies} />
+                    <CompanyJobTabs
+                        companies={companies}
+                        onEdit={setEditingPosition}
+                    />
                 </div>
             </Master>
 
             <EditJobPositionDialog
                 position={editingPosition}
+                companies={companies}
                 onClose={() => setEditingPosition(null)}
             />
         </>

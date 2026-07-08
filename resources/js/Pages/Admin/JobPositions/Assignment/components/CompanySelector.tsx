@@ -53,7 +53,7 @@ export default function CompanySelector({
 
     return (
         <Field orientation="vertical" className="w-full ">
-            <FieldLabel>Select Companies</FieldLabel>
+            <FieldLabel>Assign Companies</FieldLabel>
             <FieldDescription>
                 Assign this position to one or more companies.
             </FieldDescription>

@@ -1,59 +1,68 @@
+import { useEffect } from "react";
 import { useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import {
-    FieldDescription,
-    FieldLegend,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+    DialogDescription,
+} from "@/components/ui/dialog";
+import {
     FieldSet,
+    FieldLegend,
+    FieldDescription,
     Field,
     FieldLabel,
     FieldError,
-    FieldSeparator,
 } from "@/components/ui/field";
 import CompanySelector from "./CompanySelector";
+import type { Company } from "../../../Types/company";
+import type { JobPosition } from "../../../Types/job-position";
 
-interface Company {
-    id: number;
-    name: string;
-    slug: string;
-    logo_path: string | null;
-    status: "active" | "inactive";
-    users_count?: number;
+interface EditJobPositionDialogProps {
+    position: JobPosition | null;
+    companies: Company[];
+    onClose: () => void;
 }
 
-interface CompanyWithTypes extends Company {
-    employee_types: { id: number; employee_type: "office" | "field" }[];
-}
+export default function EditJobPositionDialog({
+    position,
+    onClose,
+    companies,
+}: EditJobPositionDialogProps) {
+    const form = useForm({ name: "", company_ids: [] as number[] });
+    console.log(position);
+    useEffect(() => {
+        if (!position) return;
 
-interface Props {
-    companies: CompanyWithTypes[];
-}
-
-export default function AddJobPositionForm({ companies }: Props) {
-    const form = useForm({
-        company_ids: [] as number[],
-        name: "",
-    });
+        form.setData({
+            name: position.name,
+            company_ids: [position.company_ids],
+        });
+    }, [position]);
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        form.post("/admin/job-positions", {
-            onSuccess: () => form.reset(),
+        form.put(`/admin/job-positions/${position?.id}`, {
+            onSuccess: () => onClose(),
         });
     }
 
     return (
-        <Card>
-            <CardContent>
+        <Dialog open={!!position} onOpenChange={onClose}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Edit Job Position</DialogTitle>
+                    <DialogDescription>
+                        Update the position name and assigned companies.
+                    </DialogDescription>
+                </DialogHeader>
                 <form onSubmit={handleSubmit} className="max-w-md ">
                     <div className="space-y-1">
                         <FieldSet>
-                            <FieldLegend>New Job Position</FieldLegend>
-                            <FieldDescription>
-                                Create a reusable job position and assign it to
-                                one or more companies.
-                            </FieldDescription>
                             <Field className="space-y-1">
                                 <FieldLabel>Position Name</FieldLabel>
                                 <Input
@@ -75,21 +84,27 @@ export default function AddJobPositionForm({ companies }: Props) {
                             />
                         </FieldSet>
 
-                        <Field className="mt-4">
+                        <Field className="">
                             <Button
-                                type="submit"
                                 disabled={
-                                    form.processing ||
                                     !form.data.name.trim() ||
                                     form.data.company_ids.length === 0
                                 }
                             >
-                                {form.processing ? "Adding..." : "Add Position"}
+                                Save Changes
                             </Button>
                         </Field>
                     </div>
+
+                    <DialogFooter>
+                        <Button variant="outline" onClick={onClose}>
+                            Cancel
+                        </Button>
+
+                        <Button>Save Changes</Button>
+                    </DialogFooter>
                 </form>
-            </CardContent>
-        </Card>
+            </DialogContent>
+        </Dialog>
     );
 }
