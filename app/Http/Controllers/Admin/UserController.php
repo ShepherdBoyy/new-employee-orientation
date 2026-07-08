@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\ExtensionRequest;
 use App\Models\User;
+use App\Models\JobPosition;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -26,19 +27,26 @@ class UserController extends Controller
         ]);
     }
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $companyId = $request->company_id ?? '';
+
         $employees = User::where("role", "employee")
             ->with("company")
             ->latest()
             ->get();
         
-        $companies = Company::where("status", "active")        
-            ->get(["id", "name"]);
+        $companies = Company::where("status", "active")
+        ->get(["id", "name"]);
+
+        $jobs = JobPosition::whereHas('companies', function ($query) use ($companyId) {
+            $query->where('companies.id', $companyId);
+        })->with('companies')->get();
 
         return Inertia::render("Admin/Users/Employees", [
             "employees" => $employees,
-            "companies" => $companies
+            "companies" => $companies,
+            "jobs" => $jobs
         ]);
     }
 
@@ -47,29 +55,26 @@ class UserController extends Controller
         $validated = $request->validate([
             "name" => ["required", "string", "max:255"],
             "email" => ["required", "email", "unique:users,email"],
-            "role" => ["required", Rule::in(["admin", "employee"])],
-            "company_id" => [
-                Rule::requiredIf($request->role === "employee"),
-                "nullable",
-                "exists:companies,id"
-            ],
-            "job_title" => 'required', // No column yet...
-            "field_type" => 'required', // No column yet...
+            "company_id" => "required",
+            "job_id" => 'required',
+        ],
+        [
+            'company_id.required' => 'The company field is required.',
+            'job_id.required' => 'The job title field is required.'
         ]);
 
-        dd($request->all());
+        User::create([
+            "name" => $validated["name"],
+            "email" => $validated["email"],
+            "role" => $request->role,
+            "company_id" => $validated["company_id"],
+            "job_position_id" => $validated['job_id'],
+            "password" => "password",
+            "status" => "active",
+            "expires_at" => $request->role === "employee" ? now()->addHours(24) : null
+        ]);
 
-        // User::create([
-        //     "name" => $validated["name"],
-        //     "email" => $validated["email"],
-        //     "role" => $validated["role"],
-        //     "company_id" => $validated["role"] === "admin" ? null : $validated["company_id"],
-        //     "password" => "password",
-        //     "status" => "active",
-        //     "expires_at" => $validated["role"] === "employee" ? now()->addHours(24) : null
-        // ]);
-
-        // return back()->with("success", "User created successfully");
+        return back()->with("success", "User created successfully");
     }
 
     public function update(Request $request, User $user): RedirectResponse

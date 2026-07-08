@@ -18,6 +18,7 @@
         "vite": "^8.0.0"
     },
     "dependencies": {
+        "@base-ui/react": "^1.6.0",
         "@fontsource-variable/geist": "^5.2.9",
         "@inertiajs/react": "^3.4.0",
         "@inertiajs/vite": "^3.4.0",

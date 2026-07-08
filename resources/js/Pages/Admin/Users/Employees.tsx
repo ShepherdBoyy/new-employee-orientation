@@ -14,25 +14,13 @@ import {
 } from "@/components/ui/select"
 
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-
-import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-
-
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox"
 
 interface Company {
     id: number
@@ -49,38 +37,27 @@ interface Employee {
     company: Company | null
 }
 
+interface Job {
+    id: number
+    name: string
+}
+
 interface Props {
     employees: Employee[]
     companies: Company[]
+    jobs: Job[]
 }
 
-export default function Employees({ employees, companies }: Props) {
+export default function Employees({ employees, companies, jobs }: Props) {
     const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null)
 
-    const createForm = useForm({ name: '', email: '', role: 'employee', company_id: '', job_title: '', field_type: '' })
+    const createForm = useForm({ name: '', email: '', role: 'employee', company_id: '', job_id: '' })
     const editForm   = useForm({ name: '', email: '', company_id: '' })
 
-    const [open, setOpen] = useState<boolean>(false);
-    const [value, setValue] = useState<string>("");
+    const [selectedJobId, setSelectedJobId] = useState<string>("");
 
-    const jobs = [
-        {
-            label: "Graphics Artist",
-            value: "ga",
-        },
-        {
-            label: "Information Technology",
-            value: "it",
-        },
-        {
-            label: "Regulatory",
-            value: "reg",
-        },
-        {
-            label: "Sales",
-            value: "sa",
-        }
-    ];
+    // Find the selected job object from your array to display its name
+    const selectedJobName = jobs.find(job => String(job.id) === selectedJobId)?.name || "";
 
     function handleCreate(e: React.FormEvent) {
         e.preventDefault()
@@ -111,7 +88,7 @@ export default function Employees({ employees, companies }: Props) {
 
     function handleResetPassword(employee: Employee) {
         if (confirm(`Send password reset link to ${employee.email}?`)) {
-            router.post(`/admin/users/${employee.id}/reset-password`)
+            router.post(`/admin/users/${employee.id}/resset-password`)
         }
     }
 
@@ -119,6 +96,22 @@ export default function Employees({ employees, companies }: Props) {
         if (confirm(`Delete ${employee.name}? This cannot be undone.`)) {
             router.delete(`/admin/users/${employee.id}`)
         }
+    }
+
+    function handleCompany (value) {
+        createForm.setData('company_id', value)
+        router.visit('/admin/users/employees', {
+            method: "get",
+            data: {
+                company_id: value
+            },
+            preserveState: true,
+        });
+    }
+
+    function handleJob(value) {
+        setSelectedJobId(value)
+        createForm.setData('job_id', value)
     }
 
     return (
@@ -158,8 +151,8 @@ export default function Employees({ employees, companies }: Props) {
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-600 mb-1">Company</label>
-                                <Select value={createForm.data.company_id} onValueChange={value => createForm.setData('company_id', value)}>
-                                    <SelectTrigger className="w-full max-w-48">
+                                <Select value={createForm.data.company_id} onValueChange={value => handleCompany(value)}>
+                                    <SelectTrigger className="w-full max-w-xl8">
                                     <SelectValue placeholder="Select a company" />
                                     </SelectTrigger>
                                     <SelectContent position="popper">
@@ -177,57 +170,39 @@ export default function Employees({ employees, companies }: Props) {
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-600 mb-1">Job Title</label>
-                                <Popover onOpenChange={setOpen} open={open}>
-                                    <PopoverTrigger asChild>
-                                    <Button
-                                        aria-expanded={open}
-                                        className="w-full justify-between border-input bg-background px-3 font-normal outline-none outline-offset-0 hover:bg-background focus-visible:outline-[3px]"
-                                        role="combobox"
-                                        variant="outline"
-                                    >
-                                        <span className={cn("truncate", !value && "text-muted-foreground")}>
-                                        {value
-                                            ? jobs.find((jobs) => jobs.value === value)
-                                                ?.label
-                                            : "Select job title"}
-                                        </span>
-                                    </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent
-                                    align="start"
-                                    className="w-full min-w-[var(--radix-popper-anchor-width)] border-input p-0"
-                                    >
-                                    <Command>
-                                        <CommandInput placeholder="Search job title..." />
-                                        <CommandList>
-                                        <CommandEmpty>No job title found.</CommandEmpty>
-                                        <CommandGroup>
-                                            {jobs.map((jobs) => (
-                                            <CommandItem
-                                                key={jobs.value}
-                                                onSelect={(currentValue) => {
-                                                setValue(currentValue === value ? "" : currentValue);
-                                                setOpen(false);
-                                                }}
-                                                value={jobs.value}
-                                            >
-                                                {jobs.label}
-                                            </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                        </CommandList>
-                                    </Command>
-                                    </PopoverContent>
-                                </Popover>
-                                {createForm.errors.job_title && <p className="text-red-500 text-xs mt-1">{createForm.errors.job_title}</p>}
+
+                                <Combobox
+                                    items={jobs}
+                                    value={selectedJobId}
+                                    onValueChange={(val) => handleJob(val)}
+                                >
+                                    {/* Explicitly pass the display value to the input field */}
+                                    <ComboboxInput 
+                                    placeholder="Select a job" 
+                                    value={selectedJobName} 
+                                    />
+                                    
+                                    <ComboboxContent>
+                                        <ComboboxEmpty>No items found.</ComboboxEmpty>
+                                        <ComboboxList>
+                                            {(job) => (
+                                            <ComboboxItem key={job.id} value={String(job.id)}>
+                                                {job.name}
+                                            </ComboboxItem>
+                                            )}
+                                        </ComboboxList>
+                                    </ComboboxContent>
+                                </Combobox>
+                                
+                                {createForm.errors.job_id && <p className="text-red-500 text-xs mt-1">{createForm.errors.job_id}</p>}
                             </div>
-                            <div>
+                            {/* <div>
                                 <label className="block text-sm text-gray-600 mb-1">Field Type</label>
-                                <Select>
-                                    <SelectTrigger className="w-full max-w-48">
+                                <Select >
+                                    <SelectTrigger className="w-full max-w-xl8" >
                                         <SelectValue placeholder="Select employee field" />
                                     </SelectTrigger>
-                                    <SelectContent position="popper">
+                                    <SelectContent position="popper" className="w-full max-w-xl">
                                         <SelectGroup>
                                             <SelectItem value="1">Field Base</SelectItem>
                                             <SelectItem value="2">Non Field Base</SelectItem>
@@ -235,7 +210,7 @@ export default function Employees({ employees, companies }: Props) {
                                     </SelectContent>
                                 </Select>
                                 {createForm.errors.field_type && <p className="text-red-500 text-xs mt-1">{createForm.errors.field_type}</p>}
-                            </div>
+                            </div> */}
                             <div className="col-span-3 flex justify-end">
                                 <button
                                     type="submit"
