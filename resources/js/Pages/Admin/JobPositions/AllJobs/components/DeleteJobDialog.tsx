@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Trash2Icon } from "lucide-react";
 import { JobPosition } from "@/Pages/Admin/Types/job-position";
+import { router } from "@inertiajs/react";
 
 type Props = {
     job: JobPosition | null;
@@ -18,7 +19,17 @@ type Props = {
     onConfirm: () => void;
 };
 
+
 export default function DeleteJobDialog({ job, onClose, onConfirm }: Props) {
+    function deleteHandle() {
+        router.visit(`/admin/job-positions/${job.id}`,{
+            method:'delete',
+            onSuccess: () => {
+
+            }
+        })
+    }
+
     return (
         <>
             <AlertDialog
@@ -46,7 +57,7 @@ export default function DeleteJobDialog({ job, onClose, onConfirm }: Props) {
 
                         <AlertDialogAction
                             variant="destructive"
-                            onClick={onConfirm}
+                            onClick={deleteHandle}
                         >
                             Delete
                         </AlertDialogAction>

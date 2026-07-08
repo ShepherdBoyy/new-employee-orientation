@@ -37,9 +37,8 @@ export default function EditJobDialog({ onClose, job }: Props) {
 
         if (!job) return;
 
-        form.put(`/admin/jobs/${job.id}`, {
+        form.put(`/admin/job-positions/${job.id}`, {
             onSuccess: () => {
-                form.reset();
                 onClose();
             },
         });
