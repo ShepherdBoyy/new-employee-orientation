@@ -46,7 +46,11 @@ export function AppSidebar() {
                     path: "/admin/companies",
                 },
                 {
-                    title: "Job Positions",
+                    title: "Jobs",
+                    path: "/admin/all-job-positions",
+                },
+                {
+                    title: "Job Assignments",
                     path: "/admin/job-positions",
                 },
             ],
@@ -62,8 +66,8 @@ export function AppSidebar() {
                 },
                 {
                     title: "Assignment",
-                    path: "/admin/folder-targets"
-                }
+                    path: "/admin/folder-targets",
+                },
             ],
         },
         {
