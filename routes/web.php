@@ -12,13 +12,18 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Employee\EmployeeController;
 use Illuminate\Support\Facades\Route;
 
+
 Route::middleware("guest")->group(function () {
     Route::get("/login", [AuthController::class, "showLogin"])->name("login");
     Route::post("/login", [AuthController::class, "login"])->name("login.attempt");
 });
 
+Route::controller(EmployeeController::class)->group( function () {
+    Route::get('/employee', 'Index');
+});
+
 Route::middleware("auth")->group(function () {
-    Route::post("/logout", [AuthController::class, "logout"])->name("logout");
+    Route::get("/logout", [AuthController::class, "logout"])->name("logout");
     
     Route::middleware("role:admin")->prefix("admin")->name("admin.")->group(function () {
         Route::get("/dashboard", [AdminController::class, "index"])->name("dashboard");
@@ -33,6 +38,8 @@ Route::middleware("auth")->group(function () {
         Route::post('/job-positions', [JobPositionController::class, 'store'])->name('job-positions.store');
         Route::put('/job-positions/{jobPosition}', [JobPositionController::class, 'update'])->name('job-positions.update');
         Route::delete('/job-positions/{jobPosition}', [JobPositionController::class, 'destroy'])->name('job-positions.destroy');
+
+        Route::get("/all-job-positions", [JobPositionController::class, "allJobsIndex"])->name("all-jobs-positions.index");
 
         Route::get("/folders", [FolderController::class,"index"])->name("folders.index");
         Route::post("/folders", [FolderController::class, "store"])->name("folders.store");
