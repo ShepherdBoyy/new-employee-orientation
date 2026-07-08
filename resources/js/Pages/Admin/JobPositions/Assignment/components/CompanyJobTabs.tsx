@@ -24,7 +24,6 @@ type Props = {
 
 export default function CompanyJobTabs({ companies, onEdit }: Props) {
     if (!companies.length) return null;
-    console.log(companies);
     return (
         <Card className="">
             <CardHeader className="">

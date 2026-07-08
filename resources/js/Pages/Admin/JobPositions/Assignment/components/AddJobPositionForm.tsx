@@ -1,6 +1,8 @@
 import { useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import * as React from "react"
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
     FieldDescription,
@@ -10,6 +12,20 @@ import {
     FieldLabel,
     FieldError,
 } from "@/components/ui/field";
+
+import {
+  Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxValue,
+  useComboboxAnchor,
+} from "@/components/ui/combobox"
+
 import CompanySelector from "./CompanySelector";
 import type { Company } from "../../../Types/company";
 
@@ -17,17 +33,23 @@ interface Props {
     companies: Company[];
 }
 
-export default function AddJobPositionForm({ companies }: Props) {
+export default function AddJobPositionForm({ companies, jobs }: Props) {
     const form = useForm({
         company_ids: [] as number[],
-        name: "",
+        job_ids: [] as number[],
     });
+
+    const anchor = useComboboxAnchor();
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        form.post("/admin/job-positions", {
+        form.post("/admin/assign-jobs", {
             onSuccess: () => form.reset(),
         });
+    }
+
+    function handleJob(value) {
+        form.setData('job_ids', value)
     }
 
     return (
@@ -43,13 +65,47 @@ export default function AddJobPositionForm({ companies }: Props) {
                             </FieldDescription>
                             <Field className="space-y-1">
                                 <FieldLabel>Position Name</FieldLabel>
-                                <Input
-                                    value={form.data.name}
-                                    onChange={(e) =>
-                                        form.setData("name", e.target.value)
-                                    }
-                                    placeholder="e.g. Software Engineer"
-                                />
+
+                                <Combobox
+                                    multiple
+                                    autoHighlight
+                                    items={jobs}
+                                    itemToStringValue={(item) => String(item.id)} 
+                                    onValueChange={(val) => handleJob(val)} // val will now be an array of IDs: [1, 2, 3]
+                                >
+                                    <ComboboxChips ref={anchor} className="w-full max-w-xs">
+                                        <ComboboxValue>
+                                        {(values: number[]) => ( // 2. values is now an array of job IDs
+                                            <>
+                                            {values.map((id) => {
+                                                // 3. Look up the full job object from your dataset using the ID
+                                                const job = jobs.find((j) => j.id === id);
+                                                if (!job) return null;
+
+                                                return (
+                                                <ComboboxChip key={job.id}>
+                                                    {job.name}
+                                                </ComboboxChip>
+                                                );
+                                            })}
+                                            <ComboboxChipsInput />
+                                            </>
+                                        )}
+                                        </ComboboxValue>
+                                    </ComboboxChips>
+                                    
+                                    <ComboboxContent anchor={anchor}>
+                                        <ComboboxEmpty>No items found.</ComboboxEmpty>
+                                        <ComboboxList>
+                                        {(item) => (
+                                            /* 4. Pass the item's id as the primary value instead of the whole object */
+                                            <ComboboxItem key={item.id} value={item.id}>
+                                            {item.name}
+                                            </ComboboxItem>
+                                        )}
+                                        </ComboboxList>
+                                    </ComboboxContent>
+                                </Combobox>
 
                                 <FieldError>{form.errors.name}</FieldError>
                             </Field>
@@ -67,7 +123,6 @@ export default function AddJobPositionForm({ companies }: Props) {
                                 type="submit"
                                 disabled={
                                     form.processing ||
-                                    !form.data.name.trim() ||
                                     form.data.company_ids.length === 0
                                 }
                             >

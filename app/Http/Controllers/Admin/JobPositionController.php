@@ -15,20 +15,6 @@ use Inertia\Response;
 use Illuminate\Support\Facades\DB;
 class JobPositionController extends Controller
 {
-    public function jobAssignments(): Response
-    {
-        $positions = JobPosition::orderBy("name")
-            ->get();
-
-        $companies = Company::where("status", "active")
-            ->with('jobs')
-            ->get(["id", "name", "logo_path"]);
-        
-        return Inertia::render("Admin/JobPositions/Assignment/Index", [
-            "companies" => $companies,
-            "positions" => $positions
-        ]);
-    }
 
     public function index()
     {
@@ -46,6 +32,7 @@ class JobPositionController extends Controller
         
         return back()->with("success", "Job position created successfully");
     }
+    
 
     public function update(Request $request, JobPosition $jobPosition): RedirectResponse
     {
@@ -80,8 +67,39 @@ class JobPositionController extends Controller
         ]);
     }
 
-    public function allJobsIndex(): Response
+    public function jobAssignments(): Response
     {
-        return Inertia::render("Admin/JobPositions/AllJobs/Index");
+        $positions = JobPosition::orderBy("name")
+            ->get();
+
+        $companies = Company::where("status", "active")
+            ->with('jobs')
+            ->get(["id", "name", "logo_path"]);
+
+        $jobs = JobPosition::all();
+        return Inertia::render("Admin/JobPositions/Assignment/Index", [
+            "companies" => $companies,
+            "positions" => $positions,
+            "jobs" => $jobs
+        ]);
+    }
+
+    public function assignJobs(Request $request)
+    {
+        $request->validate([
+            'company_ids' => 'required|array',
+            'company_ids.*' => 'exists:companies,id',
+            'job_ids' => 'present|array',
+            'job_ids.*' => 'exists:job_positions,id',
+        ]);
+
+        // 1. Fetch the collection of company models
+        $companies = Company::whereIn('id', $request->company_ids)->get();
+
+        // 2. Loop through each company and sync the jobs
+        foreach ($companies as $company) {
+            // This inserts new relationships and ignores existing ones
+            $company->jobs()->syncWithoutDetaching($request->job_ids);
+        }
     }
 }

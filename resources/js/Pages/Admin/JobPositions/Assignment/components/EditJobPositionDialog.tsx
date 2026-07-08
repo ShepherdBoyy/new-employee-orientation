@@ -34,7 +34,6 @@ export default function EditJobPositionDialog({
     companies,
 }: EditJobPositionDialogProps) {
     const form = useForm({ name: "", company_ids: [] as number[] });
-    console.log(position);
     useEffect(() => {
         if (!position) return;
 

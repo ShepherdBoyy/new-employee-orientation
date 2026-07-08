@@ -10,7 +10,7 @@ interface Props {
     companies: CompanyWithJobs[];
 }
 
-export default function JobPositionsIndex({ companies }: Props) {
+export default function JobPositionsIndex({ companies, jobs }: Props) {
     const [editingPosition, setEditingPosition] = useState<JobPosition | null>(
         null,
     );
@@ -19,7 +19,7 @@ export default function JobPositionsIndex({ companies }: Props) {
         <>
             <Master>
                 <div className="grid lg:grid-cols-[420px_1fr] gap-3 items-start">
-                    <AddJobPositionForm companies={companies} />
+                    <AddJobPositionForm companies={companies} jobs={jobs} />
                     <CompanyJobTabs
                         companies={companies}
                         onEdit={setEditingPosition}

@@ -40,6 +40,7 @@ Route::middleware("auth")->group(function () {
         Route::delete('/job-positions/{jobPosition}', [JobPositionController::class, 'destroy'])->name('job-positions.destroy');
 
         Route::get("/all-job-positions", [JobPositionController::class, "jobAssignments"])->name("all-jobs-positions.index");
+        Route::post("/assign-jobs", [JobPositionController::class, 'assignJobs']);
         
         Route::get("/folders", [FolderController::class,"index"])->name("folders.index");
         Route::post("/folders", [FolderController::class, "store"])->name("folders.store");
