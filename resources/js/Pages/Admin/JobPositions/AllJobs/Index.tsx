@@ -10,9 +10,9 @@ type Props = {
 };
 export default function Index({ jobs }: Props) {
     const [editingJob, setEditingJob] = useState<JobPosition | null>(null);
-
     const [deletingJob, setDeletingJob] = useState<JobPosition | null>(null);
     const [createOpen, setCreateOpen] = useState(false);
+    console.log(jobs);
     return (
         <Master>
             <div>

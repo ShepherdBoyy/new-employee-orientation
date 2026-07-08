@@ -32,7 +32,7 @@ export default function CreateJobDialog({ open, onOpenChange }: Props) {
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        form.post("/admin/all-job-positions", {
+        form.post("/admin/job-positions", {
             preserveScroll: true,
 
             onSuccess: () => {

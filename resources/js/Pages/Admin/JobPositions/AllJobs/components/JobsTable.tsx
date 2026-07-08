@@ -16,7 +16,6 @@ type Props = {
 };
 
 export default function JobsTable({ jobs, onEdit, onDelete }: Props) {
-    console.log(jobs);
     return (
         <Table>
             <TableHeader>

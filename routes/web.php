@@ -35,12 +35,12 @@ Route::middleware("auth")->group(function () {
         Route::delete("/companies/{company}", [CompanyController::class, "destroy"])->name("companies.destroy");
 
         Route::get("/job-positions", [JobPositionController::class, "index"])->name("job-positions.index");
-        Route::post('/job-positions', [JobPositionController::class, 'store'])->name('job-positions.store');
+        Route::post('/job-positions', [JobPositionController::class,     'store'])->name('job-positions.store');
         Route::put('/job-positions/{jobPosition}', [JobPositionController::class, 'update'])->name('job-positions.update');
         Route::delete('/job-positions/{jobPosition}', [JobPositionController::class, 'destroy'])->name('job-positions.destroy');
 
-        Route::get("/all-job-positions", [JobPositionController::class, "allJobsIndex"])->name("all-jobs-positions.index");
-
+        Route::get("/all-job-positions", [JobPositionController::class, "jobAssignments"])->name("all-jobs-positions.index");
+        
         Route::get("/folders", [FolderController::class,"index"])->name("folders.index");
         Route::post("/folders", [FolderController::class, "store"])->name("folders.store");
         Route::put("/folders/{folder}", [FolderController::class, "update"])->name("folders.update");

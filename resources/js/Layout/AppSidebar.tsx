@@ -47,11 +47,11 @@ export function AppSidebar() {
                 },
                 {
                     title: "Jobs",
-                    path: "/admin/all-job-positions",
+                    path: "/admin/job-positions",
                 },
                 {
                     title: "Job Assignments",
-                    path: "/admin/job-positions",
+                    path: "/admin/all-job-positions",
                 },
             ],
         },

@@ -13,12 +13,7 @@ class JobPosition extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        "company_id",
         "name"
-    ];
-
-    protected $casts = [
-        'company_id' => 'array',
     ];
 
     public function users(): HasMany
