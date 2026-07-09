@@ -19,10 +19,10 @@ import type { JobPosition } from "../../../Types/job-position";
 
 type Props = {
     companies: CompanyWithJobs[];
-    onEdit: (job: JobPosition) => void;
+    onClose: (job: JobPosition) => void;
 };
 
-export default function CompanyJobTabs({ companies, onEdit }: Props) {
+export default function CompanyJobTabs({ companies, onClose }: Props) {
     if (!companies.length) return null;
     return (
         <Card className="">
@@ -68,11 +68,11 @@ export default function CompanyJobTabs({ companies, onEdit }: Props) {
                                                 </CardDescription>
 
                                                 <Button
-                                                    variant="outline"
+                                                    variant="secondary"
                                                     size="sm"
-                                                    onClick={() => onEdit(job)}
+                                                    onClick={() => onClose(job)}
                                                 >
-                                                    Edit
+                                                    Remove
                                                 </Button>
                                             </CardHeader>
                                         </Card>

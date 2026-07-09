@@ -102,4 +102,12 @@ class JobPositionController extends Controller
             $company->jobs()->syncWithoutDetaching($request->job_ids);
         }
     }
+
+    public function deleteAssignedJob($company_id, $job_id)
+    {
+        DB::table('company_job_position')
+        ->where('company_id', $company_id)
+        ->where('job_position_id', $job_id)
+        ->delete();
+    }
 }

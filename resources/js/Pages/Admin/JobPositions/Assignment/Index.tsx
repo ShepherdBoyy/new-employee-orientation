@@ -5,15 +5,26 @@ import EditJobPositionDialog from "./components/EditJobPositionDialog";
 import Master from "@/Layout/Master";
 import type { JobPosition } from "../../Types/job-position";
 import type { CompanyWithJobs } from "../../Types/company";
+import RemoveJobDialog from "./components/RemoveJobDialog";
+import { router } from "@inertiajs/react";
 
 interface Props {
     companies: CompanyWithJobs[];
+    jobs:JobPosition
+
 }
 
 export default function JobPositionsIndex({ companies, jobs }: Props) {
-    const [editingPosition, setEditingPosition] = useState<JobPosition | null>(
-        null,
-    );
+    const [removeJob, setRemoveJob] = useState<JobPosition | null>(null);
+    function handleRemove() {
+            if (!removeJob) return;
+    
+            router.delete(`/admin/jobs/${removeJob.id}`, {
+                onSuccess: () => {
+                    setRemoveJob(null);
+                },
+            });
+        }
 
     return (
         <>
@@ -22,15 +33,20 @@ export default function JobPositionsIndex({ companies, jobs }: Props) {
                     <AddJobPositionForm companies={companies} jobs={jobs} />
                     <CompanyJobTabs
                         companies={companies}
-                        onEdit={setEditingPosition}
+                        onClose={setRemoveJob}
                     />
                 </div>
             </Master>
 
-            <EditJobPositionDialog
+            {/* <EditJobPositionDialog
                 position={editingPosition}
                 companies={companies}
                 onClose={() => setEditingPosition(null)}
+            /> */}
+            <RemoveJobDialog
+                onClose={() => setRemoveJob(null)}
+                onConfirm={() => handleRemove}
+                job={removeJob}
             />
         </>
     );
