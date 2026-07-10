@@ -4,7 +4,6 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\ExtensionRequestController;
 use App\Http\Controllers\Admin\FolderController;
-use App\Http\Controllers\Admin\FolderTargetController;
 use App\Http\Controllers\Admin\JobPositionController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\UserController;
@@ -44,25 +43,26 @@ Route::middleware("auth")->group(function () {
         Route::post("/assign-jobs", [JobPositionController::class, 'assignJobs']);
         Route::delete("/delete-assigned-job/{comapny_id}/{job_id}", [JobPositionController::class, 'deleteAssignedJob']);
         
-        Route::get("/folders", [FolderController::class,"index"])->name("folders.index");
+        Route::get("/folders/preview-list", [FolderController::class, "previewFolderList"])->name("folders.preview-list");
+        Route::get("/folders/{folder}/preview", [FolderController::class, "previewFolder"])->name("folders.preview");
+
+        Route::get("/folders/global", [FolderController::class, "globalIndex"])->name("folders.global");
+        Route::get("/folders/{company}", [FolderController::class, "companyIndex"])->name("folders.company");
+        Route::get("/folders/{company}/job-positions/{jobPosition}", [FolderController::class, "positionIndex"])->name("folders.job-position");
+        
         Route::post("/folders", [FolderController::class, "store"])->name("folders.store");
         Route::put("/folders/{folder}", [FolderController::class, "update"])->name("folders.update");
         Route::patch("/folders/reorder", [FolderController::class, "reorder"])->name("folders.reorder");
+        Route::patch("/folders/reorder-targets", [FolderController::class, "reorderTargets"])->name("folders.reorder-targets");
         Route::delete("/folders/{folder}", [FolderController::class, "destroy"])->name("folders.destroy");
 
-        Route::get("/folders/{folder}", [SlideController::class, "index"])->name("folders.slide.index");
+        Route::get("/folders/{folder}/slides", [SlideController::class, "index"])->name("folders.slide.index");
         Route::post("/folders/{folder}/slides", [SlideController::class, "store"])->name("folders.slide.store");
         Route::patch("/folders/{folder}/slides/reorder", [SlideController::class, "reorder"])->name("folders.slides.reorder");
         Route::delete("/folders/{folder}/slides/{slide}", [SlideController::class, "destroy"])->name("folders.slides.destroy");
 
-        Route::get("/folder-targets", [FolderTargetController::class, "index"])->name("folder-targets.index");
-        Route::post("/folder-targets", [FolderTargetController::class, "store"])->name("folder-targets.store");
-        Route::patch("/folder-targets/reorder", [FolderTargetController::class, "reorder"])->name("folder-targets.reorder");
-        Route::delete("/folder-targets/{folderTarget}", [FolderTargetController::class, "destroy"])->name("folder-targets.destroy");
-        
         Route::get("/users/admins", [UserController::class, "admins"])->name("users.admins");
         Route::get("/users/employees", [UserController::class, "index"])->name("users.employees");
-
         Route::post("/users", [UserController::class, "store"])->name("users.store");
         Route::put("/users/{user}", [UserController::class, "update"])->name("users.update");
         Route::patch("/users/{user}/toggle-status", [UserController::class, "toggleStatus"])->name("users.toggle-status");
