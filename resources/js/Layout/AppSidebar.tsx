@@ -19,9 +19,12 @@ import {
 } from "lucide-react";
 import SidebarNavItem from "./SideBarNav/SidebarNavItem";
 import SidebarNavGroup from "./SideBarNav/SidebarNavGroup";
-import type { NavItem } from "./SideBarNav/navTypes";
+import type { CompanyNav, NavItem } from "./SideBarNav/navTypes";
+import { usePage } from "@inertiajs/react";
 
 export function AppSidebar() {
+    const companies = usePage().props.sidebarCompanies as CompanyNav[];
+
     const navLinks: NavItem[] = [
         {
             type: "link",
@@ -61,13 +64,13 @@ export function AppSidebar() {
             icon: <Projector absoluteStrokeWidth />,
             items: [
                 {
-                    title: "Folder",
-                    path: "/admin/folders",
+                    title: "Global Folders",
+                    path: "/admin/folders/global",
                 },
-                {
-                    title: "Assignment",
-                    path: "/admin/folder-targets",
-                },
+                ...companies.map((company) => ({
+                    title: company.name,
+                    path: `/admin/folders/${company.id}`
+                }))
             ],
         },
         {

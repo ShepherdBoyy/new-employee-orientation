@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -37,7 +38,18 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            //
+            "auth" => [
+                "user" => $request->user()
+            ],
+            "sidebarCompanies" => function () use ($request) {
+                if (!$request->user()?->isAdmin()) {
+                    return [];
+                }
+
+                return Company::where("status", "active")
+                    ->orderBy("name")
+                    ->get(["id", "name"]);
+            }
         ];
     }
 }
