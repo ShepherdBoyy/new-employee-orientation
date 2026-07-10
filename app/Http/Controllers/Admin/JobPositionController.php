@@ -4,15 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\CompanyEmployeeType;
 use App\Models\JobPosition;
+use DB;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Support\Facades\DB;
+
 class JobPositionController extends Controller
 {
 
@@ -57,7 +56,7 @@ class JobPositionController extends Controller
         JobPosition::destroy($request->ids);
     }
 
-    public function getByCompanyAndType(Request $request): JsonResponse
+    public function getByCompany(Request $request): JsonResponse
     {
         $validated = $request->validate([
             "company_id" => ["required", "exists:companies,id"],

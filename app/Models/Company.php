@@ -24,14 +24,32 @@ class Company extends Model
 
     public function foldersForEmployee(User $user): Collection
     {
-        $targetedFolderIds = FolderTarget::forEmployee($user)
+        $companySpecific = FolderTarget::where("company_id", $user->company_id)
+            ->whereNull("job_position_id")
             ->orderBy("order")
             ->pluck("folder_id");
+
+        $global = FolderTarget::whereNull("company_id")
+            ->whereNull("job_position_id")
+            ->orderBy("order")
+            ->pluck("folder_id");
+
+        $jobSpecific = FolderTarget::where("company_id", $user->company_id)
+            ->where("job_position_id", $user->job_position_id)
+            ->whereNotNull("job_position_id")
+            ->orderBy("order")
+            ->pluck("folder_id");
+
+        $orderedFolderIds = $companySpecific
+            ->concat($global)
+            ->concat($jobSpecific)
+            ->unique()
+            ->values();
         
-        return Folder::whereIn("id", $targetedFolderIds)
+        return Folder::whereIn("id", $orderedFolderIds)
             ->get()
-            ->sortBy(function ($folder) use ($targetedFolderIds) {
-                return array_search($folder->id, $targetedFolderIds->toArray());
+            ->sortBy(function ($folder) use ($orderedFolderIds) {
+                return $orderedFolderIds->search($folder->id);
             })
             ->values();
     }
