@@ -1,13 +1,13 @@
 import { useState } from "react";
+import { Separator } from "@/components/ui/separator";
+import { router } from "@inertiajs/react";
 import type { JobPosition } from "../../Types/job-position";
 import Master from "@/Layout/Master";
-import JobsTable from "./components/JobsTable";
+import JobList from "./components/JobList";
 import CreateJobDialog from "./components/CreateJobDialog";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import EditJobDialog from "./components/EditJobDialog";
 import DeleteJobDialog from "./components/DeleteJobDialog";
-import { router } from "@inertiajs/react";
+import ToolbarJob from "./components/ToolbarJob";
 type Props = {
     jobs: JobPosition[];
 };
@@ -23,29 +23,57 @@ export default function Index({ jobs }: Props) {
     }
     const [editingJob, setEditingJob] = useState<JobPosition | null>(null);
     const [deletingJob, setDeletingJob] = useState<JobPosition | null>(null);
+
     const [createOpen, setCreateOpen] = useState(false);
-    console.log(jobs);
+    const [search, setSearch] = useState("");
+    const [selectedJobIds, setSelectedJobIds] = useState<number[]>([]);
+    const filteredJobs = jobs.filter((job) =>
+        job.name.toLowerCase().includes(search.toLowerCase()),
+    );
+    const allSelected =
+        filteredJobs.length > 0 &&
+        selectedJobIds.length === filteredJobs.length;
+
+    function handleToggleAll() {
+        if (allSelected) {
+            setSelectedJobIds([]);
+        } else {
+            setSelectedJobIds(filteredJobs.map((job) => job.id));
+        }
+    }
     return (
         <Master>
-            <div className="max-w-5xl mx-auto">
-                <div>
-                    <h1>Job Positions </h1>
-                    <p>
-                        Job Positions are reusable roles that can later be
-                        assigned to one or more companies.
-                    </p>
+            <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-semibold tracking-tight">
+                            Job Positions
+                        </h1>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Reusable roles that can later be assigned to one or
+                            more companies.
+                        </p>
+                    </div>
                 </div>
-                <Separator />
 
-                <Button size="lg" onClick={() => setCreateOpen(true)}>
-                    New Job
-                </Button>
+                <Separator />
+                <ToolbarJob
+                    search={search}
+                    onSearchChange={setSearch}
+                    allSelected={allSelected}
+                    onToggleAll={handleToggleAll}
+                    selectedCount={selectedJobIds.length}
+                    onDeleteSelected={() => {}}
+                    onCreate={() => setCreateOpen(true)}
+                />
                 <CreateJobDialog
                     open={createOpen}
                     onOpenChange={setCreateOpen}
                 />
-                <JobsTable
-                    jobs={jobs}
+                <JobList
+                    jobs={filteredJobs}
+                    selected={selectedJobIds}
+                    onSelectionChange={setSelectedJobIds}
                     onEdit={setEditingJob}
                     onDelete={setDeletingJob}
                 />

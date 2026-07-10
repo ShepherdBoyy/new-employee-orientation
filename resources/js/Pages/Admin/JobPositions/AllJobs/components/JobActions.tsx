@@ -25,7 +25,7 @@ export default function JobTableActions({ job, onEdit, onDelete }: Props) {
                 </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="start">
                 <DropdownMenuItem onClick={() => onEdit(job)}>
                     <Pen className="mr-2 h-4 w-4" />
                     Edit
