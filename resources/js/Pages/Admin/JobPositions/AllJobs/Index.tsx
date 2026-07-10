@@ -4,10 +4,11 @@ import { router } from "@inertiajs/react";
 import type { JobPosition } from "../../Types/job-position";
 import Master from "@/Layout/Master";
 import JobList from "./components/JobList";
-import CreateJobDialog from "./components/CreateJobDialog";
-import EditJobDialog from "./components/EditJobDialog";
-import DeleteJobDialog from "./components/DeleteJobDialog";
+import CreateJobDialog from "./components/forms/CreateJobDialog";
+import EditJobDialog from "./components/forms/EditJobDialog";
+import DeleteJobDialog from "./components/forms/DeleteJobDialog";
 import ToolbarJob from "./components/ToolbarJob";
+import DeleteSelectedJobs from "./components/forms/DeleteSelectedJobs";
 type Props = {
     jobs: JobPosition[];
 };
@@ -23,13 +24,26 @@ export default function Index({ jobs }: Props) {
     }
     const [editingJob, setEditingJob] = useState<JobPosition | null>(null);
     const [deletingJob, setDeletingJob] = useState<JobPosition | null>(null);
-
     const [createOpen, setCreateOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [selectedJobIds, setSelectedJobIds] = useState<number[]>([]);
-    const filteredJobs = jobs.filter((job) =>
-        job.name.toLowerCase().includes(search.toLowerCase()),
-    );
+
+    const [selected, setSelected] = useState<number[]>([]);
+    const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
+
+    const filteredJobs = jobs
+        .filter((job) => job.name.toLowerCase().includes(search.toLowerCase()))
+        .sort((a, b) => {
+            const aAssigned = a.companies?.length ?? 0;
+            const bAssigned = b.companies?.length ?? 0;
+
+            // Assigned jobs first
+            if (aAssigned === 0 && bAssigned > 0) return 1;
+            if (aAssigned > 0 && bAssigned === 0) return -1;
+
+            // Then alphabetically
+            return a.name.localeCompare(b.name);
+        });
     const allSelected =
         filteredJobs.length > 0 &&
         selectedJobIds.length === filteredJobs.length;
@@ -40,6 +54,18 @@ export default function Index({ jobs }: Props) {
         } else {
             setSelectedJobIds(filteredJobs.map((job) => job.id));
         }
+    }
+
+    function handleDeleteSelected() {
+        router.delete("/admin/jobs/bulk-delete", {
+            data: {
+                ids: selected,
+            },
+            onSuccess: () => {
+                setSelected([]);
+                setDeleteSelectedOpen(false);
+            },
+        });
     }
     return (
         <Master>
@@ -63,7 +89,7 @@ export default function Index({ jobs }: Props) {
                     allSelected={allSelected}
                     onToggleAll={handleToggleAll}
                     selectedCount={selectedJobIds.length}
-                    onDeleteSelected={() => {}}
+                    onDeleteSelected={() => setDeleteSelectedOpen(true)}
                     onCreate={() => setCreateOpen(true)}
                 />
                 <CreateJobDialog
@@ -78,6 +104,8 @@ export default function Index({ jobs }: Props) {
                     onDelete={setDeletingJob}
                 />
             </div>
+
+            {/* Forms */}
             <EditJobDialog
                 job={editingJob}
                 onClose={() => setEditingJob(null)}
@@ -86,6 +114,12 @@ export default function Index({ jobs }: Props) {
                 job={deletingJob}
                 onClose={() => setDeletingJob(null)}
                 onConfirm={handleDelete}
+            />
+            <DeleteSelectedJobs
+                ids={selectedJobIds}
+                open={deleteSelectedOpen}
+                onClose={() => setDeleteSelectedOpen(false)}
+                onConfirm={() => handleDeleteSelected}
             />
         </Master>
     );
