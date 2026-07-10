@@ -54,19 +54,9 @@ export default function Index({ jobs }: Props) {
         } else {
             setSelectedJobIds(filteredJobs.map((job) => job.id));
         }
-    }
-
-    function handleDeleteSelected() {
-        router.delete("/admin/jobs/bulk-delete", {
-            data: {
-                ids: selected,
-            },
-            onSuccess: () => {
-                setSelected([]);
-                setDeleteSelectedOpen(false);
-            },
-        });
-    }
+    }  
+    
+    
     return (
         <Master>
             <div className="space-y-6">
@@ -117,9 +107,9 @@ export default function Index({ jobs }: Props) {
             />
             <DeleteSelectedJobs
                 ids={selectedJobIds}
+                setIds={setSelectedJobIds}
                 open={deleteSelectedOpen}
                 onClose={() => setDeleteSelectedOpen(false)}
-                onConfirm={() => handleDeleteSelected}
             />
         </Master>
     );

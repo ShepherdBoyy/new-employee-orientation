@@ -52,6 +52,11 @@ class JobPositionController extends Controller
         return back()->with("success", "Job position deleted successfully");
     }
 
+    public function destroyMultipleJobs(Request $request) 
+    {
+        JobPosition::destroy($request->ids);
+    }
+
     public function getByCompanyAndType(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -110,4 +115,5 @@ class JobPositionController extends Controller
         ->where('job_position_id', $job_id)
         ->delete();
     }
+
 }

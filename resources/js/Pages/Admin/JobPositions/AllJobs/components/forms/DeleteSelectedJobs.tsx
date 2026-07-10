@@ -16,16 +16,26 @@ import { router } from "@inertiajs/react";
 type Props = {
     ids: number[];
     onClose: () => void;
-    onConfirm: () => void;
     open: boolean;
+    setIds: React.Dispatch<React.SetStateAction<number[]>>;
 };
 
 export default function DeleteSelectedJobs({
     ids,
     onClose,
-    onConfirm,
     open,
+    setIds,
 }: Props) {
+    function handleDeleteSelected() {
+        router.delete("/admin/destroy-multiple-jobs", {
+            data: {
+                ids: ids,
+            },
+            onSuccess: () => {
+                setIds([])
+            },
+        });
+    }
     return (
         <AlertDialog
             open={open}
@@ -53,7 +63,7 @@ export default function DeleteSelectedJobs({
 
                     <AlertDialogAction
                         variant="destructive"
-                        onClick={onConfirm}
+                        onClick={handleDeleteSelected}
                     >
                         Delete
                     </AlertDialogAction>

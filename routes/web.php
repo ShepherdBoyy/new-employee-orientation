@@ -38,6 +38,7 @@ Route::middleware("auth")->group(function () {
         Route::post('/job-positions', [JobPositionController::class, 'store'])->name('job-positions.store');
         Route::put('/job-positions/{jobPosition}', [JobPositionController::class, 'update'])->name('job-positions.update');
         Route::delete('/job-positions/{jobPosition}', [JobPositionController::class, 'destroy'])->name('job-positions.destroy');
+        Route::delete('/destroy-multiple-jobs', [JobPositionController::class, 'destroyMultipleJobs']);
 
         Route::get("/all-job-positions", [JobPositionController::class, "jobAssignments"])->name("all-jobs-positions.index");
         Route::post("/assign-jobs", [JobPositionController::class, 'assignJobs']);
