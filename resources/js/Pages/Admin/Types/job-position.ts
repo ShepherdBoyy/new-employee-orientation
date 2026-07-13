@@ -5,5 +5,6 @@ export type JobPosition = {
     name: string;
     companies?: Company[];
     companies_count?: number;
-    company_ids: number;
 };
+
+export type JobSortOption = "assigned" | "most-companies" | "least-companies";
