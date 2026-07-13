@@ -16,7 +16,8 @@ export interface Paginated<T> {
         label: string;
         active: boolean;
     }[];
-
+    to: number;
+    from: number;
     current_page: number;
     last_page: number;
     total: number;

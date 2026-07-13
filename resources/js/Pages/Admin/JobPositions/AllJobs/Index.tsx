@@ -12,7 +12,7 @@ import DeleteSelectedJobs from "./components/forms/DeleteSelectedJobs";
 import AppPagination from "./components/Pagination";
 import type { Paginated } from "../../Types/job-position";
 type Props = {
-    jobs: JobPosition[];
+    jobs: Paginated<JobPosition>;
 };
 export default function Index({ jobs }: Props) {
     function handleDelete() {
@@ -32,7 +32,7 @@ export default function Index({ jobs }: Props) {
 
     const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
     const [sort, setSort] = useState<JobSortOption>("assigned");
-    const filteredJobs = jobs
+    const filteredJobs = jobs.data
         .filter((job) => job.name.toLowerCase().includes(search.toLowerCase()))
         .sort((a, b) => {
             const aCompanies = a.companies?.length ?? 0;
@@ -105,14 +105,22 @@ export default function Index({ jobs }: Props) {
                     onDelete={setDeletingJob}
                 />
                 <AppPagination
-                    from={1}
-                    to={12}
-                    total={48}
-                    currentPage={1}
-                    lastPage={4}
-                    onPrevious={() => {}}
-                    onNext={() => {}}
-                    onPageChange={() => {}}
+                    from={jobs.from}
+                    to={jobs.to}
+                    total={jobs.total}
+                    currentPage={jobs.current_page}
+                    lastPage={jobs.last_page}
+                    onPrevious={() => {
+                        router.visit(jobs?.prev_page_url)
+                    }}
+                    onNext={() => {
+                        router.visit(jobs?.next_page_url)
+                    }}
+                    onPageChange={(page) => {
+                        router.visit(window.location.pathname, {
+                            data: { page: page }
+                        });
+                    }}
                 />
             </div>
 
