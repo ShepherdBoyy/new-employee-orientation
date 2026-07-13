@@ -14,7 +14,7 @@ class CompanyController extends Controller
 {
     public function index(): Response
     {
-        $companies = Company::withCount("users")
+        $companies = Company::withCount(["users", "jobs"])
             ->latest()
             ->get();
 

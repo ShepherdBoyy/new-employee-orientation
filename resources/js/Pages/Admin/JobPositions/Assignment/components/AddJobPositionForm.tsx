@@ -1,30 +1,33 @@
 import { useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import * as React from "react"
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import * as React from "react";
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+} from "@/components/ui/card";
 import {
     FieldDescription,
-    FieldLegend,
-    FieldSet,
     Field,
     FieldLabel,
     FieldError,
+    FieldGroup,
 } from "@/components/ui/field";
 
 import {
-  Combobox,
-  ComboboxChip,
-  ComboboxChips,
-  ComboboxChipsInput,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxValue,
-  useComboboxAnchor,
-} from "@/components/ui/combobox"
+    Combobox,
+    ComboboxChip,
+    ComboboxChips,
+    ComboboxChipsInput,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxItem,
+    ComboboxList,
+    ComboboxValue,
+    useComboboxAnchor,
+} from "@/components/ui/combobox";
 
 import CompanySelector from "./CompanySelector";
 import type { Company } from "../../../Types/company";
@@ -49,76 +52,86 @@ export default function AddJobPositionForm({ companies, jobs }: Props) {
     }
 
     function handleJob(value) {
-        form.setData('job_ids', value)
+        form.setData("job_ids", value);
     }
 
     return (
-        <Card>
-            <CardContent>
-                <form onSubmit={handleSubmit} className="max-w-md ">
-                    <div className="space-y-1">
-                        <FieldSet>
-                            <FieldLegend>New Job Position</FieldLegend>
+        <Card className="w-full h-full flex flex-col overflow-hidden">
+            <form onSubmit={handleSubmit} className="max-w-md ">
+                <CardHeader className="border-b bg-muted/20">
+                    <CardTitle>Assign Job Position</CardTitle>
+                    <CardDescription>
+                        Select a job position and assign it to one or more
+                        companies.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <FieldGroup>
+                        <Field className="mt-4">
+                            <FieldLabel>Position Name</FieldLabel>
                             <FieldDescription>
-                                Create a reusable job position and assign it to
-                                one or more companies.
+                                Select 1 or more job positions
                             </FieldDescription>
-                            <Field className="space-y-1">
-                                <FieldLabel>Position Name</FieldLabel>
-
-                                <Combobox
-                                    multiple
-                                    autoHighlight
-                                    items={jobs}
-                                    itemToStringValue={(item) => String(item.id)} 
-                                    onValueChange={(val) => handleJob(val)} // val will now be an array of IDs: [1, 2, 3]
-                                >
-                                    <ComboboxChips ref={anchor} className="w-full max-w-xs">
-                                        <ComboboxValue>
-                                        {(values: number[]) => ( // 2. values is now an array of job IDs
+                            <Combobox
+                                multiple
+                                autoHighlight
+                                items={jobs}
+                                itemToStringValue={(item) => String(item.id)}
+                                onValueChange={(val) => handleJob(val)}
+                                // val will now be an array of IDs: [1, 2, 3]
+                            >
+                                <ComboboxChips ref={anchor}>
+                                    <ComboboxValue>
+                                        {(
+                                            values: number[], // 2. values is now an array of job IDs
+                                        ) => (
                                             <>
-                                            {values.map((id) => {
-                                                // 3. Look up the full job object from your dataset using the ID
-                                                const job = jobs.find((j) => j.id === id);
-                                                if (!job) return null;
+                                                {values.map((id) => {
+                                                    const job = jobs.find(
+                                                        (j) => j.id === id,
+                                                    );
+                                                    if (!job) return null;
 
-                                                return (
-                                                <ComboboxChip key={job.id}>
-                                                    {job.name}
-                                                </ComboboxChip>
-                                                );
-                                            })}
-                                            <ComboboxChipsInput />
+                                                    return (
+                                                        <ComboboxChip
+                                                            key={job.id}
+                                                        >
+                                                            {job.name}
+                                                        </ComboboxChip>
+                                                    );
+                                                })}
+                                                <ComboboxChipsInput />
                                             </>
                                         )}
-                                        </ComboboxValue>
-                                    </ComboboxChips>
-                                    
-                                    <ComboboxContent anchor={anchor}>
-                                        <ComboboxEmpty>No items found.</ComboboxEmpty>
-                                        <ComboboxList>
+                                    </ComboboxValue>
+                                </ComboboxChips>
+
+                                <ComboboxContent anchor={anchor}>
+                                    <ComboboxEmpty>
+                                        No items found.
+                                    </ComboboxEmpty>
+                                    <ComboboxList>
                                         {(item) => (
                                             /* 4. Pass the item's id as the primary value instead of the whole object */
-                                            <ComboboxItem key={item.id} value={item.id}>
-                                            {item.name}
+                                            <ComboboxItem
+                                                key={item.id}
+                                                value={item.id}
+                                            >
+                                                {item.name}
                                             </ComboboxItem>
                                         )}
-                                        </ComboboxList>
-                                    </ComboboxContent>
-                                </Combobox>
+                                    </ComboboxList>
+                                </ComboboxContent>
+                            </Combobox>
 
-                                <FieldError>{form.errors.name}</FieldError>
-                            </Field>
-                            <CompanySelector
-                                companies={companies}
-                                selected={form.data.company_ids}
-                                onChange={(ids) =>
-                                    form.setData("company_ids", ids)
-                                }
-                            />
-                        </FieldSet>
-
-                        <Field className="mt-4">
+                            <FieldError>{form.errors.name}</FieldError>
+                        </Field>
+                        <CompanySelector
+                            companies={companies}
+                            selected={form.data.company_ids}
+                            onChange={(ids) => form.setData("company_ids", ids)}
+                        />
+                        <Field>
                             <Button
                                 type="submit"
                                 disabled={
@@ -129,9 +142,9 @@ export default function AddJobPositionForm({ companies, jobs }: Props) {
                                 {form.processing ? "Adding..." : "Add Position"}
                             </Button>
                         </Field>
-                    </div>
-                </form>
-            </CardContent>
+                    </FieldGroup>
+                </CardContent>
+            </form>
         </Card>
     );
 }
