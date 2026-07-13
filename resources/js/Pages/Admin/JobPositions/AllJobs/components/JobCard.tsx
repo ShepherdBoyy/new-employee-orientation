@@ -10,6 +10,7 @@ import {
     CardHeader,
     CardTitle,
     CardDescription,
+    CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -32,7 +33,7 @@ export default function JobCard({
         <>
             <Card className="transition-colors hover:bg-muted/30">
                 <CardHeader className="flex justify-between">
-                    <div className="flex gap-3 items-center">
+                    <div className="flex gap-2 items-center">
                         <Checkbox
                             checked={selected}
                             onCheckedChange={onToggle}
@@ -40,15 +41,6 @@ export default function JobCard({
 
                         <div>
                             <CardTitle>{job.name}</CardTitle>
-                            <CardDescription>
-                                {job.companies?.length
-                                    ? `Assigned to ${job.companies.length} ${
-                                          job.companies.length === 1
-                                              ? "company"
-                                              : "companies"
-                                      }`
-                                    : "Not assigned yet"}
-                            </CardDescription>
                         </div>
                     </div>
 
@@ -58,9 +50,19 @@ export default function JobCard({
                         onDelete={onDelete}
                     />
                 </CardHeader>
-                <CardContent className="pt-0">
+                <CardFooter className="justify-between items-center">
+                    <span className="text-xs text-muted-foreground">
+                        {job.companies?.length
+                            ? `Assigned to ${job.companies.length} ${
+                                  job.companies.length === 1
+                                      ? "company"
+                                      : "companies"
+                              }`
+                            : "Not assigned yet"}
+                    </span>
+
                     {job.companies?.length ? (
-                        <div className="flex -space-x-3">
+                        <div className="flex -space-x-4">
                             {job.companies.slice(0, 4).map((company) => (
                                 <Avatar
                                     key={company.id}
@@ -77,7 +79,7 @@ export default function JobCard({
                             ))}
 
                             {job.companies.length > 4 && (
-                                <div className="flex size-8 items-center justify-center rounded-full border-2 border-background bg-muted text-xs font-medium">
+                                <div className="flex size-8 items-center justify-center rounded-full border-2 border-background bg-muted text-xs font-medium z-10">
                                     +{job.companies.length - 4}
                                 </div>
                             )}
@@ -90,7 +92,7 @@ export default function JobCard({
                             </Link>
                         </Button>
                     )}
-                </CardContent>
+                </CardFooter>
             </Card>
         </>
     );

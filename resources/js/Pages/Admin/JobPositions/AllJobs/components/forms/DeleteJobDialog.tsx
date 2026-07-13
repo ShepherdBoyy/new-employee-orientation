@@ -19,15 +19,12 @@ type Props = {
     onConfirm: () => void;
 };
 
-
 export default function DeleteJobDialog({ job, onClose, onConfirm }: Props) {
     function deleteHandle() {
-        router.visit(`/admin/job-positions/${job.id}`,{
-            method:'delete',
-            onSuccess: () => {
-
-            }
-        })
+        router.visit(`/admin/job-positions/${job?.id}`, {
+            method: "delete",
+            onSuccess: () => {},
+        });
     }
 
     return (

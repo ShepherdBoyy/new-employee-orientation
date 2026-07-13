@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { router } from "@inertiajs/react";
-import type { JobPosition } from "../../Types/job-position";
+import type { JobPosition, JobSortOption } from "../../Types/job-position";
 import Master from "@/Layout/Master";
 import JobList from "./components/JobList";
 import CreateJobDialog from "./components/forms/CreateJobDialog";
@@ -9,6 +9,7 @@ import EditJobDialog from "./components/forms/EditJobDialog";
 import DeleteJobDialog from "./components/forms/DeleteJobDialog";
 import ToolbarJob from "./components/ToolbarJob";
 import DeleteSelectedJobs from "./components/forms/DeleteSelectedJobs";
+
 type Props = {
     jobs: JobPosition[];
 };
@@ -28,21 +29,30 @@ export default function Index({ jobs }: Props) {
     const [search, setSearch] = useState("");
     const [selectedJobIds, setSelectedJobIds] = useState<number[]>([]);
 
-    const [selected, setSelected] = useState<number[]>([]);
     const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
-
+    const [sort, setSort] = useState<JobSortOption>("assigned");
     const filteredJobs = jobs
         .filter((job) => job.name.toLowerCase().includes(search.toLowerCase()))
         .sort((a, b) => {
-            const aAssigned = a.companies?.length ?? 0;
-            const bAssigned = b.companies?.length ?? 0;
+            const aCompanies = a.companies?.length ?? 0;
+            const bCompanies = b.companies?.length ?? 0;
 
-            // Assigned jobs first
-            if (aAssigned === 0 && bAssigned > 0) return 1;
-            if (aAssigned > 0 && bAssigned === 0) return -1;
+            switch (sort) {
+                case "assigned":
+                    if (aCompanies === 0 && bCompanies > 0) return 1;
+                    if (aCompanies > 0 && bCompanies === 0) return -1;
 
-            // Then alphabetically
-            return a.name.localeCompare(b.name);
+                    return a.name.localeCompare(b.name);
+
+                case "most-companies":
+                    return bCompanies - aCompanies;
+
+                case "least-companies":
+                    return aCompanies - bCompanies;
+
+                default:
+                    return 0;
+            }
         });
     const allSelected =
         filteredJobs.length > 0 &&
@@ -54,9 +64,7 @@ export default function Index({ jobs }: Props) {
         } else {
             setSelectedJobIds(filteredJobs.map((job) => job.id));
         }
-    }  
-    
-    
+    }
     return (
         <Master>
             <div className="space-y-6">
@@ -81,6 +89,8 @@ export default function Index({ jobs }: Props) {
                     selectedCount={selectedJobIds.length}
                     onDeleteSelected={() => setDeleteSelectedOpen(true)}
                     onCreate={() => setCreateOpen(true)}
+                    sort={sort}
+                    onSortChange={setSort}
                 />
                 <CreateJobDialog
                     open={createOpen}

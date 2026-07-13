@@ -33,7 +33,7 @@ export default function JobList({
 }: Props) {
     if (!jobs.length) {
         return (
-            <Empty>
+            <Empty className="h-full">
                 <EmptyHeader>
                     <EmptyTitle>No job positions</EmptyTitle>
                     <EmptyDescription>
@@ -44,7 +44,7 @@ export default function JobList({
         );
     }
     return (
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 gap-4">
             {jobs.map((job) => (
                 <JobCard
                     key={job.id}

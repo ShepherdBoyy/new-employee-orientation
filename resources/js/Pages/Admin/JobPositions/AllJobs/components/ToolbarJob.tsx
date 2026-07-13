@@ -8,6 +8,8 @@ import {
     InputGroupAddon,
     InputGroupInput,
 } from "@/components/ui/input-group";
+import type { JobSortOption } from "@/Pages/Admin/Types/job-position";
+import JobSort from "./JobSort";
 type Props = {
     search: string;
     onSearchChange: (value: string) => void;
@@ -19,6 +21,8 @@ type Props = {
     onDeleteSelected: () => void;
 
     onCreate: () => void;
+    sort: JobSortOption;
+    onSortChange: (sort: JobSortOption) => void;
 };
 export default function ToolbarJob({
     onCreate,
@@ -28,60 +32,61 @@ export default function ToolbarJob({
     onToggleAll,
     selectedCount,
     onDeleteSelected,
+    sort,
+    onSortChange,
 }: Props) {
     return (
         <>
-            <Card>
-                <CardContent className="flex items-center justify-between gap-4 py-4">
-                    <div className="flex items-center gap-4 flex-1">
-                        <div className="flex gap-2 items-center">
-                            <div className="flex items-center gap-2 shrink-0">
-                                <Checkbox
-                                    checked={allSelected}
-                                    onCheckedChange={onToggleAll}
-                                />
+            <div className="flex items-center justify-between gap-4 py-4">
+                <div className="flex items-center gap-3 flex-1">
+                    <Button size="lg" onClick={onCreate}>
+                        <Plus className="size-4" />
+                        New Job
+                    </Button>
 
-                                <span className="text-sm text-muted-foreground">
-                                    Select all
-                                </span>
-                            </div>
-                        </div>
+                    <div className="flex gap-3 items-center">
+                        <JobSort sort={sort} onSortChange={onSortChange} />
                         <Separator orientation="vertical" />
-                        <InputGroup className="max-w-sm">
-                            <InputGroupInput
-                                value={search}
-                                onChange={(e) => onSearchChange(e.target.value)}
-                                placeholder="Search job positions..."
+
+                        <div className="flex items-center gap-2 shrink-0">
+                            <Checkbox
+                                checked={allSelected}
+                                onCheckedChange={onToggleAll}
                             />
-                            <InputGroupAddon>
-                                <SearchIcon />
-                            </InputGroupAddon>
-                        </InputGroup>
-                    </div>
 
-                    <div className="flex items-center gap-2">
-                        {selectedCount > 0 && (
                             <span className="text-sm text-muted-foreground">
-                                ({selectedCount} selected)
+                                Select all
                             </span>
-                        )}
-                        {selectedCount > 0 && (
-                            <Button
-                                variant="destructive"
-                                onClick={onDeleteSelected}
-                            >
-                                <Trash />
-                                Delete {selectedCount} jobs
-                            </Button>
-                        )}
-
-                        <Button onClick={onCreate}>
-                            <Plus className="size-4" />
-                            New Job
-                        </Button>
+                        </div>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+                <div className="flex items-center gap-2">
+                    {selectedCount > 0 && (
+                        <span className="text-sm text-muted-foreground">
+                            ({selectedCount} selected)
+                        </span>
+                    )}
+                    {selectedCount > 0 && (
+                        <Button
+                            variant="destructive"
+                            onClick={onDeleteSelected}
+                        >
+                            <Trash />
+                            Delete {selectedCount} jobs
+                        </Button>
+                    )}
+                </div>
+                <InputGroup className="max-w-sm h-9">
+                    <InputGroupInput
+                        value={search}
+                        onChange={(e) => onSearchChange(e.target.value)}
+                        placeholder="Search job positions..."
+                    />
+                    <InputGroupAddon>
+                        <SearchIcon />
+                    </InputGroupAddon>
+                </InputGroup>
+            </div>
         </>
     );
 }
