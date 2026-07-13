@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class Company extends Model
 {
@@ -20,6 +21,43 @@ class Company extends Model
     protected function casts(): array
     {
         return ["status" => "string"];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (Company $company) {
+            if (empty($company->slug)) {
+                $company->slug = static::generateUniqueSlug($company->name);
+            }
+        });
+
+        static::updating(function (Company $company) {
+            if ($company->isDirty("name") && !$company->isDirty("slug")) {
+                $company->slug = static::generateUniqueSlug($company->name, $company->id);
+            }
+        });
+    }
+
+    protected static function generateUniqueSlug(string $name, ?int $ignoreId = null): string
+    {
+        $slug = Str::slug($name);
+        $original = $slug;
+        $count = 1;
+
+        while (
+            static::where("slug", $slug)
+                ->when($ignoreId, fn($q) => $q->where("id", "!=", $ignoreId))
+                ->exists()
+        ) {
+            $slug = $original . "-" . $count++;
+        }
+
+        return $slug;
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return "slug";
     }
 
     public function foldersForEmployee(User $user): Collection
