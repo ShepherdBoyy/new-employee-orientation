@@ -1,15 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import {
+    DndContext,
+    closestCenter,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core'
+import { SortableContext, rectSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import { router } from '@inertiajs/react'
-import SlideCard from './SlideCard'
-
-export interface Slide {
-    id: number
-    folder_id: number
-    type: 'image' | 'video'
-    file_path: string
-    file_url?: string
-    order: number
-}
+import { ImageIcon } from 'lucide-react'
+import SlideItem, { type Slide } from './SlideItem'
+import DeleteSlideDialog from '../../Folders/components/DeleteSlideDialog'
 
 interface Props {
     slides: Slide[]
@@ -17,58 +19,76 @@ interface Props {
 }
 
 export default function SlideGrid({ slides: initialSlides, folderId }: Props) {
-    const [slides, setSlides]   = useState(initialSlides)
-    const [dragIndex, setDragIndex] = useState<number | null>(null)
+    const [slides, setSlides] = useState(initialSlides)
+    const [deletingSlide, setDeletingSlide] = useState<Slide | null>(null)
+    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }))
 
-    function handleDragStart(index: number) {
-        setDragIndex(index)
-    }
+    useEffect(() => {
+        setSlides(initialSlides)
+    }, [initialSlides])
 
-    function handleDragOver(e: React.DragEvent, index: number) {
-        e.preventDefault()
-        if (dragIndex === null || dragIndex === index) return
+    function handleDragEnd(event: DragEndEvent) {
+        const { active, over } = event
+        if (!over || active.id === over.id) return
 
-        const reordered    = [...slides]
-        const [moved]      = reordered.splice(dragIndex, 1)
-        reordered.splice(index, 0, moved)
-        setDragIndex(index)
+        const oldIndex = slides.findIndex(s => s.id === active.id)
+        const newIndex = slides.findIndex(s => s.id === over.id)
+        const reordered = arrayMove(slides, oldIndex, newIndex)
+
         setSlides(reordered)
+
+        router.patch(
+            `/admin/folders/${folderId}/slides/reorder`,
+            { slides: reordered.map((slide, index) => ({ id: slide.id, order: index + 1 })) },
+            { preserveScroll: true }
+        )
     }
 
-    function handleDragEnd() {
-        setDragIndex(null)
-        router.patch(`/admin/folders/${folderId}/slides/reorder`, {
-            slides: slides.map((slide, index) => ({
-                id:    slide.id,
-                order: index + 1,
-            })),
-        }, { preserveScroll: true })
+    function handleDeleteConfirm() {
+        if (deletingSlide) {
+            router.delete(`/admin/folders/${folderId}/slides/${deletingSlide.id}`, {
+                preserveScroll: true,
+            })
+            setDeletingSlide(null)
+        }
     }
 
     if (slides.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-                <p className="text-muted-foreground text-sm">
-                    No slides yet. Upload some files to get started.
-                </p>
+            <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-20 text-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                    <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div>
+                    <p className="text-sm font-medium">No slides yet</p>
+                    <p className="text-xs text-muted-foreground">Upload images or videos above.</p>
+                </div>
             </div>
         )
     }
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {slides.map((slide, index) => (
-                <SlideCard
-                    key={slide.id}
-                    slide={slide}
-                    index={index}
-                    folderId={folderId}
-                    isDragging={dragIndex === index}
-                    onDragStart={handleDragStart}
-                    onDragOver={handleDragOver}
-                    onDragEnd={handleDragEnd}
-                />
-            ))}
-        </div>
+        <>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={slides.map(s => s.id)} strategy={rectSortingStrategy}>
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                        {slides.map((slide, index) => (
+                            <SlideItem
+                                key={slide.id}
+                                slide={slide}
+                                index={index}
+                                onDeleteRequest={setDeletingSlide}
+                            />
+                        ))}
+                    </div>
+                </SortableContext>
+            </DndContext>
+
+            <DeleteSlideDialog
+                open={!!deletingSlide}
+                onCancel={() => setDeletingSlide(null)}
+                onConfirm={handleDeleteConfirm}
+            />
+        </>
     )
 }

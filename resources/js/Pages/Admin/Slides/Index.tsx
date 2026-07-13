@@ -1,156 +1,126 @@
-import { useState } from 'react'
-import { Head, Link } from '@inertiajs/react'
-import Master from '@/Layout/Master'
+import { useRef, useState } from 'react'
+import { Head, router, Link } from '@inertiajs/react'
+import { ArrowLeft, Upload, Eye, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
-import { ChevronLeft, Upload, Target } from 'lucide-react'
 import SlideGrid from './components/SlideGrid'
-import UploadSlidesDialog from './components/UploadSlidesDialog'
+import { type Slide } from './components/SlideItem'
+import Master from '@/Layout/Master'
 
-export interface Company {
+interface Target {
     id: number
-    name: string
-    slug: string
-    logo_path: string | null
-    status: 'active' | 'inactive'
-    users_count?: number
-}
-
-export interface JobPosition {
-    id: number
-    name: string
-    companies?: Company[]
-}
-
-export interface Folder {
-    id: number
-    name: string
-    order: number
-    slides_count?: number
-    targets?: FolderTarget[]
-}
-
-export interface Slide {
-    id: number
-    folder_id: number
-    type: 'image' | 'video'
-    file_path: string
-    file_url?: string
-    order: number
-}
-
-export interface FolderTarget {
-    id: number
-    folder_id: number
     company_id: number | null
     job_position_id: number | null
-    order: number
-    company?: Company
-    job_position?: JobPosition
+    audience_label: string
+}
+
+interface Folder {
+    id: number
+    name: string
+    targets: Target[]
 }
 
 interface Props {
-    folder: Folder & {
-        slides: Slide[]
-        targets: FolderTarget[]
-    }
+    folder: Folder
+    slides: Slide[]
 }
 
-export default function Index({ folder }: Props) {
-    const [uploadOpen, setUploadOpen] = useState(false)
+export default function Index({ folder, slides }: Props) {
+    const fileInputRef = useRef<HTMLInputElement>(null)
+    const [uploading, setUploading] = useState(false)
+    const [dragOver, setDragOver] = useState(false)
+
+    console.log(folder.targets);
+
+    function handleFiles(files: FileList | null) {
+        if (!files || files.length === 0) return
+        setUploading(true)
+        router.post(
+            `/admin/folders/${folder.id}/slides`,
+            { files: Array.from(files) },
+            { forceFormData: true, preserveScroll: true, onFinish: () => setUploading(false) }
+        )
+    }
+
+    function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
+        handleFiles(e.target.files)
+        e.target.value = ''
+    }
+
+    function handleDrop(e: React.DragEvent) {
+        e.preventDefault()
+        setDragOver(false)
+        handleFiles(e.dataTransfer.files)
+    }
 
     return (
         <Master>
             <Head title={folder.name} />
 
-            <div className="max-w-5xl mx-auto space-y-6">
+            <div className="w-full space-y-6 p-6 lg:p-8">
+                <Link
+                    href="/admin/folders/global"
+                    className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+                >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to folders
+                </Link>
 
-                {/* Header */}
-                <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Link
-                                href="/admin/folders"
-                                className="hover:text-foreground transition-colors flex items-center gap-1"
-                            >
-                                <ChevronLeft className="h-4 w-4" />
-                                Folders
-                            </Link>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-2xl font-semibold tracking-tight">
-                                {folder.name}
-                            </h1>
-                            <Badge variant="secondary">
-                                {folder.slides?.length ?? 0} slides
-                            </Badge>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="gap-2"
-                            onClick={() => window.location.href = `/admin/folder-targets?folder_id=${folder.id}`}
-                        >
-                            <Target className="h-4 w-4" />
-                            Manage Targets
-                            {folder.targets?.length > 0 && (
-                                <Badge variant="secondary" className="ml-1 h-5 text-xs">
-                                    {folder.targets.length}
-                                </Badge>
-                            )}
-                        </Button>
-                        <Button
-                            size="sm"
-                            className="gap-2"
-                            onClick={() => setUploadOpen(true)}
-                        >
-                            <Upload className="h-4 w-4" />
-                            Upload Slides
-                        </Button>
-                    </div>
-                </div>
-
-                <Separator />
-
-                {/* Targets summary */}
-                {folder.targets && folder.targets.length > 0 && (
-                    <div className="rounded-xl border bg-muted/40 p-4 space-y-2">
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                            Targeting Rules
-                        </p>
-                        <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col gap-4 border-b pb-5 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="space-y-2">
+                        <h1 className="text-xl font-semibold tracking-tight">{folder.name}</h1>
+                        <div className="flex flex-wrap gap-1.5">
                             {folder.targets.map(target => (
-                                <Badge key={target.id} variant="outline" className="text-xs">
-                                    {target.company_id === null && target.job_position_id === null
-                                        ? 'All employees'
-                                        : target.company_id === null
-                                        ? `All companies → ${target.job_position?.name ?? 'All positions'}`
-                                        : target.job_position_id === null
-                                        ? `${target.company?.name} → All positions`
-                                        : `${target.company?.name} → ${target.job_position?.name}`
-                                    }
+                                <Badge key={target.id} variant="secondary" className="text-xs font-normal">
+                                    {target.audience_label}
                                 </Badge>
                             ))}
                         </div>
                     </div>
-                )}
+                    <Button variant="outline" onClick={() => router.visit(`/admin/folders/${folder.id}/preview`)}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        Preview
+                    </Button>
+                </div>
 
-                {/* Slide grid */}
-                <SlideGrid
-                    slides={folder.slides ?? []}
-                    folderId={folder.id}
-                />
+                <div
+                    onDrop={handleDrop}
+                    onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+                    onDragLeave={() => setDragOver(false)}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-14 text-center transition ${
+                        dragOver ? 'border-primary bg-primary/5' : 'border-muted-foreground/20 hover:border-muted-foreground/40 hover:bg-muted/40'
+                    }`}
+                >
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*,video/*"
+                        multiple
+                        className="hidden"
+                        onChange={handleFileInput}
+                    />
+                    {uploading ? (
+                        <Loader2 className="h-7 w-7 animate-spin text-muted-foreground" />
+                    ) : (
+                        <Upload className={`h-7 w-7 ${dragOver ? 'text-primary' : 'text-muted-foreground/50'}`} />
+                    )}
+                    <p className="text-sm font-medium">
+                        {uploading ? 'Uploading...' : 'Drop files here or click to upload'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Images and videos up to 100MB each</p>
+                </div>
+
+                <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-sm font-medium text-muted-foreground">Slides</h2>
+                        <span className="text-xs text-muted-foreground">
+                            {slides.length} {slides.length === 1 ? 'slide' : 'slides'}
+                        </span>
+                    </div>
+                    <SlideGrid slides={slides} folderId={folder.id} />
+                </div>
             </div>
-
-            <UploadSlidesDialog
-                folderId={folder.id}
-                open={uploadOpen}
-                onOpenChange={setUploadOpen}
-            />
         </Master>
     )
 }

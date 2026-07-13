@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Folder;
+use App\Models\JobPosition;
 use App\Models\Slide;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Storage;
@@ -15,19 +18,16 @@ class SlideController extends Controller
 {
     public function index(Folder $folder): Response
     {
-        $folder->load("targets.company", "targets.jobPosition");
-
-        $slides = $folder->slides->map(fn($slide) => [
-            "id" => $slide->id,
-            "folder_id" => $slide->folder_id,
-            "type" => $slide->type,
-            "file_path" => $slide->file_path,
-            "file_url" => $slide->fileUrl(),
-            "order" => $slide->order
-        ]);
+        $folder->load("slides", "targets.company", "targets.jobPosition");
 
         return Inertia::render("Admin/Slides/Index", [
-            "folder" => array_merge($folder->toArray(), ["slides" => $slides])
+            "folder" => $folder,
+            "slides" => $folder->slides->map(fn($slide) => [
+                "id" => $slide->id,
+                "type" => $slide->type,
+                "file_url" => $slide->fileUrl(),
+                "order" => $slide->order
+            ])
         ]);
     }
 
@@ -46,15 +46,14 @@ class SlideController extends Controller
         $lastOrder = Slide::where("folder_id", $folder->id)
             ->max("order") ?? 0;
 
+        $storageFolder = $this->storagePath($folder);
+
         foreach ($request->file("files") as $index => $file) {
              $type = str_starts_with($file->getMimeType(), "video")
                 ? "video"
                 : "image";
             
-            $path = $file->store(
-                "folders/" . $folder->id,
-                config("filesystems.default")
-            );
+            $path = $file->store($storageFolder, config("filesystems.default"));
 
             Slide::create([
                 "folder_id" => $folder->id,
@@ -94,5 +93,39 @@ class SlideController extends Controller
         $slide->delete();
 
         return back()->with("success", "Slide deleted successfully");
+    }
+
+    public function previewFolder(Folder $folder): Response
+    {
+        $folder->load("slides");
+
+        return Inertia::render("Admin/Slides/Preview", [
+            "folder" => $folder,
+            "slides" => $folder->slides->map(fn($slide) => [
+                "id" => $slide->id,
+                "type" => $slide->type,
+                "file_url" => $slide->fileUrl(),
+                "order" => $slide->order
+            ])
+        ]);
+    }
+
+    private function storagePath(Folder $folder): string
+    {
+        $target = $folder->targets()->first();
+
+        if (!$target || (!$target->company_id && !$target->job_position_id)) {
+            return "folders/global/" . Str::slug($folder->name);
+        }
+
+        if ($target->company_id && !$target->job_position_id) {
+            $company = Company::find($target->company_id);
+            return "folders/" . $company->slug . "/" . Str::slug($folder->name);
+        }
+
+        $company = Company::find($target->company_id);
+        $jobPosition = JobPosition::find($target->job_position_id);
+
+        return "folders/" . $company->slug . "/job-positions/" . $jobPosition->slug . "/" . Str::slug($folder->name);
     }
 }
