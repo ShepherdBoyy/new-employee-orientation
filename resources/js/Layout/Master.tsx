@@ -28,7 +28,7 @@ export default function Master({ children }: MasterProps) {
                                 </div>
                             </header>
 
-                            <main className="flex-1 p-6">{children}</main>
+                            <main className="flex-1 p-8">{children}</main>
                         </SidebarInset>
                     </SidebarProvider>
                 </div>
