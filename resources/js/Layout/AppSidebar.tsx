@@ -69,7 +69,7 @@ export function AppSidebar() {
                 },
                 ...companies.map((company) => ({
                     title: company.name,
-                    path: `/admin/folders/${company.id}`
+                    path: `/admin/folders/${company.slug}`
                 }))
             ],
         },

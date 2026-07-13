@@ -19,4 +19,5 @@ export type NavItem = NavLinkItem | NavGroupItem;
 export interface CompanyNav {
     id: number;
     name: string;
+    slug: string;
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -13,6 +14,8 @@ class FolderTarget extends Model
         "job_position_id",
         "order"
     ];
+
+    protected $appends = ["audience_label"];
 
     protected function casts(): array
     {
@@ -45,27 +48,31 @@ class FolderTarget extends Model
             && $this->job_position_id === null;
     }
 
-    public function audienceLabel(): string
+    public function audienceLabel(): Attribute
     {
-        if ($this->isGlobal()) {
-            return "All employees";
-        }
-
-        $parts = [];
-
-        if ($this->company_id) {
-            $parts[] = $this->company?->name ?? "Unknown company";
-        } else {
-            $parts[] = "All companies";
-        }
-
-        if ($this->job_position_id) {
-            $parts[] = $this->jobPosition?->name ?? "Unknown position";
-        } else {
-            $parts[] = "All positions";
-        }
-
-        return implode(" → ", $parts);
+        return Attribute::make(
+            get: function () {
+                if ($this->isGlobal()) {
+                    return "All employees";
+                }
+        
+                $parts = [];
+        
+                if ($this->company_id) {
+                    $parts[] = $this->company?->name ?? "Unknown company";
+                } else {
+                    $parts[] = "All companies";
+                }
+        
+                if ($this->job_position_id) {
+                    $parts[] = $this->jobPosition?->name ?? "Unknown position";
+                } else {
+                    $parts[] = "All positions";
+                }
+        
+                return implode(" → ", $parts);
+            }
+        );
     }
 
     public function folder(): BelongsTo

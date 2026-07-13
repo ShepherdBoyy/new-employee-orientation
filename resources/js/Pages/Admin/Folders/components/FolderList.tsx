@@ -1,98 +1,108 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import {
+    DndContext,
+    closestCenter,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable'
 import { router } from '@inertiajs/react'
-import FolderCard from "./FolderCard"
-
-interface Company {
-    id: number
-    name: string
-    slug: string
-    logo_path: string | null
-    status: 'active' | 'inactive'
-    users_count?: number
-}
-
-interface JobPosition {
-    id: number
-    name: string
-    companies?: Company[]
-}
-
-interface FolderTarget {
-    id: number
-    folder_id: number
-    company_id: number | null
-    job_position_id: number | null
-    order: number
-    company?: Company
-    job_position?: JobPosition
-}
-
-interface Folder {
-    id: number
-    name: string
-    order: number
-    slides_count?: number
-    targets?: FolderTarget[]
-}
+import { FolderPlus } from 'lucide-react'
+import FolderItem, { type Folder } from './FolderItem'
+import DeleteFolderDialog from './DeleteFolderDialog'
 
 interface Props {
     folders: Folder[]
+    reorderRoute: string
+    reorderData?: Record<string, number | null>
+    previewHref: (folder: Folder) => string
     onEdit: (folder: Folder) => void
+    onDelete: (folder: Folder) => void
 }
 
-export default function FolderList({ folders: initialFolders, onEdit }: Props) {
+export default function FolderList({
+    folders: initialFolders,
+    reorderRoute,
+    reorderData = {},
+    previewHref,
+    onEdit,
+    onDelete,
+}: Props) {
     const [folders, setFolders] = useState(initialFolders)
-    const [dragIndex, setDragIndex] = useState<number | null>(null)
+    const [deletingFolder, setDeletingFolder] = useState<Folder | null>(null)
+    const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }))
 
-    function handleDragStart(index: number) {
-        setDragIndex(index)
-    }
+    // Keep local state in sync whenever Inertia gives us fresh props
+    useEffect(() => {
+        setFolders(initialFolders)
+    }, [initialFolders])
 
-    function handleDragOver(e: React.DragEvent, index: number) {
-        e.preventDefault()
-        if (dragIndex === null || dragIndex === index) return
+    function handleDragEnd(event: DragEndEvent) {
+        const { active, over } = event
+        if (!over || active.id === over.id) return
 
-        const reordered = [...folders]
-        const [moved] = reordered.splice(dragIndex, 1)
-        reordered.splice(index, 0, moved)
-        setDragIndex(index)
+        const oldIndex = folders.findIndex(f => f.id === active.id)
+        const newIndex = folders.findIndex(f => f.id === over.id)
+        const reordered = arrayMove(folders, oldIndex, newIndex)
+
         setFolders(reordered)
+
+        router.patch(
+            reorderRoute,
+            {
+                ...reorderData,
+                folders: reordered.map((folder, index) => ({ id: folder.id, order: index + 1 })),
+            },
+            { preserveScroll: true }
+        )
     }
 
-    function handleDragEnd() {
-        setDragIndex(null)
-        router.patch('/admin/folders/reorder', {
-            folders: folders.map((folder, index) => ({
-                id:    folder.id,
-                order: index + 1,
-            })),
-        }, { preserveScroll: true })
+    function handleDeleteConfirm() {
+        if (deletingFolder) {
+            onDelete(deletingFolder)
+            setDeletingFolder(null)
+        }
     }
 
     if (folders.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-                <p className="text-muted-foreground text-sm">
-                    No folders yet. Create your first folder to get started.
-                </p>
+            <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-20 text-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                    <FolderPlus className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div>
+                    <p className="text-sm font-medium">No folders yet</p>
+                    <p className="text-xs text-muted-foreground">Create one to get started.</p>
+                </div>
             </div>
         )
     }
 
     return (
-        <div className="space-y-2">
-            {folders.map((folder, index) => (
-                <FolderCard
-                    key={folder.id}
-                    folder={folder}
-                    index={index}
-                    onEdit={onEdit}
-                    isDragging={dragIndex === index}
-                    onDragStart={handleDragStart}
-                    onDragOver={handleDragOver}
-                    onDragEnd={handleDragEnd}
-                />
-            ))}
-        </div>
+        <>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={folders.map(f => f.id)} strategy={verticalListSortingStrategy}>
+                    <div className="space-y-2">
+                        {folders.map(folder => (
+                            <FolderItem
+                                key={folder.id}
+                                folder={folder}
+                                onEdit={onEdit}
+                                onDeleteRequest={setDeletingFolder}
+                                previewHref={previewHref(folder)}
+                            />
+                        ))}
+                    </div>
+                </SortableContext>
+            </DndContext>
+
+            <DeleteFolderDialog
+                folder={deletingFolder}
+                onCancel={() => setDeletingFolder(null)}
+                onConfirm={handleDeleteConfirm}
+            />
+        </>
     )
 }
