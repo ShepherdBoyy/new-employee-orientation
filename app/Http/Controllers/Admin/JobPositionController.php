@@ -17,7 +17,7 @@ class JobPositionController extends Controller
 
     public function index()
     {
-        $jobs = JobPosition::with('companies')->get();
+        $jobs = JobPosition::with('companies')->paginate(1);
         return Inertia::render("Admin/JobPositions/AllJobs/Index")->with(['jobs' => $jobs]);
     }
 
