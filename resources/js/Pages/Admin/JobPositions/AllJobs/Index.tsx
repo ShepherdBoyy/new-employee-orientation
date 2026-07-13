@@ -9,7 +9,8 @@ import EditJobDialog from "./components/forms/EditJobDialog";
 import DeleteJobDialog from "./components/forms/DeleteJobDialog";
 import ToolbarJob from "./components/ToolbarJob";
 import DeleteSelectedJobs from "./components/forms/DeleteSelectedJobs";
-
+import AppPagination from "./components/Pagination";
+import type { Paginated } from "../../Types/job-position";
 type Props = {
     jobs: JobPosition[];
 };
@@ -102,6 +103,16 @@ export default function Index({ jobs }: Props) {
                     onSelectionChange={setSelectedJobIds}
                     onEdit={setEditingJob}
                     onDelete={setDeletingJob}
+                />
+                <AppPagination
+                    from={1}
+                    to={12}
+                    total={48}
+                    currentPage={1}
+                    lastPage={4}
+                    onPrevious={() => {}}
+                    onNext={() => {}}
+                    onPageChange={() => {}}
                 />
             </div>
 
