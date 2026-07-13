@@ -14,12 +14,12 @@ import {
     FieldError,
     FieldGroup,
     FieldLabel,
-    FieldLegend,
     FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { COMPANY_THEMES } from "../Index";
+import { COMPANY_THEMES } from "../../Types/company";
 import { UseFormReturn } from "@inertiajs/react";
+import { Plus } from "lucide-react";
 
 type CreateCompanyDialogProps = {
     open: boolean;
@@ -37,12 +37,15 @@ export default function CreateCompanyDialog({
     onOpenChange,
     form,
     onSubmit,
-    onClose,
 }: CreateCompanyDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
-                <Button size="lg">New Company</Button>
+                <Button size="lg">
+                    {" "}
+                    <Plus />
+                    New Company
+                </Button>
             </DialogTrigger>
 
             <DialogContent>
@@ -135,7 +138,6 @@ export default function CreateCompanyDialog({
                                     size="lg"
                                     variant="outline"
                                     type="button"
-                                    onClick={onClose}
                                 >
                                     Cancel
                                 </Button>

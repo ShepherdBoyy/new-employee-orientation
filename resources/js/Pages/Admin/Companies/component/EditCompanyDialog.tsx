@@ -1,6 +1,6 @@
-import type { Company } from "../Index";
-import { COMPANY_THEMES } from "../Index";
+import type { CompanyWithJobCount } from "../../Types/company";
 import { UseFormReturn } from "@inertiajs/react";
+import { COMPANY_THEMES } from "../../Types/company";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -15,17 +15,17 @@ import {
     FieldDescription,
     FieldGroup,
     FieldLabel,
-    FieldLegend,
     FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+
 type CompanyForm = {
     name: string;
     logo_path: File | null;
     header_theme: string;
 };
 type EditCompanyDialogProps = {
-    company: Company | null;
+    company: CompanyWithJobCount | null;
     form: UseFormReturn<CompanyForm>;
     onSubmit: (e: React.FormEvent) => void;
     onClose: () => void;

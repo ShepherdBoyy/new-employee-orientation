@@ -6,14 +6,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import { Company } from "../Index";
+import type { CompanyWithJobCount } from "../../Types/company";
 import { EllipsisVertical, Trash, Pen } from "lucide-react";
 
 type CompanyCardActionsProps = {
-    company: Company;
-    onEdit: (company: Company) => void;
-    onDelete: (company: Company) => void;
+    company: CompanyWithJobCount;
+    onEdit: (company: CompanyWithJobCount) => void;
+    onDelete: (company: CompanyWithJobCount) => void;
 };
 
 export default function CompanyCardActions({

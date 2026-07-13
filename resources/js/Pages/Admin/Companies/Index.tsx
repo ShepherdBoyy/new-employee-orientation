@@ -14,41 +14,19 @@ import DeleteCompanyDialog from "./component/DeleteCompanyDialog";
 import CreateCompanyDialog from "./component/CreateCompanyDialog";
 import EditCompanyDialog from "./component/EditCompanyDialog";
 import CompanyCard from "./component/CompanyCard";
-
-export const COMPANY_THEMES = {
-    default :"#2563eb",
-    lush_fields: "bg-gradient-to-r from-[#5DA92F] to-[#9BD46A]",
-
-    ocean_dust: "bg-gradient-to-r from-[#9BB2E5] to-[#698CBF]",
-
-    orange_heat: "bg-gradient-to-r from-[#F64C18] to-[#EE9539]",
-
-    void_spark: "bg-gradient-to-r from-[#000328] to-[#00458E]",
-
-    lime_rush: "bg-gradient-to-r from-[#51C26F] to-[#F2E901]",
-
-    frosted_light: "bg-gradient-to-r from-[#EBF4F5] to-[#B5C6E0]",
-} as const;
-export interface Company {
-    id: number;
-    name: string;
-    slug: string;
-    logo_path: string | null;
-    status: "active" | "inactive";
-    users_count: number;
-    header_theme: keyof typeof COMPANY_THEMES;
-}
+import { Separator } from "@/components/ui/separator";
+import type { CompanyWithJobCount } from "../Types/company";
 
 interface Props {
-    companies: Company[];
+    companies: CompanyWithJobCount[];
 }
 
 export default function CompaniesIndex({ companies }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
-    const [editingCompany, setEditingCompany] = useState<Company | null>(null);
-    const [companyToDelete, setCompanyToDelete] = useState<Company | null>(
-        null,
-    );
+    const [editingCompany, setEditingCompany] =
+        useState<CompanyWithJobCount | null>(null);
+    const [companyToDelete, setCompanyToDelete] =
+        useState<CompanyWithJobCount | null>(null);
     const createForm = useForm({
         name: "",
         logo_path: null as File | null,
@@ -81,7 +59,7 @@ export default function CompaniesIndex({ companies }: Props) {
         });
     }
 
-    function handleToggleStatus(company: Company) {
+    function handleToggleStatus(company: CompanyWithJobCount) {
         router.patch(`/admin/companies/${company.id}/toggle-status`);
     }
 
@@ -99,8 +77,20 @@ export default function CompaniesIndex({ companies }: Props) {
         <>
             <Master>
                 {companies.length > 0 ? (
-                    <>
-                        <div className="flex justify-end">
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h1 className="text-2xl font-semibold tracking-tight">
+                                    Company
+                                </h1>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    Reusable roles that can later be assigned to
+                                    one or more companies.
+                                </p>
+                            </div>
+                        </div>
+                        <Separator />
+                        <div className="">
                             <CreateCompanyDialog
                                 open={createOpen}
                                 onOpenChange={(open) => {
@@ -148,39 +138,37 @@ export default function CompaniesIndex({ companies }: Props) {
                             onClose={() => setCompanyToDelete(null)}
                             onConfirm={confirmDelete}
                         />
-                    </>
+                    </div>
                 ) : (
-                    <>
-                        <Empty className="h-full">
-                            <EmptyHeader>
-                                <EmptyMedia variant="icon">
-                                    <BrushCleaning className="" />
-                                </EmptyMedia>
-                                <EmptyTitle className="text-2xl">
-                                    No companies found
-                                </EmptyTitle>
-                                <EmptyDescription>
-                                    Add your first company to start setting up
-                                    your workspace.
-                                </EmptyDescription>
-                            </EmptyHeader>
-                            <EmptyContent>
-                                <CreateCompanyDialog
-                                    open={createOpen}
-                                    onOpenChange={(open) => {
-                                        setCreateOpen(open);
+                    <Empty className="h-full">
+                        <EmptyHeader>
+                            <EmptyMedia variant="icon">
+                                <BrushCleaning className="" />
+                            </EmptyMedia>
+                            <EmptyTitle className="text-2xl">
+                                No companies found
+                            </EmptyTitle>
+                            <EmptyDescription>
+                                Add your first company to start setting up your
+                                workspace.
+                            </EmptyDescription>
+                        </EmptyHeader>
+                        <EmptyContent>
+                            <CreateCompanyDialog
+                                open={createOpen}
+                                onOpenChange={(open) => {
+                                    setCreateOpen(open);
 
-                                        if (!open) {
-                                            createForm.reset();
-                                            createForm.clearErrors();
-                                        }
-                                    }}
-                                    form={createForm}
-                                    onSubmit={handleCreate}
-                                />
-                            </EmptyContent>
-                        </Empty>
-                    </>
+                                    if (!open) {
+                                        createForm.reset();
+                                        createForm.clearErrors();
+                                    }
+                                }}
+                                form={createForm}
+                                onSubmit={handleCreate}
+                            />
+                        </EmptyContent>
+                    </Empty>
                 )}
             </Master>
         </>

@@ -1,12 +1,13 @@
-import { Company, COMPANY_THEMES } from "../Index";
 import CompanyCardActions from "./CompanyCardActions";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { CompanyWithJobCount } from "../../Types/company";
+import { COMPANY_THEMES } from "../../Types/company";
 
 type CompanyCardProps = {
-    company: Company;
-    onEdit: (company: Company) => void;
-    onDelete: (company: Company) => void;
+    company: CompanyWithJobCount;
+    onEdit: (company: CompanyWithJobCount) => void;
+    onDelete: (company: CompanyWithJobCount) => void;
 };
 
 export default function CompanyCard({
@@ -42,7 +43,10 @@ export default function CompanyCard({
             <CardHeader>
                 <CardContent className="pt-12">
                     <p className="text-sm text-muted-foreground">
-                        New Employee Orientation
+                        {company.jobs_count}{" "}
+                        {company.jobs_count === 1
+                            ? "Job Position"
+                            : "Job Positions"}
                     </p>
                 </CardContent>
             </CardHeader>
