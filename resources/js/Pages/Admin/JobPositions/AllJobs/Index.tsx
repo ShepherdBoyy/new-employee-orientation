@@ -82,6 +82,7 @@ export default function Index({ jobs }: Props) {
                 </div>
 
                 <Separator />
+
                 <ToolbarJob
                     search={search}
                     onSearchChange={setSearch}
@@ -111,35 +112,49 @@ export default function Index({ jobs }: Props) {
                     currentPage={jobs.current_page}
                     lastPage={jobs.last_page}
                     onPrevious={() => {
-                        router.visit(jobs?.prev_page_url)
+                        if (jobs.current_page > 1) {
+                            router.visit(window.location.pathname, {
+                                data: {
+                                    page: jobs.current_page - 1,
+                                },
+                                preserveScroll: true,
+                            });
+                        }
                     }}
                     onNext={() => {
-                        router.visit(jobs?.next_page_url)
+                        if (jobs.current_page < jobs.last_page) {
+                            router.visit(window.location.pathname, {
+                                data: {
+                                    page: jobs.current_page + 1,
+                                },
+                                preserveScroll: true,
+                            });
+                        }
                     }}
                     onPageChange={(page) => {
                         router.visit(window.location.pathname, {
-                            data: { page: page }
+                            data: { page: page },
                         });
                     }}
                 />
-            </div>
 
-            {/* Forms */}
-            <EditJobDialog
-                job={editingJob}
-                onClose={() => setEditingJob(null)}
-            />
-            <DeleteJobDialog
-                job={deletingJob}
-                onClose={() => setDeletingJob(null)}
-                onConfirm={handleDelete}
-            />
-            <DeleteSelectedJobs
-                ids={selectedJobIds}
-                setIds={setSelectedJobIds}
-                open={deleteSelectedOpen}
-                onClose={() => setDeleteSelectedOpen(false)}
-            />
+                {/* Forms */}
+                <EditJobDialog
+                    job={editingJob}
+                    onClose={() => setEditingJob(null)}
+                />
+                <DeleteJobDialog
+                    job={deletingJob}
+                    onClose={() => setDeletingJob(null)}
+                    onConfirm={handleDelete}
+                />
+                <DeleteSelectedJobs
+                    ids={selectedJobIds}
+                    setIds={setSelectedJobIds}
+                    open={deleteSelectedOpen}
+                    onClose={() => setDeleteSelectedOpen(false)}
+                />
+            </div>
         </Master>
     );
 }

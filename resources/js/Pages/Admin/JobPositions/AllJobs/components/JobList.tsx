@@ -1,11 +1,3 @@
-import {
-    Table,
-    TableBody,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-
 import JobCard from "./JobCard";
 
 import type { JobPosition } from "@/Pages/Admin/Types/job-position";
