@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Employee\EmployeeController;
-use App\Http\Controllers\OrientationController;
+use App\Http\Controllers\Employee\OrientationController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect("/", "login");
