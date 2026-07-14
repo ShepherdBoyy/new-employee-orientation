@@ -1,5 +1,6 @@
 import { useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner"
 import * as React from "react";
 import {
     Card,
@@ -36,7 +37,7 @@ interface Props {
     companies: Company[];
 }
 
-export default function AddJobPositionForm({ companies, jobs }: Props) {
+export default function AssignedJobPositionForm({ companies, jobs }: Props) {
     const form = useForm({
         company_ids: [] as number[],
         job_ids: [] as number[],
@@ -47,7 +48,11 @@ export default function AddJobPositionForm({ companies, jobs }: Props) {
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         form.post("/admin/assign-jobs", {
-            onSuccess: () => form.reset(),
+            onSuccess: (message) => {
+                form.reset()
+                toast.success(message.props.success, { position: "top-center" });
+            },
+            
         });
     }
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AddJobPositionForm from "./components/AddJobPositionForm";
+import AssignedJobPositionForm from "./components/AssignedJobPositionForm";
 import CompanyJobTabs from "./components/CompanyJobTabs";
 import Master from "@/Layout/Master";
 import type { JobPosition } from "../../Types/job-position";
@@ -17,7 +17,7 @@ export default function JobPositionsIndex({ companies, jobs }: Props) {
         <>
             <Master>
                 <div className="grid lg:grid-cols-[420px_1fr] gap-3 items-start">
-                    <AddJobPositionForm companies={companies} jobs={jobs} />
+                    <AssignedJobPositionForm companies={companies} jobs={jobs} />
                     <CompanyJobTabs companies={companies} />
                 </div>
             </Master>

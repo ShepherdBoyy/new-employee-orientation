@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PinOff, Trash2Icon } from "lucide-react";
 import { router } from "@inertiajs/react";
+import { toast } from "sonner";
 
 interface JobWithPivot {
     id: number;
@@ -35,8 +36,9 @@ export default function RemoveJobDialog({ job, companyName, onClose }: Props) {
             `/admin/delete-assigned-job/${job.pivot.company_id}/${job.id}`,
             {
                 preserveScroll: true,
-                onSuccess: () => {
+                onSuccess: (message) => {
                     onClose();
+                    toast.success(message.props.success, { position: "top-center" });
                 },
             },
         );

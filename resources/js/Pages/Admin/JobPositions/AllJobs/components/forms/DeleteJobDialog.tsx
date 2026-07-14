@@ -12,6 +12,7 @@ import {
 import { Trash2Icon } from "lucide-react";
 import { JobPosition } from "@/Pages/Admin/Types/job-position";
 import { router } from "@inertiajs/react";
+import { toast } from "sonner"
 
 type Props = {
     job: JobPosition | null;
@@ -23,7 +24,9 @@ export default function DeleteJobDialog({ job, onClose, onConfirm }: Props) {
     function deleteHandle() {
         router.visit(`/admin/job-positions/${job?.id}`, {
             method: "delete",
-            onSuccess: () => {},
+            onSuccess: (message) => {
+                toast.success(message.props.success, { position: "top-center" });
+            },
         });
     }
 

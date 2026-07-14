@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { usePage } from "@inertiajs/react";
+import { Toaster } from "@/components/ui/sonner"
 
 type MasterProps = {
     children: React.ReactNode;
@@ -29,6 +30,7 @@ export default function Master({ children }: MasterProps) {
                             </header>
 
                             <main className="flex-1 p-8">{children}</main>
+                            <Toaster />
                         </SidebarInset>
                     </SidebarProvider>
                 </div>

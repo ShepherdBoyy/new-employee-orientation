@@ -54,6 +54,8 @@ class JobPositionController extends Controller
     public function destroyMultipleJobs(Request $request) 
     {
         JobPosition::destroy($request->ids);
+
+        return back()->with("success", "Multiple job positions deleted successfully");
     }
 
     public function getByCompany(Request $request): JsonResponse
@@ -105,6 +107,8 @@ class JobPositionController extends Controller
             // This inserts new relationships and ignores existing ones
             $company->jobs()->syncWithoutDetaching($request->job_ids);
         }
+
+        return back()->with("success", "Job assigned successfully");
     }
 
     public function deleteAssignedJob($company_id, $job_id)
@@ -113,6 +117,8 @@ class JobPositionController extends Controller
         ->where('company_id', $company_id)
         ->where('job_position_id', $job_id)
         ->delete();
+
+        return back()->with("success", "Job position unlinked successfully");
     }
 
 }

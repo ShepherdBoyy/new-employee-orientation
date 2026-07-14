@@ -16,7 +16,7 @@ import EditCompanyDialog from "./component/EditCompanyDialog";
 import CompanyCard from "./component/CompanyCard";
 import { Separator } from "@/components/ui/separator";
 import type { CompanyWithJobCount } from "../Types/company";
-
+import { toast } from "sonner"
 interface Props {
     companies: CompanyWithJobCount[];
 }
@@ -44,10 +44,11 @@ export default function CompaniesIndex({ companies }: Props) {
         createForm.post("/admin/companies", {
             forceFormData: true,
 
-            onSuccess: () => {
+            onSuccess: (message) => {
                 createForm.reset();
                 createForm.clearErrors();
                 setCreateOpen(false);
+                toast.success(message.props.success, { position: "top-center" });
             },
         });
     }
@@ -55,7 +56,10 @@ export default function CompaniesIndex({ companies }: Props) {
     function handleUpdate(e: React.FormEvent) {
         e.preventDefault();
         editForm.put(`/admin/companies/${editingCompany?.id}`, {
-            onSuccess: () => setEditingCompany(null),
+            onSuccess: (message) => {
+                setEditingCompany(null)
+                toast.success(message.props.success, { position: "top-center" });
+            },
         });
     }
 
@@ -68,8 +72,9 @@ export default function CompaniesIndex({ companies }: Props) {
         router.delete(`/admin/companies/${companyToDelete.id}`, {
             preserveScroll: true,
 
-            onSuccess: () => {
+            onSuccess: (message) => {
                 setCompanyToDelete(null);
+                toast.success(message.props.success, { position: "top-center" });
             },
         });
     }

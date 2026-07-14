@@ -13,6 +13,8 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 
+import { toast } from "sonner"
+
 import {
     Field,
     FieldDescription,
@@ -38,8 +40,9 @@ export default function EditJobDialog({ onClose, job }: Props) {
         if (!job) return;
 
         form.put(`/admin/job-positions/${job.id}`, {
-            onSuccess: () => {
+            onSuccess: (message) => {
                 onClose();
+                toast.success(message.props.success, { position: "top-center" });
             },
         });
     }

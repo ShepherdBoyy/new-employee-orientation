@@ -12,6 +12,7 @@ import {
 import { Trash2Icon } from "lucide-react";
 import { JobPosition } from "@/Pages/Admin/Types/job-position";
 import { router } from "@inertiajs/react";
+import { toast } from "sonner"
 
 type Props = {
     ids: number[];
@@ -31,8 +32,9 @@ export default function DeleteSelectedJobs({
             data: {
                 ids: ids,
             },
-            onSuccess: () => {
+            onSuccess: (message) => {
                 setIds([])
+                toast.success(message.props.success, { position: "top-center" });
             },
         });
     }

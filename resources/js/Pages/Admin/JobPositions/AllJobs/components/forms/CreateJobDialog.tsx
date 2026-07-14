@@ -2,7 +2,7 @@ import { useForm } from "@inertiajs/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
+import { toast } from "sonner"
 import {
     Dialog,
     DialogContent,
@@ -35,9 +35,10 @@ export default function CreateJobDialog({ open, onOpenChange }: Props) {
         form.post("/admin/job-positions", {
             preserveScroll: true,
 
-            onSuccess: () => {
+            onSuccess: (message) => {
                 form.reset();
                 onOpenChange(false);
+                toast.success(message.props.success, { position: "top-center" });
             },
         });
     }
