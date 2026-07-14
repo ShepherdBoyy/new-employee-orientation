@@ -9,8 +9,10 @@ use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Employee\EmployeeController;
+use App\Http\Controllers\OrientationController;
 use Illuminate\Support\Facades\Route;
 
+Route::redirect("/", "login");
 
 Route::middleware("guest")->group(function () {
     Route::get("/login", [AuthController::class, "showLogin"])->name("login");
@@ -54,8 +56,8 @@ Route::middleware("auth")->group(function () {
         Route::patch("/folders/reorder-targets", [FolderController::class, "reorderTargets"])->name("folders.reorder-targets");
         Route::delete("/folders/{folder}", [FolderController::class, "destroy"])->name("folders.destroy");
 
-        Route::get("/folders/{folder}/preview", [SlideController::class, "previewFolder"])->name("slides.preview");
-        Route::get("/folders/{folder}/slides", [SlideController::class, "index"])->name("slides.index");
+        Route::get("/folders/{folder:slug}/preview", [SlideController::class, "previewFolder"])->name("slides.preview");
+        Route::get("/folders/{folder:slug}/slides", [SlideController::class, "index"])->name("slides.index");
         Route::post("/folders/{folder}/slides", [SlideController::class, "store"])->name("slides.store");
         Route::patch("/folders/{folder}/slides/reorder", [SlideController::class, "reorder"])->name("slides.reorder");
         Route::delete("/folders/{folder}/slides/{slide}", [SlideController::class, "destroy"])->name("slides.destroy");
@@ -74,9 +76,7 @@ Route::middleware("auth")->group(function () {
     });
 
     Route::middleware(["role:employee", "expiry"])->prefix("orientation")->name("employee.")->group(function () {
+        Route::get("/", [OrientationController::class, "index"])->name("orientation");
         Route::get("/locked", fn() => inertia("Employee/AccountLocked"))->name("account-locked");
     });
-});
-Route::controller(EmployeeController::class)->group( function () {
-    Route::get('/orientation', 'Index');
 });
