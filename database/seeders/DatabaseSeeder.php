@@ -24,5 +24,7 @@ class DatabaseSeeder extends Seeder
             'company_id' => null,
             'expires_at' => null,
         ]);
+
+        $this->call([CompanyJobPositionSeeder::class]);
     }
 }
