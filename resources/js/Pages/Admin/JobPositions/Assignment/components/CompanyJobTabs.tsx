@@ -59,15 +59,11 @@ export default function CompanyJobTabs({ companies }: Props) {
         <>
             <Card className="w-full flex flex-col overflow-hidden">
                 <CardHeader className="border-b bg-muted/20">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                            <CardTitle>Job Management Matrix</CardTitle>
-                            <CardDescription>
-                                Review and detach active job positions across
-                                your companies.
-                            </CardDescription>
-                        </div>
-                    </div>
+                    <CardTitle>Job Management Matrix</CardTitle>
+                    <CardDescription>
+                        Review and detach active job positions across your
+                        companies.
+                    </CardDescription>
                 </CardHeader>
 
                 <CardContent className="p-6">
