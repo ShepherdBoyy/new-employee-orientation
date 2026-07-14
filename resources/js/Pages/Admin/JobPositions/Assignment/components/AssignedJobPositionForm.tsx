@@ -62,15 +62,15 @@ export default function AssignedJobPositionForm({ companies, jobs }: Props) {
 
     return (
         <Card className="w-full h-full flex flex-col overflow-hidden">
-            <form onSubmit={handleSubmit} className="max-w-md ">
-                <CardHeader className="border-b bg-muted/20">
-                    <CardTitle>Assign Job Position</CardTitle>
-                    <CardDescription>
-                        Select a job position and assign it to one or more
-                        companies.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
+            <CardHeader className="border-b bg-muted/20">
+                <CardTitle>Assign Job Position</CardTitle>
+                <CardDescription>
+                    Select a job position and assign it to one or more
+                    companies.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <form onSubmit={handleSubmit} className="max-w-md ">
                     <FieldGroup>
                         <Field className="mt-4">
                             <FieldLabel>Position Name</FieldLabel>
@@ -148,8 +148,8 @@ export default function AssignedJobPositionForm({ companies, jobs }: Props) {
                             </Button>
                         </Field>
                     </FieldGroup>
-                </CardContent>
-            </form>
+                </form>
+            </CardContent>
         </Card>
     );
 }
