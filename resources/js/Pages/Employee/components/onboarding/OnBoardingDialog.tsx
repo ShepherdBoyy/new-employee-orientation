@@ -9,13 +9,13 @@ interface OnboardingDialogProps {
     onFinish?: () => void;
 }
 
-export function OnboardingDialog({ open, onFinish }: OnboardingDialogProps) {
+export function OnboardingDialog({ open, onFinish,user }: OnboardingDialogProps) {
     const [step, setStep] = useState(0);
 
     return (
         <div className=" mx-auto flex items-center justify-center min-h-screen font-poppins ">
             <div className=" grid lg:grid-cols-2 w-full max-w-7xl min-h-175 rounded-3xl overflow-hidden border shadow-xl bg-background">
-                {step === 0 && <WelcomeStep onNext={() => setStep(1)} />}
+                {step === 0 && <WelcomeStep user={user} onNext={() => setStep(1)} />}
 
                 {step === 1 && (
                     <ModulesStep

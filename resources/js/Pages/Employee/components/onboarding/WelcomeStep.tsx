@@ -1,10 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Rotate3d } from "lucide-react";
+
 interface WelcomeStepProps {
     onNext: () => void;
+    user:{
+        name:string;
+        companyName:string;
+        jobPosition:string
+    }
 }
 
-export function WelcomeStep({ onNext }: WelcomeStepProps) {
+export function WelcomeStep({ onNext, user }: WelcomeStepProps) {
     return (
         <div className="flex flex-col">
             <div className="flex gap-2 items-center px-6 py-6">
@@ -14,7 +20,7 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
 
             <div className="space-y-12 px-12 py-10">
                 <div className="flex flex-col gap-4">
-                    <p className="text-sm font-semibold">Hello there!</p>
+                    <p className="text-sm font-semibold">Hello there! {user.name}</p>
                     <h1 className="text-[40px]/snug font-light tracking-tight">
                         We're glad you're here.
                     </h1>
