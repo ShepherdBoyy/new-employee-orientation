@@ -55,11 +55,6 @@ class Company extends Model
         return $slug;
     }
 
-    public function getRouteKeyName(): string
-    {
-        return "slug";
-    }
-
     public function foldersForEmployee(User $user): Collection
     {
         $companySpecific = FolderTarget::where("company_id", $user->company_id)

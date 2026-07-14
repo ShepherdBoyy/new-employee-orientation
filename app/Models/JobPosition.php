@@ -46,11 +46,6 @@ class JobPosition extends Model
         return $slug;
     }
 
-    public function getRouteKeyName(): string
-    {
-        return "slug";
-    }
-
     public function companies(): BelongsToMany
     {
         return $this->belongsToMany(Company::class);
