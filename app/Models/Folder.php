@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Folder extends Model
 {
     protected $fillable = [
         "name",
+        "slug",
         "order"
     ];
 
@@ -17,6 +19,38 @@ class Folder extends Model
         return [
             "order" => "integer"
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (Folder $folder) {
+            if (empty($folder->slug)) {
+                $folder->slug = static::generateUniqueslug($folder->name);
+            }
+        });
+
+        static::updating(function (Folder $folder) {
+            if ($folder->isDirty("name") && !$folder->isDirty("slug")) {
+                $folder->slug = static::generateeUniqueSlug($folder->name, $folder->id);
+            }
+        });
+    }
+
+    protected static function generateUniqueSlug(string $name, ?int $ignoreId = null): string
+    {
+        $slug = Str::slug($name);
+        $original = $slug;
+        $count = 1;
+
+        while (
+            static::where("slug", $slug)
+                ->when($ignoreId, fn($q) => $q->where("id", "!=", $ignoreId))
+                ->exists()
+        ) {
+            $slug = $original . "-" . $count++;
+        }
+
+        return $slug;
     }
 
     public function scopeOrdered($query): void

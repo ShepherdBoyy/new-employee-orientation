@@ -130,7 +130,7 @@ export default function Company({ company, folders }: Props) {
                     folders={folders}
                     reorderRoute="/admin/folders/reorder-targets"
                     reorderData={{ company_id: company.id, job_position_id: null }}
-                    previewHref={folder => `/admin/folders/${folder.id}/preview`}
+                    previewHref={folder => `/admin/folders/${folder.slug}/preview`}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                 />

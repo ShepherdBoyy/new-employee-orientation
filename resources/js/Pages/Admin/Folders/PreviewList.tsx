@@ -6,17 +6,20 @@ import { Button } from '@/components/ui/button'
 interface Folder {
     id: number
     name: string
+    slug: string
     slide_count: number
 }
 
 interface Company {
     id: number
     name: string
+    slug: string
 }
 
 interface JobPosition {
     id: number
     name: string
+    slug: string
 }
 
 interface Props {
@@ -27,8 +30,8 @@ interface Props {
 
 export default function PreviewList({ folders, company, jobPosition }: Props) {
     const backHref = jobPosition
-        ? `/admin/folders/${company.id}/job-positions/${jobPosition.id}`
-        : `/admin/folders/${company.id}`
+        ? `/admin/folders/${company.slug}/job-positions/${jobPosition.slug}`
+        : `/admin/folders/${company.slug}`
 
     return (
         <>
@@ -79,8 +82,8 @@ export default function PreviewList({ folders, company, jobPosition }: Props) {
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="shrink-0 text-indigo-400 hover:bg-zinc-800 hover:text-indigo-300"
-                                        onClick={() => router.visit(`/admin/folders/${folder.id}/preview`)}
+                                        className="shrink-0 text-indigo-400 hover:bg-zinc-800 hover:text-indigo-300 cursor-pointer"
+                                        onClick={() => router.visit(`/admin/folders/${folder.slug}/preview`)}
                                     >
                                         <FolderOpen className="mr-1.5 h-4 w-4" />
                                         Open

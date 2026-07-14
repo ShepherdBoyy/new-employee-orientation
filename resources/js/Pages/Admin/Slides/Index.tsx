@@ -17,6 +17,7 @@ interface Target {
 interface Folder {
     id: number
     name: string
+    slug: string
     targets: Target[]
 }
 
@@ -77,7 +78,7 @@ export default function Index({ folder, slides }: Props) {
                             ))}
                         </div>
                     </div>
-                    <Button variant="outline" onClick={() => router.visit(`/admin/folders/${folder.id}/preview`)}>
+                    <Button variant="outline" onClick={() => router.visit(`/admin/folders/${folder.slug}/preview`)}>
                         <Eye className="mr-2 h-4 w-4" />
                         Preview
                     </Button>

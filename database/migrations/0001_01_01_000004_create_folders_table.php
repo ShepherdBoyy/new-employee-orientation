@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('folders', function (Blueprint $table) {
             $table->id();
             $table->string("name");
+            $table->string("slug")->unique();
             $table->unsignedInteger("order")->default(1);
             $table->timestamps();
         });

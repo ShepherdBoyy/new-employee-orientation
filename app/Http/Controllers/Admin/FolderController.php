@@ -211,6 +211,7 @@ class FolderController extends Controller
             "folders" => $folders->map(fn($folder) => [
                 "id" => $folder->id,
                 "name" => $folder->name,
+                "slug" => $folder->slug,
                 "slide_count" => $folder->slideCount(),
             ]),
             "company" => $company,

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 export interface Folder {
     id: number
     name: string
+    slug: string
     order: number
     slides_count: number
     targets: {
@@ -60,7 +61,7 @@ export default function FolderItem({ folder, onEdit, onDeleteRequest, previewHre
             </div>
 
             <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                <Button variant="ghost" size="sm" onClick={() => router.visit(`/admin/folders/${folder.id}/slides`)}>
+                <Button variant="ghost" size="sm" onClick={() => router.visit(`/admin/folders/${folder.slug}/slides`)}>
                     <FolderOpen className="mr-1.5 h-4 w-4" />
                     Open
                 </Button>
