@@ -9,7 +9,7 @@ import EditJobDialog from "./components/forms/EditJobDialog";
 import DeleteJobDialog from "./components/forms/DeleteJobDialog";
 import ToolbarJob from "./components/ToolbarJob";
 import DeleteSelectedJobs from "./components/forms/DeleteSelectedJobs";
-import AppPagination from "./components/Pagination";
+import AppPagination from "../../../../Layout/Pagination";
 import type { Paginated } from "../../Types/job-position";
 type Props = {
     jobs: Paginated<JobPosition>;
@@ -111,26 +111,8 @@ export default function Index({ jobs }: Props) {
                     total={jobs.total}
                     currentPage={jobs.current_page}
                     lastPage={jobs.last_page}
-                    onPrevious={() => {
-                        if (jobs.current_page > 1) {
-                            router.visit(window.location.pathname, {
-                                data: {
-                                    page: jobs.current_page - 1,
-                                },
-                                preserveScroll: true,
-                            });
-                        }
-                    }}
-                    onNext={() => {
-                        if (jobs.current_page < jobs.last_page) {
-                            router.visit(window.location.pathname, {
-                                data: {
-                                    page: jobs.current_page + 1,
-                                },
-                                preserveScroll: true,
-                            });
-                        }
-                    }}
+                    onPrevious={jobs?.prev_page_url}
+                    onNext={jobs?.next_page_url}
                     onPageChange={(page) => {
                         router.visit(window.location.pathname, {
                             data: { page: page },

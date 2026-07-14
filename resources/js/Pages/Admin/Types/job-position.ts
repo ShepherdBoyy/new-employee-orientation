@@ -22,4 +22,6 @@ export interface Paginated<T> {
     last_page: number;
     total: number;
     per_page: number;
+    prev_page_url: string;
+    next_page_url: string;
 }
