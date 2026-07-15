@@ -47,7 +47,7 @@ class OrientationController extends Controller
             ];
         });
 
-        return Inertia::render("Employee/Orientation", [
+        return Inertia::render("Employee/Welcome", [
             "folders" => $folderList,
             "user" => [
                 "name" => $user->name,
