@@ -1,26 +1,23 @@
-import { Button } from "@/components/ui/button";
 import { Rotate3d } from "lucide-react";
-
+import type { OnboardingUser } from "../../Types";
 interface WelcomeStepProps {
     onNext: () => void;
-    user:{
-        name:string;
-        companyName:string;
-        jobPosition:string
-    }
+    user: OnboardingUser;
 }
 
 export function WelcomeStep({ onNext, user }: WelcomeStepProps) {
     return (
         <div className="flex flex-col">
-            <div className="flex gap-2 items-center px-6 py-6">
+            <div className="flex gap-2 items-center px-6 py-6 ">
                 <Rotate3d absoluteStrokeWidth strokeWidth={1.5} size={22} />
                 <p className="">NEO</p>
             </div>
 
-            <div className="space-y-12 px-12 py-10">
+            <div className="space-y-12 px-12 py-14">
                 <div className="flex flex-col gap-4">
-                    <p className="text-sm font-semibold">Hello there! {user.name}</p>
+                    <p className="text-sm font-semibold">
+                        Hello there! {user.name} 👋
+                    </p>
                     <h1 className="text-[40px]/snug font-light tracking-tight">
                         We're glad you're here.
                     </h1>
