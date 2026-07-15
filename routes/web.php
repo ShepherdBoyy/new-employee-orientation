@@ -71,7 +71,10 @@ Route::middleware("auth")->group(function () {
 
     Route::middleware(["role:employee", "expiry"])->prefix("orientation")->name("employee.")->group(function () {
         Route::get("/", [OrientationController::class, "welcome"])->name("orientation");
-        Route::get("/folders", [OrientationController::class, "index"])->name("folders");
+        Route::get("/folders", [OrientationController::class, "index"])->name("folders.index");
+        Route::get("/folders/{folder:slug}", [OrientationController::class, "showFolder"])->name("folders.show");
+        Route::post("/folders/{folder}/complete", [OrientationController::class, "completeFolder"])->name("folders.complete");
+        Route::get("/acknowledgement", [OrientationController::class, "acknowledgement"])->name("acknowledgement");
         Route::get("/locked", fn() => inertia("Employee/AccountLocked"))->name("account-locked");
     });
 });

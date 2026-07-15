@@ -106,4 +106,42 @@ class OrientationController extends Controller
             "isCompleted" => in_array($folder->id, $completedIds)
         ]);
     }
+
+    public function completeFolder(Folder $folder): RedirectResponse
+    {
+        $user = Auth::user();
+        $folders = $user->company->foldersForEmployee($user);
+
+        abort_unless($folders->contains("id", $folder->id), 403);
+
+        FolderCompletion::firstOrCreate(
+            ["user_id" => $user->id, "folder_id" => $folder->id],
+            ["completed_at" => now()]
+        );
+
+        if ($user->hasCompletedAllFolders()) {
+            return redirect()->route("employee.acknowledgement");
+        }
+
+        return redirect()->route("employee.folders.index")
+            ->with("success", "Module completed. Keep going!");
+    }
+
+    public function acknowledgement(): Response|RedirectResponse
+    {
+        $user = Auth::user();
+
+        if (!$user->hasCompletedAllFolders()) {
+            return redirect()->route("employee.folders.index");
+        }
+
+        if ($user->hasAcknowledgedOrientation()) {
+            return redirect()->route("employee.completed");
+        }
+
+        return Inertia::render("Employee/Acknowledgement", [
+            "user" => $user->only("name"),
+            "progress" => $user->orientationProgress()
+        ]);
+    }
 }
