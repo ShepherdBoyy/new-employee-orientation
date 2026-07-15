@@ -6,11 +6,9 @@ export type User = {
 };
 
 export default function Welcome({ user }: User) {
-    const [open, setOpen] = useState(true);
-
     return (
-        <div className="min-h-screen bg-muted/30">
-            <Onboarding user={user} onFinish={() => setOpen(false)} />
+        <div className="min-h-screen mx-auto flex items-center justify-center font-poppins bg-muted/30">
+            <Onboarding user={user} />
         </div>
     );
 }

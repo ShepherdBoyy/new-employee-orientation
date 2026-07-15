@@ -5,7 +5,7 @@ interface WelcomeStepProps {
     user: OnboardingUser;
 }
 
-export function WelcomeStep({ onNext, user }: WelcomeStepProps) {
+export default function WelcomeStep({ onNext, user }: WelcomeStepProps) {
     return (
         <div className="flex flex-col">
             <div className="flex gap-2 items-center px-6 py-6 ">

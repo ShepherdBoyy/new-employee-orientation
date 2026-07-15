@@ -10,8 +10,8 @@ import {
 } from "lucide-react";
 
 interface ModulesStepProps {
+    onNext: () => void;
     onBack: () => void;
-    onFinish?: () => void;
 }
 
 const instructions = [
@@ -38,7 +38,7 @@ const instructions = [
     },
 ];
 
-export function ModulesStep({ onBack, onFinish }: ModulesStepProps) {
+export default function ModulesStep({ onBack, onNext }: ModulesStepProps) {
     return (
         <div className="flex flex-col">
             <div className="flex gap-2 items-center px-6 py-6 ">
@@ -103,7 +103,7 @@ export function ModulesStep({ onBack, onFinish }: ModulesStepProps) {
                     <div className="flex justify-between py-8">
                         <button onClick={onBack}>Back</button>
 
-                        <button onClick={onFinish}>Start Orientation</button>
+                        <button onClick={onNext}>Start Orientation</button>
                     </div>
                 </div>
             </div>
