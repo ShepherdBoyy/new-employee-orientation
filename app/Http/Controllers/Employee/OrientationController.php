@@ -12,6 +12,23 @@ use Inertia\Response;
 
 class OrientationController extends Controller
 {
+    public function welcome(): Response|RedirectResponse
+    {
+        $user = Auth::user()->load(["company", "jobPosition"]);
+
+        if ($user->hasAcknowledgedOrientation()) {
+            return redirect()->route("employee.completed");
+        }
+
+        return Inertia::render("Employee/Welcome", [
+            "user" => [
+                "name" => $user->name,
+                "companyName" => $user->company?->name,
+                "jobPosition" => $user->jobPosition?->name
+            ],
+        ]);
+    }
+
     public function index(): Response|RedirectResponse
     {
         $user = Auth::user()->load(["company", "jobPosition"]);
@@ -47,14 +64,46 @@ class OrientationController extends Controller
             ];
         });
 
-        return Inertia::render("Employee/Welcome", [
+        return Inertia::render("Employee/FolderList", [
             "folders" => $folderList,
-            "user" => [
-                "name" => $user->name,
-                "companyName" => $user->company?->name,
-                "jobPosition" => $user->jobPosition?->name
-            ],
             "allCompleted" => $user->hasCompletedAllFolders()
+        ]);
+    }
+
+    public function showFolder(Folder $folder): Response|RedirectResponse
+    {
+        $user = Auth::user();
+        $folders = $user->company->foldersForEmployee($user)->values();
+        $folderIndex = $folders->search(fn($f) => $f->id === $folder->id);
+
+        abort_if($folderIndex === false, 403, "You do not have access to this folder");
+
+        $completedIds = FolderCompletion::where("user_id", $user->id)
+            ->pluck("folder_id")
+            ->toArray();
+        
+        for ($i = 0; $i < $folderIndex; $i++) {
+            if (!in_array($folders[$i]->id, $completedIds)) {
+                return redirect()->route("employee.folders.index")
+                    ->withErrors(["folder" => "You must complete the previous module first"]);
+            }
+        }
+
+        $folder->load("slides");
+
+        return Inertia::render("Employee/FolderViewer", [
+            "folder" => [
+                "id" => $folder->id,
+                "slug" => $folder->slug,
+                "name" => $folder->name
+            ],
+            "slides" => $folder->slides->map(fn($slide) => [
+                "id" => $slide->id,
+                "type" => $slide->type,
+                "file_url" => $slide->fileUrl(),
+                "order" => $slide->order
+            ]),
+            "isCompleted" => in_array($folder->id, $completedIds)
         ]);
     }
 }

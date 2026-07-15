@@ -12,15 +12,9 @@ use App\Http\Controllers\Employee\EmployeeController;
 use App\Http\Controllers\Employee\OrientationController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect("/", "login");
-
 Route::middleware("guest")->group(function () {
     Route::get("/login", [AuthController::class, "showLogin"])->name("login");
     Route::post("/login", [AuthController::class, "login"])->name("login.attempt");
-});
-
-Route::controller(EmployeeController::class)->group( function () {
-    Route::get('/employee', 'Index');
 });
 
 Route::middleware("auth")->group(function () {
@@ -76,7 +70,8 @@ Route::middleware("auth")->group(function () {
     });
 
     Route::middleware(["role:employee", "expiry"])->prefix("orientation")->name("employee.")->group(function () {
-        Route::get("/", [OrientationController::class, "index"])->name("orientation");
+        Route::get("/", [OrientationController::class, "welcome"])->name("orientation");
+        Route::get("/folders", [OrientationController::class, "index"])->name("folders");
         Route::get("/locked", fn() => inertia("Employee/AccountLocked"))->name("account-locked");
     });
 });
