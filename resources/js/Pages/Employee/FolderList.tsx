@@ -27,7 +27,6 @@ export default function FolderList({ folders, allCompleted }: Props) {
 
             <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-10 font-poppins">
                 <Header />
-                {/* Header */}
                 <div className="mb-8 space-y-4">
                     <div>
                         <h1 className="text-2xl font-semibold tracking-tight">
@@ -53,8 +52,7 @@ export default function FolderList({ folders, allCompleted }: Props) {
                     </div>
                 </div>
 
-                {/* Grid — 3 columns, max 8 (3x3 with one gap) */}
-                <div className="grid flex-1 grid-cols-1 gap-4 content-start sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid flex-1 gap-4 content-start sm:grid-cols-2 lg:grid-cols-4">
                     {folders.map((folder, index) => (
                         <FolderModuleCard
                             key={folder.id}
@@ -64,7 +62,6 @@ export default function FolderList({ folders, allCompleted }: Props) {
                     ))}
                 </div>
 
-                {/* Continue to acknowledgement */}
                 {allCompleted && (
                     <div className="mt-8 flex flex-col items-center gap-3 rounded-2xl border bg-muted/30 p-6 text-center">
                         <p className="text-sm font-medium">
