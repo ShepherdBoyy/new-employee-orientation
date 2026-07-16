@@ -13,10 +13,11 @@ return new class extends Migration
             $table->foreignId("user_id")->unique()->constrained()->cascadeOnDelete();
             $table->string("full_name_confirmation");
             $table->string("signature_path");
+            $table->string("photo_path");
             $table->string("integrity_hash");
             $table->string("ip_address");
             $table->text('user_agent');
-            $table->timestamp("acknowleged_at");
+            $table->timestamp("acknowledged_at");
         });
     }
 

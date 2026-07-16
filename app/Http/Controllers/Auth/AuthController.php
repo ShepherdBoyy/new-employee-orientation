@@ -48,7 +48,7 @@ class AuthController extends Controller
     {
         return match($role) {
             "admin" => redirect()->route("admin.dashboard"),
-            "employee" => redirect()->route("employee.orientation"),
+            "employee" => redirect()->route("employee.welcome"),
             default => redirect()->route("login")
         };
     }
