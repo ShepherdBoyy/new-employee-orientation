@@ -31,7 +31,7 @@ class Folder extends Model
 
         static::updating(function (Folder $folder) {
             if ($folder->isDirty("name") && !$folder->isDirty("slug")) {
-                $folder->slug = static::generateeUniqueSlug($folder->name, $folder->id);
+                $folder->slug = static::generateUniqueSlug($folder->name, $folder->id);
             }
         });
     }
