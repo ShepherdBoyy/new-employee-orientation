@@ -7,7 +7,7 @@ export type User = {
 
 export default function Welcome({ user }: User) {
     return (
-        <div className="min-h-screen mx-auto flex items-center justify-center font-poppins bg-muted/30">
+        <div className="min-h-screen mx-auto flex items-center justify-center font-poppins bg-[#001524]">
             <Onboarding user={user} />
         </div>
     );

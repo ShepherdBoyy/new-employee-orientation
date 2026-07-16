@@ -8,6 +8,7 @@ import {
     Signature,
     Rotate3d,
 } from "lucide-react";
+import { useState } from "react";
 
 interface ModulesStepProps {
     onNext: () => void;
@@ -17,28 +18,35 @@ interface ModulesStepProps {
 const instructions = [
     {
         icon: Puzzle,
-        title: "Assigned Modules",
-        description: "Modules are assigned based on your company and position.",
+        title: "Your Custom Path",
+        description:
+            "We've handpicked modules tailored specifically to your role and team.",
     },
     {
         icon: Projector,
-        title: "Review Slides",
-        description: "Read each presentation carefully before proceeding.",
+        title: "Dive into the Slides",
+        description:
+            "Explore each presentation at your own pace to get up to speed.",
     },
     {
         icon: BadgeCheck,
-        title: "Confirm Completion",
-        description: "Mark each module as completed once you've reviewed it.",
+        title: "Track Your Progress",
+        description:
+            "Check off each module as you finish to keep moving forward.",
     },
     {
         icon: Signature,
-        title: "Electronic Signature",
+        title: "Make it Official",
         description:
-            "Complete your orientation by signing after finishing all modules.",
+            "Wrap up your orientation with a quick e-signature—you're almost there!",
     },
 ];
 
 export default function ModulesStep({ onBack, onNext }: ModulesStepProps) {
+    const [current, setCurrent] = useState(0);
+
+    const currentInstruction = instructions[current];
+    const Icon = currentInstruction.icon;
     return (
         <div className="flex flex-col">
             <div className="flex gap-2 items-center px-6 py-6 ">
@@ -58,52 +66,79 @@ export default function ModulesStep({ onBack, onNext }: ModulesStepProps) {
                     </p>
                 </div>
 
-                <div className="space-y-6">
-                    {instructions.map((item, index) => {
-                        const Icon = item.icon;
-                        const progress = [20, 40, 60, 100][index];
+                <div className="space-y-6 ">
+                    <div
+                        key={current}
+                        className="bg-muted rounded-3xl p-10  shadow-lg"
+                    >
+                        <div className="flex items-center justify-end">
+                            <span className="text-sm text-muted-foreground">
+                                {Math.round(
+                                    ((current + 1) / instructions.length) * 100,
+                                )}
+                                %
+                            </span>
+                        </div>
 
-                        return (
-                            <div
-                                key={item.title}
-                                className="relative flex gap-6"
-                            >
-                                {/* Timeline */}
-                                <div className="flex flex-col items-center">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full border bg-background">
-                                        <Icon
-                                            absoluteStrokeWidth
-                                            strokeWidth={1.6}
-                                            className="h-5 w-5"
-                                        />
-                                    </div>
-
-                                    {index !== instructions.length - 1 && (
-                                        <div className="mt-2 h-12 w-px bg-border" />
-                                    )}
-                                </div>
-
-                                {/* Content */}
-                                <div className="pb-4">
-                                    <p className="text-xs font-medium text-primary">
-                                        {progress}% Complete
-                                    </p>
-
-                                    <h3 className="mt-1  font-medium">
-                                        {item.title}
-                                    </h3>
-
-                                    <p className="mt-1 text-muted-foreground text-sm">
-                                        {item.description}
-                                    </p>
-                                </div>
+                        <div className="mt-10 flex justify-center animate-in fade-in slide-in-from-right-4 duration-400">
+                            <div className="flex h-20 w-20 items-center justify-center rounded-full">
+                                <Icon
+                                    className="h-14 w-14"
+                                    strokeWidth={1.6}
+                                    absoluteStrokeWidth
+                                />
                             </div>
-                        );
-                    })}
-                    <div className="flex justify-between py-8">
-                        <button onClick={onBack}>Back</button>
+                        </div>
 
-                        <button onClick={onNext}>Start Orientation</button>
+                        <div className="mt-8 text-center animate-in fade-in slide-in-from-right-4 duration-400">
+                            <h2 className="text-4xl font-light tracking-tight">
+                                {currentInstruction.title}
+                            </h2>
+
+                            <p className="mt-4 text-muted-foreground leading-7">
+                                {currentInstruction.description}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="mt-8 flex justify-center gap-3">
+                        {instructions.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setCurrent(index)}
+                                className={`h-2 rounded-full transition-all duration-300 ${
+                                    current === index
+                                        ? "w-8 bg-primary"
+                                        : "w-2 bg-muted-foreground/30"
+                                }`}
+                            />
+                        ))}
+                    </div>
+                    <div className="flex justify-between py-8">
+                        <button
+                            onClick={() => {
+                                if (current > 0) {
+                                    setCurrent((prev) => prev - 1);
+                                } else {
+                                    onBack();
+                                }
+                            }}
+                        >
+                            {current === 0 ? "Back" : "Previous"}
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                if (current < instructions.length - 1) {
+                                    setCurrent((prev) => prev + 1);
+                                } else {
+                                    onNext();
+                                }
+                            }}
+                        >
+                            {current === instructions.length - 1
+                                ? "Continue"
+                                : "Next"}
+                        </button>
                     </div>
                 </div>
             </div>

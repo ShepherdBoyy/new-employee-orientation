@@ -26,17 +26,16 @@ export function Onboarding({ onFinish, user }: OnboardingProps) {
             );
         case OnboardingStep.Modules:
             return (
-                <div className="grid lg:grid-cols-2 w-full max-w-7xl rounded-3xl overflow-hidden border shadow-xl bg-background">
+                <div className="w-full max-w-5xl rounded-3xl overflow-hidden border shadow-xl bg-background">
                     <ModulesStep
                         onBack={() => setStep(OnboardingStep.Welcome)}
                         onNext={() => setStep(OnboardingStep.Guidelines)}
                     />
-                    <div className="border rounded-lg bg-muted "></div>
                 </div>
             );
         case OnboardingStep.Guidelines:
             return (
-                <div className="w-full max-w-7xl rounded-3xl overflow-hidden border shadow-xl bg-background">
+                <div className=" w-full max-w-7xl min-h-screen lg:h-200 rounded-none lg:rounded-3xl overflow-hidden border shadow-xl bg-background">
                     <GuidelinesStep />
                 </div>
             );
