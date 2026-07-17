@@ -18,17 +18,20 @@ import {
 
 // 1. Import your fixed RemoveJobDialog component
 import RemoveJobDialog from "./RemoveJobDialog";
+import  JobDescriptionDialog from "./JobDescriptionDialog";
 
 import type { CompanyWithJobs } from "../../../Types/company";
 import { Badge } from "@/components/ui/badge";
-import { PinOff } from "lucide-react";
+import { PinOff, BriefcaseBusiness } from "lucide-react";
+import { router } from "@inertiajs/react";
 
 // Match the type expected by the Dialog component
 interface JobWithPivot {
     id: number;
-    name: string;
+    name: string
     pivot: {
         company_id: number;
+        name: string;
         [key: string]: any;
     };
 }
@@ -37,9 +40,12 @@ type Props = {
     companies: CompanyWithJobs[];
 };
 
-export default function CompanyJobTabs({ companies }: Props) {
+export default function CompanyJobTabs({ companies, jd_pdf }: Props) {
     const [activeDeletingJob, setActiveDeletingJob] =
         useState<JobWithPivot | null>(null);
+
+    const [activeJdDialog, setActiveJdDialog] = useState(false);
+    const [activeDeleteDialog, setActiveDeleteDialog ] = useState(false);
 
     if (!companies.length) return null;
 
@@ -53,7 +59,25 @@ export default function CompanyJobTabs({ companies }: Props) {
 
     const activeDeletingCompanyName = companies.find(
         (c) => c.id === activeDeletingJob?.pivot.company_id,
-    )?.name;
+    );
+
+    function jdhandler(job) {
+        setActiveJdDialog(true);
+        setActiveDeletingJob(
+            job as unknown as JobWithPivot,
+        )
+
+        router.visit(
+            '/admin/all-job-positions',
+            {
+                data:{
+                    company_id: job.pivot.company_id,
+                    job_position_id: job.pivot.job_position_id
+                },
+                preserveState:true
+            }
+        )
+    }
 
     return (
         <>
@@ -111,18 +135,34 @@ export default function CompanyJobTabs({ companies }: Props) {
                                                         {job.name}
                                                     </h4>
 
-                                                    <Button
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            setActiveDeletingJob(
-                                                                job as unknown as JobWithPivot,
-                                                            )
-                                                        }
-                                                        variant="outline"
-                                                    >
-                                                        <PinOff />
-                                                        Remove
-                                                    </Button>
+
+                                                    <div className="grid gap-2 sm:grid-cols-2">
+                                                        <Button
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                jdhandler(job)
+                                                            }}
+                                                            variant="outline"
+                                                        >
+                                                            <BriefcaseBusiness />
+                                                            Job Description
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                setActiveDeleteDialog(true)
+                                                                setActiveDeletingJob(
+                                                                    job as unknown as JobWithPivot,
+                                                                )
+                                                            }
+                                                                
+                                                            }
+                                                            variant="outline"
+                                                        >
+                                                            <PinOff />
+                                                            Remove
+                                                        </Button>
+                                                    </div>
                                                 </CardContent>
                                             </Card>
                                         ))}
@@ -146,11 +186,20 @@ export default function CompanyJobTabs({ companies }: Props) {
                 </CardContent>
             </Card>
 
+                            
             {/* 5. Render the AlertDialog globally at the root layout level */}
             <RemoveJobDialog
                 job={activeDeletingJob}
-                companyName={activeDeletingCompanyName}
-                onClose={() => setActiveDeletingJob(null)} // Clear state to shut down the dialog
+                companyName={activeDeletingCompanyName?.name}
+                isOpen={activeDeleteDialog}
+                onClose={() => setActiveDeleteDialog(false)} // Clear state to shut down the dialog
+            />
+
+            <JobDescriptionDialog 
+                companyJobIds={activeDeletingJob?.pivot}
+                isOpen={activeJdDialog}
+                onClose={() => setActiveJdDialog(false)}
+                jd_pdf={jd_pdf}
             />
         </>
     );

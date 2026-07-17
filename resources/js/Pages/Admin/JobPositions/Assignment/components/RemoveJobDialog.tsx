@@ -25,10 +25,11 @@ interface JobWithPivot {
 type Props = {
     job: JobWithPivot | null;
     companyName?: string;
+    isOpen: boolean;
     onClose: () => void;
 };
 
-export default function RemoveJobDialog({ job, companyName, onClose }: Props) {
+export default function RemoveJobDialog({ job, companyName, isOpen, onClose }: Props) {
     function deleteHandle() {
         if (!job) return;
 
@@ -46,7 +47,7 @@ export default function RemoveJobDialog({ job, companyName, onClose }: Props) {
 
     return (
         <AlertDialog
-            open={!!job}
+            open={!!isOpen}
             onOpenChange={(open) => {
                 if (!open) onClose();
             }}
