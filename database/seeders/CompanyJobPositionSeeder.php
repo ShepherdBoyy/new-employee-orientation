@@ -76,7 +76,6 @@ class CompanyJobPositionSeeder extends Seeder
                 "name" => $companyName,
                 "slug" => Str::slug($companyName),
                 "logo_path" => null,
-                "status" => "active",
                 "header_theme" => $details["theme"]
             ]);
 

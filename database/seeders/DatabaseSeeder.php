@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
             'email'      => 'admin@neo.com',
             'password'   => 'password',
             'role'       => 'admin',
-            'status'     => 'active',
             'company_id' => null,
             'expires_at' => null,
         ]);
