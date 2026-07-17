@@ -38,6 +38,7 @@ Route::middleware("auth")->group(function () {
         Route::get("/all-job-positions", [JobPositionController::class, "jobAssignments"])->name("all-jobs-positions.index");
         Route::post("/assign-jobs", [JobPositionController::class, 'assignJobs']);
         Route::delete("/delete-assigned-job/{comapny_id}/{job_id}", [JobPositionController::class, 'deleteAssignedJob']);
+        Route::post('/upload-jd', [JobPositionController::class, 'uploadJd']);
         
         Route::get("/folders/preview-list", [FolderController::class, "previewFolderList"])->name("folders.preview-list");
         Route::get("/folders/global", [FolderController::class, "globalIndex"])->name("folders.global");
