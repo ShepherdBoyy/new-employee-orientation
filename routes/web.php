@@ -2,13 +2,11 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CompanyController;
-use App\Http\Controllers\Admin\ExtensionRequestController;
 use App\Http\Controllers\Admin\FolderController;
 use App\Http\Controllers\Admin\JobPositionController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Employee\EmployeeController;
 use App\Http\Controllers\Employee\OrientationController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,7 +24,6 @@ Route::middleware("auth")->group(function () {
         Route::get("/companies", [CompanyController::class, "index"])->name("companies.index");
         Route::post("/companies", [CompanyController::class, "store"])->name("companies.store");
         Route::put("/companies/{company}", [CompanyController::class, "update"])->name("companies.update");
-        Route::patch("/companies/{company}/toggle-status", [CompanyController::class, "toggleStatus"])->name("companies.toggle-status");
         Route::delete("/companies/{company}", [CompanyController::class, "destroy"])->name("companies.destroy");
 
         Route::get("/job-positions", [JobPositionController::class, "index"])->name("job-positions.index");
@@ -61,13 +58,11 @@ Route::middleware("auth")->group(function () {
         Route::get("/users/employees", [UserController::class, "index"])->name("users.employees");
         Route::post("/users", [UserController::class, "store"])->name("users.store");
         Route::put("/users/{user}", [UserController::class, "update"])->name("users.update");
-        Route::patch("/users/{user}/toggle-status", [UserController::class, "toggleStatus"])->name("users.toggle-status");
         Route::delete("/users/{user}", [UserController::class, "destroy"])->name("users.destroy");
         Route::post("/users/{user}/reset-password", [UserController::class, "resetPassword"])->name("users.reset-password");
-        
-        Route::get("/extension-requests", [ExtensionRequestController::class, "extensionRequests"])->name("extension-requests.index");
-        Route::patch("/extension-requests/{extensionRequests}/approve", [ExtensionRequestController::class, "approveExtension"])->name("extension-requests.approve");
-        Route::patch("/extension-requests/{extensionRequests}/deny", [ExtensionRequestController::class, "denyExtension"])->name("extension-requests.deny");
+        Route::get("/users/employees/{user}/progress", [UserController::class, "progress"])->name("users.employees.progress");
+        Route::get("/users/emlpoyees/{user}/signature", [UserController::class, "viewSignature"])->name("users.employees.signature");
+        Route::get("/users/emlpoyees/{user}/photo", [UserController::class, "viewPhoto"])->name("users.employees.photo");
     });
 
     Route::middleware(["role:employee", "expiry"])->prefix("orientation")->name("employee.")->group(function () {
@@ -78,5 +73,6 @@ Route::middleware("auth")->group(function () {
         Route::get("/acknowledgement", [OrientationController::class, "acknowledgement"])->name("acknowledgement");
         Route::post("/acknowledgement", [OrientationController::class, "submitAcknowledgement"])->name("acknowledgement.submit");
         Route::get("/completed", [OrientationController::class, "completed"])->name("completed");
+        Route::get("/locked", [OrientationController::class, "locked"])->name("account-locked");
     });
 });
