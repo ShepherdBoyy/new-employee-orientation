@@ -18,7 +18,6 @@ class User extends Authenticatable
         "email",
         "password",
         "role",
-        "status",
         "job_position_id",
         "expires_at"
     ];
@@ -33,7 +32,6 @@ class User extends Authenticatable
         return [
             'password' => 'hashed',
             "expires_at" => "datetime",
-            "status" => "string",
             "role" => "string",
         ];
     }
@@ -46,16 +44,6 @@ class User extends Authenticatable
     public function isEmployee(): bool
     {
         return $this->role === "employee";
-    }
-
-    public function isActive(): bool
-    {
-        return $this->status === "active";
-    }
-
-    public function isLocked(): bool
-    {
-        return $this->status === "locked";
     }
 
     public function isExpired(): bool
@@ -142,10 +130,5 @@ class User extends Authenticatable
     public function orientationAcknowledgement(): HasOne
     {
         return $this->hasOne(OrientationAcknowledgement::class);
-    }
-
-    public function extensionRequests(): HasMany
-    {
-        return $this->hasMany(ExtensionRequest::class);
     }
 }

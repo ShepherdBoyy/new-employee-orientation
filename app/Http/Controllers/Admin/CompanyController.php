@@ -39,9 +39,7 @@ class CompanyController extends Controller
 
         Company::create([
             "name" => $validated["name"],
-            "slug" => Str::slug($validated["name"]),
             "logo_path" => $logoPath,
-            "status" => "active",
             "header_theme" => $validated["header_theme"]
         ]);
 
@@ -64,22 +62,11 @@ class CompanyController extends Controller
 
         $company->update([
             "name" => $validated["name"],
-            "slug" => Str::slug($validated["name"]),
             "logo_path" => $logoPath,
             "header_theme" => $validated["header_theme"]
         ]);
 
         return back()->with("success", "Company updated successfully");
-    }
-
-    public function toggleStatus(Company $company): RedirectResponse
-    {
-        $newStatus = $company->status === "active" ? "inactive" : "active";
-        $label = $newStatus === "active" ? "activated" : "deactivated";
-
-        $company->update(["status" => $newStatus]);
-
-        return back()->with("success", "Company {$label} successfully");
     }
 
     public function destroy(Company $company): RedirectResponse

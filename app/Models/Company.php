@@ -14,14 +14,8 @@ class Company extends Model
         "name",
         "slug",
         "logo_path",
-        "status",
         "header_theme"
     ];
-
-    protected function casts(): array
-    {
-        return ["status" => "string"];
-    }
 
     protected static function booted(): void
     {

@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string("name");
             $table->string("slug")->unique();
             $table->string("logo_path")->nullable();
-            $table->enum("status", ["active", "inactive"])->default("active");
             $table->string("header_theme");
             $table->timestamps();
         });

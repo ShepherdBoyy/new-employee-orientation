@@ -48,8 +48,7 @@ class HandleInertiaRequests extends Middleware
                     return [];
                 }
 
-                return Company::where("status", "active")
-                    ->orderBy("name")
+                return Company::orderBy("name")
                     ->get(["id", "name", "slug"]);
             }
         ];

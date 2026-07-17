@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Folder;
 use App\Models\FolderCompletion;
 use App\Models\OrientationAcknowledgement;
-use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -244,6 +243,11 @@ class OrientationController extends Controller
                 "completed" => in_array($folder->id, $completedIds)
             ]),
         ]);
+    }
+
+    public function locked(): Response
+    {
+        return Inertia::render("Employee/AccountExpired");
     }
 
     private function storeBase64File(string $base64, string $folder, string $filename): string

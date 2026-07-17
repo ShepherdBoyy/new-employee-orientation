@@ -16,11 +16,7 @@ class CheckAccountExpiry
             return redirect()->route("login");
         }
 
-        if ($user->isEmployee() && $user->isExpired() && $user->isActive()) {
-            $user->update(["status" => "locked"]);
-        }
-
-        if ($user->isEmployee() && $user->isLocked()) {
+        if ($user->isEmployee() && $user->isExpired()) {
             return redirect()->route("employee.account-locked");
         }
 

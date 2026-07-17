@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string("password");
             $table->enum("role", ["admin", "employee"]);
             $table->foreignId("job_position_id")->nullable()->constrained()->nullOnDelete();
-            $table->enum("status", ['active', "locked"])->default("active");
             $table->timestamp("expires_at")->nullable();
             $table->rememberToken();
             $table->timestamps();
