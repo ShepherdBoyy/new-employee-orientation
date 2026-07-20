@@ -25,5 +25,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([CompanyJobPositionSeeder::class]);
+
+        $this->call([FolderSeeder::class]);
     }
 }
