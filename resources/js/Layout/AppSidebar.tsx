@@ -95,7 +95,7 @@ export function AppSidebar() {
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild size="lg">
+                        <SidebarMenuButton asChild>
                             <a href="#">
                                 <div className="flex size-10 items-center justify-center overflow-hidden rounded-xl transition-all duration-500">
                                     <SwatchBook />
