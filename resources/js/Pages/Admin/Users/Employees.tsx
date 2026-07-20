@@ -1,343 +1,544 @@
-import { useState } from 'react'
-import { useForm, router, Head } from '@inertiajs/react'
-import Master from '@/Layout/Master'
-
-import { Input } from "@/components/ui/input"
+import { useEffect, useMemo, useState } from "react";
+import { Head, useForm, router } from "@inertiajs/react";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-
+    Plus,
+    Pencil,
+    Trash2,
+    Users2,
+    CalendarClock,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from "@/components/ui/combobox"
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogMedia,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import EmployeeDetailDialog, {
+    type Employee as EmployeeDetail,
+} from "./components/EmployeeDetailDialog";
+import Master from "@/Layout/Master";
+
+interface JobPosition {
+    id: number;
+    name: string;
+}
 
 interface Company {
-    id: number
-    name: string
+    id: number;
+    name: string;
+    jobs: JobPosition[];
 }
 
 interface Employee {
-    id: number
-    name: string
-    email: string
-    status: 'active' | 'locked'
-    expires_at: string | null
-    acknowledgements_count: number
-    company: Company | null
-}
-
-interface Job {
-    id: number
-    name: string
+    id: number;
+    name: string;
+    email: string;
+    expires_at: string | null;
+    company: { id: number; name: string } | null;
+    job_position: JobPosition | null;
+    total_folders: number;
+    completed_folders: number;
+    status: "not_started" | "in_progress" | "acknowledged";
 }
 
 interface Props {
-    employees: Employee[]
-    companies: Company[]
-    jobs: Job[]
+    employees: Employee[];
+    companies: Company[];
 }
 
-export default function Employees({ employees, companies, jobs }: Props) {
-    const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null)
+const statusMap = {
+    not_started: {
+        label: "Not Started",
+        className: "bg-muted text-muted-foreground",
+    },
+    in_progress: {
+        label: "In Progress",
+        className:
+            "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
+    },
+    acknowledged: {
+        label: "Acknowledged",
+        className:
+            "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
+    },
+};
 
-    const createForm = useForm({ name: '', email: '', role: 'employee', company_id: '', job_id: '' })
-    const editForm   = useForm({ name: '', email: '', company_id: '' })
+export default function Employees({
+    employees: initialEmployees,
+    companies,
+}: Props) {
+    const [employees, setEmployees] = useState(initialEmployees);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [editingEmployee, setEditingEmployee] = useState<Employee | null>(
+        null,
+    );
+    const [deletingEmployee, setDeletingEmployee] = useState<Employee | null>(
+        null,
+    );
+    const [viewingEmployee, setViewingEmployee] =
+        useState<EmployeeDetail | null>(null);
 
-    const [selectedJobId, setSelectedJobId] = useState<string>("");
+    useEffect(() => setEmployees(initialEmployees), [initialEmployees]);
 
-    // Find the selected job object from your array to display its name
-    const selectedJobName = jobs.find(job => String(job.id) === selectedJobId)?.name || "";
+    const { data, setData, post, put, processing, errors, reset } = useForm({
+        name: "",
+        email: "",
+        role: "employee",
+        company_id: "",
+        job_position_id: "",
+    });
 
-    function handleCreate(e: React.FormEvent) {
-        e.preventDefault()
-        createForm.post('/admin/users', {
-            onSuccess: () => createForm.reset(),
-        })
+    const availablePositions = useMemo(() => {
+        const company = companies.find((c) => String(c.id) === data.company_id);
+        return company?.jobs ?? [];
+    }, [data.company_id, companies]);
+
+    function openCreate() {
+        setEditingEmployee(null);
+        reset();
+        setData("role", "employee");
+        setDialogOpen(true);
     }
 
-    function handleEdit(employee: Employee) {
-        setEditingEmployee(employee)
-        editForm.setData({
-            name:       employee.name,
-            email:      employee.email,
-            company_id: employee.company ? String(employee.company.id) : '',
-        })
-    }
-
-    function handleUpdate(e: React.FormEvent) {
-        e.preventDefault()
-        editForm.put(`/admin/users/${editingEmployee?.id}`, {
-            onSuccess: () => setEditingEmployee(null),
-        })
-    }
-
-    function handleToggleStatus(employee: Employee) {
-        router.patch(`/admin/users/${employee.id}/toggle-status`)
-    }
-
-    function handleResetPassword(employee: Employee) {
-        if (confirm(`Send password reset link to ${employee.email}?`)) {
-            router.post(`/admin/users/${employee.id}/resset-password`)
-        }
-    }
-
-    function handleDelete(employee: Employee) {
-        if (confirm(`Delete ${employee.name}? This cannot be undone.`)) {
-            router.delete(`/admin/users/${employee.id}`)
-        }
-    }
-
-    function handleCompany (value) {
-        createForm.setData('company_id', value)
-        router.visit('/admin/users/employees', {
-            method: "get",
-            data: {
-                company_id: value
-            },
-            preserveState: true,
+    function openEdit(employee: Employee, e: React.MouseEvent) {
+        e.stopPropagation();
+        setEditingEmployee(employee);
+        setData({
+            name: employee.name,
+            email: employee.email,
+            role: "employee",
+            company_id: employee.company ? String(employee.company.id) : "",
+            job_position_id: employee.job_position
+                ? String(employee.job_position.id)
+                : "",
         });
+        setDialogOpen(true);
     }
 
-    function handleJob(value) {
-        setSelectedJobId(value)
-        createForm.setData('job_id', value)
+    function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        if (editingEmployee) {
+            put(`/admin/users/${editingEmployee.id}`, {
+                onSuccess: () => {
+                    reset();
+                    setDialogOpen(false);
+                },
+            });
+        } else {
+            post("/admin/users", {
+                onSuccess: () => {
+                    reset();
+                    setDialogOpen(false);
+                },
+            });
+        }
+    }
+
+    function handleDeleteConfirm() {
+        if (deletingEmployee) {
+            router.delete(`/admin/users/${deletingEmployee.id}`, {
+                preserveScroll: true,
+            });
+            setDeletingEmployee(null);
+        }
+    }
+
+    function handleDeleteClick(employee: Employee, e: React.MouseEvent) {
+        e.stopPropagation();
+        setDeletingEmployee(employee);
+    }
+
+    function isExpired(expiresAt: string | null) {
+        return expiresAt ? new Date(expiresAt) < new Date() : false;
     }
 
     return (
-        <>
+        <Master>
             <Head title="Employees" />
 
-            <Master>
-
-                <div className="max-w-6xl mx-auto p-8 space-y-8">
-                    <h1 className="text-2xl font-semibold text-gray-800">Employees</h1>
-
-                    {/* Create Form */}
-                    <div className="bg-white rounded-2xl shadow-sm p-6">
-                        <h2 className="text-base font-medium text-gray-700 mb-4">Add New Employee</h2>
-                        <form onSubmit={handleCreate} className="grid grid-cols-3 gap-3 items-end">
-                            <div>
-                                <label className="block text-sm text-gray-600 mb-1">Name</label>
-                                <Input
-                                    type="text"
-                                    value={createForm.data.name}
-                                    onChange={e => createForm.setData('name', e.target.value)}
-                                    className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-                                    placeholder="Juan dela Cruz"
-                                />
-                                {createForm.errors.name && <p className="text-red-500 text-xs mt-1">{createForm.errors.name}</p>}
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-600 mb-1">Email</label>
-                                <Input
-                                    type="email"
-                                    value={createForm.data.email}
-                                    onChange={e => createForm.setData('email', e.target.value)}
-                                    className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-                                    placeholder="employee@company.com"
-                                />
-                                {createForm.errors.email && <p className="text-red-500 text-xs mt-1">{createForm.errors.email}</p>}
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-600 mb-1">Company</label>
-                                <Select value={createForm.data.company_id} onValueChange={value => handleCompany(value)}>
-                                    <SelectTrigger className="w-full max-w-xl8">
-                                    <SelectValue placeholder="Select a company" />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper">
-                                        <SelectGroup>
-                                            {companies.map((c) => (
-                                                // Ensure value is cast to a string for Shadcn compatibility
-                                                <SelectItem key={c.id} value={String(c.id)}>
-                                                    {c.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
-                                {createForm.errors.company_id && <p className="text-red-500 text-xs mt-1">{createForm.errors.company_id}</p>}
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-600 mb-1">Job Title</label>
-
-                                <Combobox
-                                    items={jobs}
-                                    value={selectedJobId}
-                                    onValueChange={(val) => handleJob(val)}
-                                >
-                                    {/* Explicitly pass the display value to the input field */}
-                                    <ComboboxInput 
-                                    placeholder="Select a job" 
-                                    value={selectedJobName} 
-                                    />
-                                    
-                                    <ComboboxContent>
-                                        <ComboboxEmpty>No items found.</ComboboxEmpty>
-                                        <ComboboxList>
-                                            {(job) => (
-                                            <ComboboxItem key={job.id} value={String(job.id)}>
-                                                {job.name}
-                                            </ComboboxItem>
-                                            )}
-                                        </ComboboxList>
-                                    </ComboboxContent>
-                                </Combobox>
-                                
-                                {createForm.errors.job_id && <p className="text-red-500 text-xs mt-1">{createForm.errors.job_id}</p>}
-                            </div>
-                            {/* <div>
-                                <label className="block text-sm text-gray-600 mb-1">Field Type</label>
-                                <Select >
-                                    <SelectTrigger className="w-full max-w-xl8" >
-                                        <SelectValue placeholder="Select employee field" />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper" className="w-full max-w-xl">
-                                        <SelectGroup>
-                                            <SelectItem value="1">Field Base</SelectItem>
-                                            <SelectItem value="2">Non Field Base</SelectItem>
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
-                                {createForm.errors.field_type && <p className="text-red-500 text-xs mt-1">{createForm.errors.field_type}</p>}
-                            </div> */}
-                            <div className="col-span-3 flex justify-end">
-                                <button
-                                    type="submit"
-                                    disabled={createForm.processing}
-                                    className="bg-gray-900 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition disabled:opacity-50"
-                                >
-                                    {createForm.processing ? 'Creating...' : 'Create Employee'}
-                                </button>
-                            </div>
-                        </form>
+            <div className="w-full space-y-6 p-6 lg:p-8">
+                <div className="flex items-center justify-between border-b pb-5">
+                    <div>
+                        <h1 className="text-xl font-semibold tracking-tight">
+                            Employees
+                        </h1>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            Manage employee accounts and their orientation
+                            access.
+                        </p>
                     </div>
-
-                    {/* Table */}
-                    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                        <table className="w-full text-sm">
-                            <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
-                                <tr>
-                                    <th className="px-6 py-3 text-left">Name</th>
-                                    <th className="px-6 py-3 text-left">Company</th>
-                                    <th className="px-6 py-3 text-left">Progress</th>
-                                    <th className="px-6 py-3 text-left">Status</th>
-                                    <th className="px-6 py-3 text-left">Expires</th>
-                                    <th className="px-6 py-3 text-left">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {employees.map(employee => (
-                                    <tr key={employee.id}>
-                                        <td className="px-6 py-4">
-                                            <p className="font-medium text-gray-800">{employee.name}</p>
-                                            <p className="text-xs text-gray-400">{employee.email}</p>
-                                        </td>
-                                        <td className="px-6 py-4 text-gray-500 text-xs">
-                                            {employee.company?.name ?? '—'}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className="text-xs text-gray-500">
-                                                {employee.acknowledgements_count} slides acknowledged
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                                employee.status === 'active'
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : 'bg-gray-100 text-gray-500'
-                                            }`}>
-                                                {employee.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-xs text-gray-400">
-                                            {employee.expires_at
-                                                ? new Date(employee.expires_at).toLocaleString()
-                                                : '—'}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex gap-2 flex-wrap">
-                                                <button onClick={() => handleEdit(employee)} className="text-blue-600 hover:underline text-xs">Edit</button>
-                                                <button onClick={() => handleToggleStatus(employee)} className="text-yellow-600 hover:underline text-xs">
-                                                    {employee.status === 'active' ? 'Deactivate' : 'Activate'}
-                                                </button>
-                                                <button onClick={() => handleResetPassword(employee)} className="text-indigo-600 hover:underline text-xs">Reset PW</button>
-                                                <button onClick={() => handleDelete(employee)} className="text-red-600 hover:underline text-xs">Delete</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {employees.length === 0 && (
-                                    <tr>
-                                        <td colSpan={6} className="px-6 py-8 text-center text-gray-400">No employees yet.</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                    <Button onClick={openCreate}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        New Employee
+                    </Button>
                 </div>
 
-                {/* Edit Modal */}
-                {editingEmployee && (
-                    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
-                            <h2 className="text-base font-medium text-gray-700 mb-4">Edit Employee</h2>
-                            <form onSubmit={handleUpdate} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm text-gray-600 mb-1">Name</label>
-                                    <input
-                                        type="text"
-                                        value={editForm.data.name}
-                                        onChange={e => editForm.setData('name', e.target.value)}
-                                        className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-                                    />
-                                    {editForm.errors.name && <p className="text-red-500 text-xs mt-1">{editForm.errors.name}</p>}
-                                </div>
-                                <div>
-                                    <label className="block text-sm text-gray-600 mb-1">Email</label>
-                                    <input
-                                        type="email"
-                                        value={editForm.data.email}
-                                        onChange={e => editForm.setData('email', e.target.value)}
-                                        className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-                                    />
-                                    {editForm.errors.email && <p className="text-red-500 text-xs mt-1">{editForm.errors.email}</p>}
-                                </div>
-                                <div>
-                                    <label className="block text-sm text-gray-600 mb-1">Company</label>
-                                    <select
-                                        value={editForm.data.company_id}
-                                        onChange={e => editForm.setData('company_id', e.target.value)}
-                                        className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-                                    >
-                                        <option value="">Select company</option>
-                                        {companies.map(c => (
-                                            <option key={c.id} value={c.id}>{c.name}</option>
-                                        ))}
-                                    </select>
-                                    {editForm.errors.company_id && <p className="text-red-500 text-xs mt-1">{editForm.errors.company_id}</p>}
-                                </div>
-                                <div className="flex gap-3 justify-end">
-                                    <button type="button" onClick={() => setEditingEmployee(null)} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Cancel</button>
-                                    <button type="submit" disabled={editForm.processing} className="bg-gray-900 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition disabled:opacity-50">
-                                        {editForm.processing ? 'Saving...' : 'Save Changes'}
-                                    </button>
-                                </div>
-                            </form>
+                {employees.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-20 text-center">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                            <Users2 className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium">
+                                No employees yet
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                                Create one to get started.
+                            </p>
                         </div>
                     </div>
+                ) : (
+                    <div className="rounded-xl border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Employee</TableHead>
+                                    <TableHead>Company</TableHead>
+                                    <TableHead>Progress</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Access Expires</TableHead>
+                                    <TableHead className="text-right">
+                                        Actions
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {employees.map((employee) => {
+                                    const expired = isExpired(
+                                        employee.expires_at,
+                                    );
+                                    const progressPct = employee.total_folders
+                                        ? (employee.completed_folders /
+                                              employee.total_folders) *
+                                          100
+                                        : 0;
+
+                                    return (
+                                        <TableRow
+                                            key={employee.id}
+                                            className="cursor-pointer"
+                                            onClick={() =>
+                                                setViewingEmployee(employee)
+                                            }
+                                        >
+                                            <TableCell>
+                                                <div className="flex items-center gap-3">
+                                                    <Avatar className="h-8 w-8">
+                                                        <AvatarFallback className="text-xs">
+                                                            {employee.name
+                                                                .slice(0, 2)
+                                                                .toUpperCase()}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                    <div>
+                                                        <p className="font-medium leading-none">
+                                                            {employee.name}
+                                                        </p>
+                                                        <p className="mt-1 text-xs text-muted-foreground">
+                                                            {employee.email}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-muted-foreground">
+                                                {employee.company?.name ?? "—"}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <Progress
+                                                        value={progressPct}
+                                                        className="h-1.5 w-16"
+                                                    />
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {
+                                                            employee.completed_folders
+                                                        }
+                                                        /
+                                                        {employee.total_folders}
+                                                    </span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    className={cn(
+                                                        "font-normal",
+                                                        statusMap[
+                                                            employee.status
+                                                        ].className,
+                                                    )}
+                                                >
+                                                    {
+                                                        statusMap[
+                                                            employee.status
+                                                        ].label
+                                                    }
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                {employee.expires_at ? (
+                                                    <Badge
+                                                        variant={
+                                                            expired
+                                                                ? "destructive"
+                                                                : "secondary"
+                                                        }
+                                                        className="gap-1 font-normal"
+                                                    >
+                                                        <CalendarClock className="h-3 w-3" />
+                                                        {expired
+                                                            ? "Expired"
+                                                            : new Date(
+                                                                  employee.expires_at,
+                                                              ).toLocaleDateString()}
+                                                    </Badge>
+                                                ) : (
+                                                    "—"
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-1">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 cursor-pointer"
+                                                        onClick={(e) =>
+                                                            openEdit(
+                                                                employee,
+                                                                e,
+                                                            )
+                                                        }
+                                                    >
+                                                        <Pencil className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+                                                        onClick={(e) =>
+                                                            handleDeleteClick(
+                                                                employee,
+                                                                e,
+                                                            )
+                                                        }
+                                                    >
+                                                        <Trash2 className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                    </div>
                 )}
-            </Master>
-        </>
-    )
+            </div>
+
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>
+                            {editingEmployee ? "Edit Employee" : "New Employee"}
+                        </DialogTitle>
+                        <DialogDescription>
+                            {editingEmployee
+                                ? "Update the employee details below."
+                                : "Access expires 2 days after the account is created."}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="space-y-1.5">
+                            <Label htmlFor="name">Full name</Label>
+                            <Input
+                                id="name"
+                                value={data.name}
+                                onChange={(e) =>
+                                    setData("name", e.target.value)
+                                }
+                                placeholder="Juan Dela Cruz"
+                                autoFocus
+                            />
+                            {errors.name && (
+                                <p className="text-sm text-destructive">
+                                    {errors.name}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                value={data.email}
+                                onChange={(e) =>
+                                    setData("email", e.target.value)
+                                }
+                                placeholder="employee@company.com"
+                            />
+                            {errors.email && (
+                                <p className="text-sm text-destructive">
+                                    {errors.email}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label>Company</Label>
+                            <Select
+                                value={data.company_id}
+                                onValueChange={(val) => {
+                                    setData("company_id", val);
+                                    setData("job_position_id", "");
+                                }}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select a company" />
+                                </SelectTrigger>
+                                <SelectContent position="popper">
+                                    {companies.map((company) => (
+                                        <SelectItem
+                                            key={company.id}
+                                            value={String(company.id)}
+                                        >
+                                            {company.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {errors.company_id && (
+                                <p className="text-sm text-destructive">
+                                    {errors.company_id}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label>Job position</Label>
+                            <Select
+                                value={data.job_position_id}
+                                onValueChange={(val) =>
+                                    setData("job_position_id", val)
+                                }
+                                disabled={!data.company_id}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue
+                                        placeholder={
+                                            data.company_id
+                                                ? "Select a position"
+                                                : "Select a company first"
+                                        }
+                                    />
+                                </SelectTrigger>
+                                <SelectContent position="popper">
+                                    {availablePositions.map((position) => (
+                                        <SelectItem
+                                            key={position.id}
+                                            value={String(position.id)}
+                                        >
+                                            {position.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {errors.job_position_id && (
+                                <p className="text-sm text-destructive">
+                                    {errors.job_position_id}
+                                </p>
+                            )}
+                        </div>
+
+                        <DialogFooter>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setDialogOpen(false)}
+                                className="cursor-pointer"
+                            >
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={processing} className="cursor-pointer">
+                                {processing
+                                    ? "Saving..." 
+                                    : editingEmployee
+                                      ? "Save Changes"
+                                      : "Create Employee"}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            <AlertDialog
+                open={!!deletingEmployee}
+                onOpenChange={(o) => !o && setDeletingEmployee(null)}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                            <Trash2 />
+                        </AlertDialogMedia>
+                        <AlertDialogTitle>Delete Account?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will permanently delete this employee's account
+                            and all their orientation progress records. This
+                            action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            variant="destructive"
+                            onClick={handleDeleteConfirm}
+                            className=""
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <EmployeeDetailDialog
+                employee={viewingEmployee}
+                onClose={() => setViewingEmployee(null)}
+            />
+        </Master>
+    );
 }

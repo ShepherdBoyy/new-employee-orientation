@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Storage;
+use URL;
 
 class OrientationAcknowledgement extends Model
 {
@@ -65,17 +66,19 @@ class OrientationAcknowledgement extends Model
 
     public function signatureUrl(): string
     {
-        return Storage::disk("private")->temporaryUrl(
-            $this->signature_path,
-            now()->addMinutes(5)
+        return URL::temporarySignedRoute(
+            "admin.users.employees.signature-file",
+            now()->addMinutes(5),
+            ["user" => $this->user_id]
         );
     }
 
     public function photoUrl(): string
     {
-        return Storage::disk("private")->temporaryUrl(
-            $this->photo_path,
-            now()->addMinutes(5)
+        return URL::temporarySignedRoute(
+            "admin.users.employees.photo-file",
+            now()->addMinutes(5),
+            ["user" => $this->user_id]
         );
     }
 
