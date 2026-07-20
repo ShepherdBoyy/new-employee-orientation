@@ -6,12 +6,15 @@ import FolderModuleCard, {
     type OrientationFolder,
 } from "./components/folder/FolderModuleCard";
 import Header from "./components/folder/Header";
+import type { OnboardingUser } from "./Types";
+import EmployeeLayout from "@/Layout/EmployeeLayout";
 interface Props {
     folders: OrientationFolder[];
     allCompleted: boolean;
+    user: OnboardingUser;
 }
 
-export default function FolderList({ folders, allCompleted }: Props) {
+export default function FolderList({ folders, allCompleted, user }: Props) {
     const completedCount = folders.filter((f) => f.completed).length;
     const progress = folders.length
         ? (completedCount / folders.length) * 100
@@ -22,11 +25,9 @@ export default function FolderList({ folders, allCompleted }: Props) {
     }
 
     return (
-        <>
-            <Head title="Orientation Modules" />
-
-            <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-6 py-10 font-poppins">
-                <Header />
+        <EmployeeLayout>
+            <div className="space-y-10">
+                <Header user={user} />
                 <div className="mb-8 space-y-4">
                     <div>
                         <h1 className="text-2xl font-semibold tracking-tight">
@@ -52,7 +53,7 @@ export default function FolderList({ folders, allCompleted }: Props) {
                     </div>
                 </div>
 
-                <div className="grid flex-1 gap-4 content-start sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid flex-1 gap-4 content-start sm:grid-cols-2 lg:grid-cols-3">
                     {folders.map((folder, index) => (
                         <FolderModuleCard
                             key={folder.id}
@@ -75,6 +76,6 @@ export default function FolderList({ folders, allCompleted }: Props) {
                     </div>
                 )}
             </div>
-        </>
+        </EmployeeLayout>
     );
 }

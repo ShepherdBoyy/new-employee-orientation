@@ -69,7 +69,12 @@ class OrientationController extends Controller
 
         return Inertia::render("Employee/FolderList", [
             "folders" => $folderList,
-            "allCompleted" => $user->hasCompletedAllFolders()
+            "allCompleted" => $user->hasCompletedAllFolders(),
+            "user" => [
+                "name" => $user->name,
+                "companyName" => $user->company?->name,
+                "jobPosition" => $user->jobPosition?->name
+            ],
         ]);
     }
 
