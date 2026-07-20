@@ -59,10 +59,15 @@ Route::middleware("auth")->group(function () {
         Route::post("/users", [UserController::class, "store"])->name("users.store");
         Route::put("/users/{user}", [UserController::class, "update"])->name("users.update");
         Route::delete("/users/{user}", [UserController::class, "destroy"])->name("users.destroy");
-        Route::post("/users/{user}/reset-password", [UserController::class, "resetPassword"])->name("users.reset-password");
         Route::get("/users/employees/{user}/progress", [UserController::class, "progress"])->name("users.employees.progress");
-        Route::get("/users/emlpoyees/{user}/signature", [UserController::class, "viewSignature"])->name("users.employees.signature");
-        Route::get("/users/emlpoyees/{user}/photo", [UserController::class, "viewPhoto"])->name("users.employees.photo");
+        Route::get("/users/employees/{user}/signature", [UserController::class, "viewSignature"])->name("users.employees.signature");
+        Route::get("/users/employees/{user}/photo", [UserController::class, "viewPhoto"])->name("users.employees.photo");
+        Route::get("/users/employees/{user}/acknowledgement/signature-file", [UserController::class, "streamSignature"])
+            ->name("users.employees.signature-file")
+            ->middleware("signed");
+        Route::get("/users/employees/{user}/acknowledgement/photo-file", [UserController::class, "streamPhoto"])
+            ->name("users.employees.photo-file")
+            ->middleware("signed");
     });
 
     Route::middleware(["role:employee", "expiry"])->prefix("orientation")->name("employee.")->group(function () {
