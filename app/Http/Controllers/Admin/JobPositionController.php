@@ -80,8 +80,7 @@ class JobPositionController extends Controller
         $positions = JobPosition::orderBy("name")
             ->get();
 
-        $companies = Company::where("status", "active")
-            ->with('jobs')
+        $companies = Company::with('jobs')
             ->get(["id", "name", "logo_path"]);
 
         $jobs = JobPosition::all();
