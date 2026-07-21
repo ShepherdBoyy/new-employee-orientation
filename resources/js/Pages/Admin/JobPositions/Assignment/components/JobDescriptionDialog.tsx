@@ -17,11 +17,9 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button";
 import { PinOff, Trash2Icon } from "lucide-react";
 import { router, Form } from "@inertiajs/react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Document, pdfjs, Page } from 'react-pdf'
-import React, { lazy, Suspense, useEffect, useState } from 'react';
-
-
+import React, { useEffect, useState } from 'react';
 
 interface CompanyJobIds {
     company_id: number,
@@ -33,12 +31,10 @@ interface Props {
     isOpen: boolean;
     onClose: () => void;
 }
-const PdfViewer = lazy(() => import('@/Layout/PdfViewer'));
 
 export default function JobDescriptionDialog({ isOpen, onClose, companyJobIds, jd_pdf }: Props) {
     
     const [isClient, setIsClient] = useState(false);
-
     // useEffect only runs in the browser, safely bypassing SSR
     useEffect(() => {
         setIsClient(true);
@@ -46,56 +42,54 @@ export default function JobDescriptionDialog({ isOpen, onClose, companyJobIds, j
     return (
         <>
             <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-                <DialogContent className="sm:max-w-3xl w-full max-h-[90vh] flex flex-col">
-                    <DialogHeader>
+                <DialogContent
+                    className={cn(
+                        jd_pdf
+                        ? "sm:max-w-6xl w-full h-[90vh] flex flex-col p-6"
+                        : "sm:max-w-4xl w-full flex flex-col p-6"
+                    )}
+                >
+                    <DialogHeader className="shrink-0 pb-4">
                         <DialogTitle>Job Description</DialogTitle>
                         <DialogDescription>
-                            Job description for this company
+                            Job description for this position
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="flex flex-col items-center gap-2 flex-1 min-h-0 w-full">
-                        <div className="grid flex-1 gap-2 w-full min-h-0">
-
-                            {jd_pdf ? (
-                                <div className="w-full max-h-[60vh] overflow-y-auto border border-gray-200 rounded-lg p-2 bg-gray-50 [&_canvas]:!w-full [&_canvas]:!h-auto">
-                                    <Suspense fallback={<div>Loading PDF Viewer...</div>}>
-                                        <PdfViewer fileUrl={jd_pdf.file_path} />
-                                    </Suspense> 
-                                </div>
-                            )
-                            :
-                            (
-                                <div>
-                                    <Form 
-                                        action="/admin/upload-jd" 
-                                        method="post"
-                                        transform={(data) => ({ ...data, 
-                                            company_id: companyJobIds?.company_id, 
-                                            job_position_id: companyJobIds?.job_position_id 
-                                        })}
-                                    >
-                                        {({
-                                            errors
-                                        }) => ( 
-                                            <>
-                                                <Field className="pb-3">
-                                                    <div className="flex gap-2">
-                                                        <FieldLabel htmlFor="pdf_file">PDF</FieldLabel>
-                                                        {errors.pdf_file && <div>{errors.pdf_file}</div>}
-                                                    </div>
-                                                    <Input id="pdf_file" name="pdf_file" type="file" />
-                                                    <FieldDescription>Select a pdf to upload.</FieldDescription>
-                                                    
-                                                </Field>
-                                                
-                                                <Button>Submit</Button>
-                                            </>
-                                        )}
-                                    </Form>
-                                </div>
-                            )}                            
-                        </div>
-                    </div>
+                        {jd_pdf ? (
+                            <div className="flex-1 min-h-0 w-full rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                                <iframe
+                                    src={`/storage/${jd_pdf.file_path}#toolbar=0&navpanes=0`}
+                                    title="Job Description PDF"
+                                    className="w-full h-full border-none"
+                                />
+                            </div>
+                        ) : (
+                            <div className="p-4 h-full overflow-y-auto">
+                                <Form 
+                                    action="/admin/upload-jd" 
+                                    method="post"
+                                    transform={(data) => ({ 
+                                        ...data, 
+                                        company_id: companyJobIds?.company_id, 
+                                        job_position_id: companyJobIds?.job_position_id 
+                                    })}
+                                >
+                                    {({ errors }) => ( 
+                                        <div className="space-y-4">
+                                            <Field className="pb-3">
+                                                <div className="flex gap-2">
+                                                    <FieldLabel htmlFor="pdf_file">PDF</FieldLabel>
+                                                    {errors.pdf_file && <div className="text-red-500 text-sm">{errors.pdf_file}</div>}
+                                                </div>
+                                                <Input id="pdf_file" name="pdf_file" type="file" />
+                                                <FieldDescription>Select a pdf to upload.</FieldDescription>
+                                            </Field>
+                                            <Button type="submit">Submit</Button>
+                                        </div>
+                                    )}
+                                </Form>
+                            </div>
+                        )} 
                 </DialogContent>
             </Dialog>
         </>
