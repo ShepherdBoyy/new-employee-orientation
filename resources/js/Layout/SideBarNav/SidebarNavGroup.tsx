@@ -8,7 +8,12 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
+import {
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubItem,
+} from "@/components/ui/sidebar";
 import { ChevronRight } from "lucide-react";
 import { Link, usePage } from "@inertiajs/react";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -52,7 +57,10 @@ export default function SidebarNavGroup({ item }: SidebarGroupNavProps) {
                                         : ""
                                 }
                             >
-                                {item.icon}
+                                <SidebarMenuSubItem>
+                                    {item.icon}
+                                </SidebarMenuSubItem>
+
                                 {!collapsed && (
                                     <>
                                         <span>{item.title}</span>
@@ -68,25 +76,32 @@ export default function SidebarNavGroup({ item }: SidebarGroupNavProps) {
                         </TooltipContent>
                     )}
                 </Tooltip>
-                <CollapsibleContent className="ml-5 border-l group-data-[collapsible=icon]:border-l-0">
-                    {item.items.map((child, i) => {
-                        const isActive = url.startsWith(child.path);
-                        return (
-                            <SidebarMenuItem key={i}>
-                                <Link href={child.path}>
-                                    <SidebarMenuButton
-                                        className={isActive ? "font-bold" : ""}
-                                    >
-                                        {!collapsed && (
-                                            <span className="ml-4 text-sm font-sans">
-                                                {child.title}
-                                            </span>
-                                        )}
-                                    </SidebarMenuButton>
-                                </Link>
-                            </SidebarMenuItem>
-                        );
-                    })}
+                <CollapsibleContent className="">
+                    <SidebarMenuSub>
+                        {item.items.map((child, i) => {
+                            const isActive = url.startsWith(child.path);
+                            return (
+                                <SidebarMenuSubItem
+                                    key={i}
+                                    className="group-data-[collapsible=icon]:hidden"
+                                >
+                                    <Link href={child.path}>
+                                        <SidebarMenuButton
+                                            className={
+                                                isActive ? "font-bold" : ""
+                                            }
+                                        >
+                                            {!collapsed && (
+                                                <span className="text-sm font-sans">
+                                                    {child.title}
+                                                </span>
+                                            )}
+                                        </SidebarMenuButton>
+                                    </Link>
+                                </SidebarMenuSubItem>
+                            );
+                        })}
+                    </SidebarMenuSub>
                 </CollapsibleContent>
             </Collapsible>
         </>
