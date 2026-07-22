@@ -21,7 +21,15 @@ export function Onboarding({ onFinish, user }: OnboardingProps) {
                         user={user}
                         onNext={() => setStep(OnboardingStep.Modules)}
                     />
-                    <div className="border rounded-lg bg-muted "></div>
+                    <div className="rounded-lg w-full h-full p-2">
+                        <video
+                            src="/video/welcome.mp4"
+                            className="max-w-full h-full rounded-xl object-cover"
+                            autoPlay
+                            muted
+                            loop
+                        />
+                    </div>
                 </div>
             );
         case OnboardingStep.Modules:
