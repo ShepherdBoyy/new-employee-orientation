@@ -23,8 +23,7 @@ export default function EmployeeLayout({ children }: EmployeeLayoutProps) {
                 {children}
             </main>
 
-            {/* FAQ Window */}
-            {openFAQ && (
+            {/* {openFAQ && (
                 <div className="fixed bottom-24 right-8 z-50 w-[380px] rounded-2xl border bg-background shadow-2xl">
                     <div className="flex items-center justify-between border-b px-5 py-4">
                         <div>
@@ -42,21 +41,19 @@ export default function EmployeeLayout({ children }: EmployeeLayoutProps) {
                     </div>
 
                     <div className="max-h-125 overflow-y-auto p-5">
-                        {/* <FAQ /> */}
                         FAQ Component goes here...
                     </div>
                 </div>
             )}
 
             <FloatingFAQ />
-            {/* FAB */}
             <button
                 onClick={() => setOpenFAQ((prev) => !prev)}
                 className="fixed bottom-8 right-8 z-50 flex items-center gap-3 rounded-full bg-primary px-5 py-3 text-primary-foreground shadow-xl transition-all hover:scale-105 hover:shadow-2xl"
             >
                 <MessageCircle size={20} />
                 <span className="font-medium">Need Help?</span>
-            </button>
+            </button> */}
         </>
     );
 }
