@@ -1,12 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Head, useForm, router } from "@inertiajs/react";
-import {
-    Plus,
-    Pencil,
-    Trash2,
-    Users2,
-    CalendarClock,
-} from "lucide-react";
+import { Plus, Pencil, Trash2, Users2, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,30 +40,21 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import EmployeeDetailDialog, {
     type Employee as EmployeeDetail,
 } from "./components/EmployeeDetailDialog";
 import Master from "@/Layout/Master";
-
-interface JobPosition {
-    id: number;
-    name: string;
-}
-
-interface Company {
-    id: number;
-    name: string;
-    jobs: JobPosition[];
-}
+import type { JobPosition } from "../Types/job-position";
+import type { CompanyWithJobs } from "../Types/company";
 
 interface Employee {
     id: number;
     name: string;
     email: string;
     expires_at: string | null;
-    company: { id: number; name: string } | null;
+    company: { id: number; name: string; logo_path: string } | null;
     job_position: JobPosition | null;
     total_folders: number;
     completed_folders: number;
@@ -78,7 +63,7 @@ interface Employee {
 
 interface Props {
     employees: Employee[];
-    companies: Company[];
+    companies: CompanyWithJobs[];
 }
 
 const statusMap = {
@@ -87,7 +72,7 @@ const statusMap = {
         className: "bg-muted text-muted-foreground",
     },
     in_progress: {
-        label: "In Progress",
+        label: "Ongoing",
         className:
             "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
     },
@@ -114,6 +99,8 @@ export default function Employees({
         useState<EmployeeDetail | null>(null);
 
     useEffect(() => setEmployees(initialEmployees), [initialEmployees]);
+
+    console.log(companies);
 
     const { data, setData, post, put, processing, errors, reset } = useForm({
         name: "",
@@ -256,15 +243,8 @@ export default function Employees({
                                                 setViewingEmployee(employee)
                                             }
                                         >
-                                            <TableCell>
+                                            <TableCell className="">
                                                 <div className="flex items-center gap-3">
-                                                    <Avatar className="h-8 w-8">
-                                                        <AvatarFallback className="text-xs">
-                                                            {employee.name
-                                                                .slice(0, 2)
-                                                                .toUpperCase()}
-                                                        </AvatarFallback>
-                                                    </Avatar>
                                                     <div>
                                                         <p className="font-medium leading-none">
                                                             {employee.name}
@@ -275,8 +255,27 @@ export default function Employees({
                                                     </div>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-muted-foreground">
-                                                {employee.company?.name ?? "—"}
+                                            <TableCell className="text-muted-foreground flex items-center gap-2">
+                                                <Avatar className="h-8 w-8">
+                                                    <AvatarImage
+                                                        src={
+                                                            employee.company
+                                                                ?.logo_path
+                                                                ? `/storage/${employee.company.logo_path}`
+                                                                : undefined
+                                                        }
+                                                    />
+                                                    <AvatarFallback>
+                                                        {employee.company?.name?.charAt(
+                                                            0,
+                                                        ) ?? "—"}
+                                                    </AvatarFallback>
+                                                </Avatar>
+
+                                                <span>
+                                                    {employee.company?.name ??
+                                                        "—"}
+                                                </span>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">
@@ -494,9 +493,13 @@ export default function Employees({
                             >
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={processing} className="cursor-pointer">
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                className="cursor-pointer"
+                            >
                                 {processing
-                                    ? "Saving..." 
+                                    ? "Saving..."
                                     : editingEmployee
                                       ? "Save Changes"
                                       : "Create Employee"}
