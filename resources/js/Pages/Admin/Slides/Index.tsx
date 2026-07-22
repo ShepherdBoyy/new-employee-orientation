@@ -7,18 +7,24 @@ import SlideGrid from './components/SlideGrid'
 import { type Slide } from './components/SlideItem'
 import Master from '@/Layout/Master'
 
-interface Target {
+interface Company {
     id: number
-    company_id: number | null
-    job_position_id: number | null
-    audience_label: string
+    name: string
+    slug: string
+}
+
+interface JobPosition {
+    id: number
+    name: string
+    slug: string
 }
 
 interface Folder {
     id: number
     name: string
     slug: string
-    targets: Target[]
+    company: Company
+    job_position: JobPosition | null
 }
 
 interface Props {
@@ -30,8 +36,6 @@ export default function Index({ folder, slides }: Props) {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [uploading, setUploading] = useState(false)
     const [dragOver, setDragOver] = useState(false)
-
-    console.log(folder.targets);
 
     function handleFiles(files: FileList | null) {
         if (!files || files.length === 0) return
@@ -54,13 +58,17 @@ export default function Index({ folder, slides }: Props) {
         handleFiles(e.dataTransfer.files)
     }
 
+    const backHref = folder.job_position
+        ? `/admin/folders/${folder.company.slug}/job-positions`
+        : `/admin/folders/${folder.company.slug}`
+
     return (
         <Master>
             <Head title={folder.name} />
 
             <div className="w-full space-y-6 p-6 lg:p-8">
                 <Link
-                    href="/admin/folders/global"
+                    href={backHref}
                     className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
                 >
                     <ArrowLeft className="h-4 w-4" />
@@ -71,11 +79,14 @@ export default function Index({ folder, slides }: Props) {
                     <div className="space-y-2">
                         <h1 className="text-xl font-semibold tracking-tight">{folder.name}</h1>
                         <div className="flex flex-wrap gap-1.5">
-                            {folder.targets.map(target => (
-                                <Badge key={target.id} variant="secondary" className="text-xs font-normal">
-                                    {target.audience_label}
+                            <Badge variant="secondary" className="text-xs font-normal">
+                                {folder.company.name}
+                            </Badge>
+                            {folder.job_position && (
+                                <Badge variant="secondary" className="text-xs font-normal">
+                                    {folder.job_position.name}
                                 </Badge>
-                            ))}
+                            )}
                         </div>
                     </div>
                     <Button variant="outline" onClick={() => router.visit(`/admin/folders/${folder.slug}/preview`)}>

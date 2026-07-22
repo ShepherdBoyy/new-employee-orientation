@@ -14,8 +14,6 @@ import {
     SwatchBook,
     BriefcaseBusiness,
     Projector,
-    CalendarRange,
-    ToolCase,
 } from "lucide-react";
 import SidebarNavItem from "./SideBarNav/SidebarNavItem";
 import SidebarNavGroup from "./SideBarNav/SidebarNavGroup";
@@ -56,10 +54,6 @@ export function AppSidebar() {
             title: "Presentation",
             icon: <Projector absoluteStrokeWidth />,
             items: [
-                {
-                    title: "Global Folders",
-                    path: "/admin/folders/global",
-                },
                 ...companies.map((company) => ({
                     title: company.name,
                     path: `/admin/folders/${company.slug}`,
