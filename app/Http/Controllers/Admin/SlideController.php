@@ -18,10 +18,16 @@ class SlideController extends Controller
 {
     public function index(Folder $folder): Response
     {
-        $folder->load("slides", "targets.company", "targets.jobPosition");
+        $folder->load("slides", "company:id,name,slug", "jobPosition:id,name,slug");
 
         return Inertia::render("Admin/Slides/Index", [
-            "folder" => $folder,
+            "folder" => [
+                "id" => $folder->id,
+                "name" => $folder->name,
+                "slug" => $folder->slug,
+                "company" => $folder->company,
+                "job_position" => $folder->jobPosition
+            ],
             "slides" => $folder->slides->map(fn($slide) => [
                 "id" => $slide->id,
                 "type" => $slide->type,
@@ -112,20 +118,10 @@ class SlideController extends Controller
 
     private function storagePath(Folder $folder): string
     {
-        $target = $folder->targets()->first();
-
-        if (!$target || (!$target->company_id && !$target->job_position_id)) {
-            return "folders/global/" . Str::slug($folder->name);
+        if ($folder->job_position_id) {
+            return "folders/" . $folder->company->slug . "/job-positions/" . $folder->jobPosition->slug . "/" . $folder->slug;
         }
 
-        if ($target->company_id && !$target->job_position_id) {
-            $company = Company::find($target->company_id);
-            return "folders/" . $company->slug . "/" . Str::slug($folder->name);
-        }
-
-        $company = Company::find($target->company_id);
-        $jobPosition = JobPosition::find($target->job_position_id);
-
-        return "folders/" . $company->slug . "/job-positions/" . $jobPosition->slug . "/" . Str::slug($folder->name);
+        return "folders/" . $folder->company->slug . "/" . $folder->slug;
     }
 }

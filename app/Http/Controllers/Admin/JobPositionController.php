@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Folder;
 use App\Models\JobPosition;
 use App\Models\Document;
 use DB;
@@ -120,13 +121,14 @@ class JobPositionController extends Controller
             'job_ids.*' => 'exists:job_positions,id',
         ]);
 
-        // 1. Fetch the collection of company models
         $companies = Company::whereIn('id', $request->company_ids)->get();
 
-        // 2. Loop through each company and sync the jobs
         foreach ($companies as $company) {
-            // This inserts new relationships and ignores existing ones
             $company->jobs()->syncWithoutDetaching($request->job_ids);
+
+            foreach ($request->job_ids as $jobId) {
+                Folder::ensureJobSpecificFolder($company->id, $jobId);
+            }
         }
 
         return back()->with("success", "Job assigned successfully");

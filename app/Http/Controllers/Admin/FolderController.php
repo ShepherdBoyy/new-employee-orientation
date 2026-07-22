@@ -5,124 +5,98 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Folder;
-use App\Models\FolderTarget;
 use App\Models\JobPosition;
 use App\Models\Slide;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Storage;
 
 class FolderController extends Controller
 {
-    public function globalIndex(): Response
-    {
-        $folders = Folder::whereHas("targets", function ($query) {
-            $query->whereNull("company_id")
-                  ->whereNull("job_position_id");
-        })
-        ->withCount("slides")
-        ->with("targets")
-        ->get()
-        ->sortBy(function ($folder) {
-            return $folder->targets
-                ->firstWhere(fn($t) => $t->company_id === null && $t->job_position_id === null)
-                ?->order ?? 0;
-        })->values();
-    
-        return Inertia::render("Admin/Folders/Global", [
-            "folders" => $folders
-        ]);
-    }
-
     public function companyIndex(Company $company): Response
     {
-        $company->load("jobs");
+        $companyWideFolders = Folder::forCompany($company->id)
+            ->companyWide()
+            ->ordered()
+            ->withCount("slides")
+            ->get();
 
-        $folders = Folder::whereHas("targets", function ($query) use ($company) {
-            $query->where("company_id", $company->id)
-                  ->whereNull("job_position_id");
-        })
-        ->withCount("slides")
-        ->with("targets")
-        ->get()
-        ->sortBy(function ($folder) use ($company) {
-            return $folder->targets
-                ->firstWhere(fn($t) => $t->company_id === $company->id && $t->job_position_id === null)
-                ?->order ?? 0;
-        })->values();
+        $company->load("jobs:id,name,slug");
+
+        $jobSpecificFolders = Folder::forCompany($company->id)
+            ->whereNotNull("job_position_id")
+            ->get(["id", "job_position_id", "order", "name"]);
+        
+        $firstJobSpecific = $jobSpecificFolders->first();
+        
+        $jobSpecificSummary = $company->jobs->isNotEmpty() ? [
+            "total_positions" => $company->jobs->count(),
+            "order" => $firstJobSpecific?->order ?? ($companyWideFolders->max("order") + 1 ?? 1),
+            "name" => $firstJobSpecific?->name ?? "Job-Specific Training"
+        ] : null;
 
         return Inertia::render("Admin/Folders/Company", [
+            "company" => [
+                "id" => $company->id,
+                "name" => $company->name,
+                "slug" => $company->slug,
+                "jobs" => $company->jobs
+            ],
+            "companyWideFolders" => $companyWideFolders,
+            "jobSpecificSummary" => $jobSpecificSummary
+        ]); 
+    }
+
+    public function jobPositionPicker(Company $company): Response
+    {
+        $company->load("jobs:id,name,slug");
+
+        $folders = Folder::forCompany($company->id)
+            ->whereNotNull("job_position_id")
+            ->get(["id", "job_position_id", "slug"]);
+
+        $positions = $company->jobs->map(function (JobPosition $position) use ($folders) {
+            $folder = $folders->firstWhere("job_position_id", $position->id);
+
+            return [
+                "id" => $position->id,
+                "name" => $position->name,
+                "has_folder" => $folder !== null,
+                "folder_slug" => $folder?->slug
+            ]; 
+        });
+
+        return Inertia::render("Admin/Folders/JobPositionPicker", [
             "company" => $company,
-            "folders" => $folders
+            "positions" => $positions
         ]);
     }
 
-    public function positionIndex(Company $company, JobPosition $job): Response
+    public function resolveJobSpecificFolder(Company $company, JobPosition $jobPosition): RedirectResponse
     {
-        $folders = Folder::whereHas("targets", function ($query) use ($company, $job) {
-            $query->where("company_id", $company->id)
-                  ->where("job_position_id", $job->id);
-        })
-        ->withCount("slides")
-        ->with("targets")
-        ->get()
-        ->sortBy(function ($folder) use ($company, $job) {
-            return $folder->targets
-                ->firstWhere(fn($t) => $t->company_id === $company->id && $t->job_position_id === $job->id)
-                ?->order ?? 0;
-        })->values();
+        $folder = Folder::ensureJobSpecificFolder($company->id, $jobPosition->id);
 
-        return Inertia::render("Admin/Folders/Position", [
-            "company" => $company,
-            "jobPosition" => $job,
-            "folders" => $folders
-        ]);
+        return redirect()->route("admin.slides.index", $folder->slug);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             "name" => ["required", "string", "max:255"],
-            "context" => ["required", "in:global,company,position"],
-            "company_id" => [
-                "nullable",
-                "exists:companies,id",
-                Rule::requiredIf(
-                    in_array($request->context, ["company", "position"])
-                )
-            ],
-            "job_position_id" => [
-                "nullable",
-                "exists:job_positions,id",
-                Rule::requiredIf(
-                    $request->context === "position"
-                )
-            ]
+            "company_id" => ["required", "exists:companies,id"]
         ]);
 
-        $lastOrder = Folder::max("order") ?? 0;
-
-        $folder = Folder::create([
-            "name" => $validated["name"],
-            "order" => $lastOrder + 1
-        ]);
-
-        $targetCompanyId = $validated["context"] === "global" ? null : $validated["company_id"];
-        $targetJobPositionId = $validated["context"] === "position" ? $validated["job_position_id"] : null;
-
-        $targetOrder = FolderTarget::where("company_id", $targetCompanyId)
-            ->where("job_position_id", $targetJobPositionId)
+        $lastOrder = Folder::forCompany($validated["company_id"])
+            ->companyWide()
             ->max("order") ?? 0;
 
-        FolderTarget::create([
-            "folder_id" => $folder->id,
-            "company_id" => $targetCompanyId,
-            "job_position_id" => $targetJobPositionId,
-            "order" => $targetOrder + 1
+        Folder::create([
+            "company_id" => $validated["company_id"],
+            "name" => $validated["name"],
+            "order" => $lastOrder + 1
         ]);
 
         return back()->with("success", "Folder created successfully");
@@ -139,40 +113,42 @@ class FolderController extends Controller
         return back()->with("success", "Folder updated successfully");
     }
 
+    public function updateJobSpecificName(Request $request, Company $company): RedirectResponse
+    {
+        $validated = $request->validate([
+            "name" => ["required", "string", "max:255"]
+        ]);
+
+        Folder::where("company_id", $company->id)
+            ->whereNotNull("job_position_id")
+            ->update(["name" => $validated["name"]]);
+
+        return back()->with("success", "Job-specific training name updated successfully");
+    }
+
     public function reorder(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            "folders" => ["required", "array"],
-            "folders.*.id" => ["required", "exists:folders,id"],
-            "folders.*.order" => ["required", "integer", "min:1"]
+            "company_id" => ["required", "exists:companies,id"],
+            "items" => ["required", "array"],
+            "items.*.type" => ["required", "in:folder,job-specific"],
+            "items.*.id" => ["nullable", "integer"],
+            "items.*.order" => ["required", "integer", "min:1"]
         ]);
         
-        foreach ($validated["folders"] as $item) {
-            Folder::where("id", $item["id"])
-                ->update(["order" => $item["order"]]);
+        foreach ($validated["items"] as $item) {
+            if ($item["type"] === "job-specific") {
+                Folder::where("company_id", $validated["company_id"])
+                    ->whereNotNull("job_position_id")
+                    ->update(["order" => $item["order"]]);
+            } else {
+                Folder::where("id", $item["id"])
+                    ->where("company_id", $validated["company_id"])
+                    ->update(["order" => $item["order"]]);
+            }
         }
 
         return back()->with("success", "Folders reordered successfully");
-    }
-
-    public function reorderTargets(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            "company_id" => ["nullable", "exists:companies,id"],
-            "job_position_id" => ["nullable", "exists:job_positions,id"],
-            "folders" => ["required", "array"],
-            "folders.*.id" => ["required", "exists:folders,id"],
-            "folders.*.order" => ["required", "integer", "min:1"]
-        ]);
-
-        foreach ($validated["folders"] as $item) {
-            FolderTarget::where("folder_id", $item["id"])
-                ->where("company_id", $validated["company_id"])
-                ->where("job_position_id", $validated["job_position_id"])
-                ->update(["order" => $item["order"]]);
-        }
-
-        return back()->with("success", "Folder reordered successfully");
     }
 
     public function destroy(Folder $folder): RedirectResponse
