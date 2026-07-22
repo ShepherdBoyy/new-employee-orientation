@@ -29,10 +29,6 @@ interface Props {
 }
 
 export default function PreviewList({ folders, company, jobPosition }: Props) {
-    const backHref = jobPosition
-        ? `/admin/folders/${company.slug}/job-positions/${jobPosition.slug}`
-        : `/admin/folders/${company.slug}`
-
     return (
         <>
             <Head title={`Preview — ${company.name}`} />
@@ -47,7 +43,7 @@ export default function PreviewList({ folders, company, jobPosition }: Props) {
                             {jobPosition && <span> · {jobPosition.name}</span>}
                         </span>
                     </div>
-                    <Link href={backHref} className="inline-flex items-center gap-1.5 text-indigo-200 hover:text-white">
+                    <Link href={`/admin/folders/${company.slug}`} className="inline-flex items-center gap-1.5 text-indigo-200 hover:text-white">
                         <ArrowLeft className="h-4 w-4" />
                         Back to folders
                     </Link>

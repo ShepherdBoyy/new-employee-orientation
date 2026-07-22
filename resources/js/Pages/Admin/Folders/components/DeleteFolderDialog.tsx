@@ -8,10 +8,10 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { type Folder } from './FolderItem'
+import { type CompanyFolder } from './FolderCard'
 
 interface Props {
-    folder: Folder | null
+    folder: CompanyFolder | null
     onCancel: () => void
     onConfirm: () => void
 }
