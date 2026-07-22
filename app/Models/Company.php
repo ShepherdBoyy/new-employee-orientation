@@ -90,6 +90,11 @@ class Company extends Model
     {
         return $this->belongsToMany(JobPosition::class);
     }
+    
+    public function document(): HasMany
+    {
+        return $this->hasMany(Document::class);
+    }
 
     public function folderTargets(): HasMany
     {

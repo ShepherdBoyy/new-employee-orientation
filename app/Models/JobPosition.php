@@ -51,6 +51,11 @@ class JobPosition extends Model
         return $this->belongsToMany(Company::class);
     }
 
+    public function document(): HasMany
+    {
+        return $this->hasMany(Document::class);
+    }
+
     public function users(): HasMany
     {
         return $this->hasMany(User::class);

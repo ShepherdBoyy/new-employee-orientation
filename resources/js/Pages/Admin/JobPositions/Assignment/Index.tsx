@@ -12,13 +12,13 @@ interface Props {
     jobs: JobPosition;
 }
 
-export default function JobPositionsIndex({ companies, jobs, jd_pdf }: Props) {
+export default function JobPositionsIndex({ companies, jobs }: Props) {
     return (
         <>
             <Master>
                 <div className="grid lg:grid-cols-[420px_1fr] gap-3 items-start">
                     <AssignedJobPositionForm companies={companies} jobs={jobs} />
-                    <CompanyJobTabs companies={companies} jd_pdf={jd_pdf} />
+                    <CompanyJobTabs companies={companies}/>
                 </div>
             </Master>
 

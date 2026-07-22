@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\JobPosition;
-use App\Models\jd_pdf;
+use App\Models\Document;
 use DB;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -77,21 +77,37 @@ class JobPositionController extends Controller
 
     public function jobAssignments(Request $request): Response
     {
-        $positions = JobPosition::orderBy("name")
-            ->get();
+        $companies = Company::with(['jobs'])->get();
 
-        $companies = Company::with('jobs')
-            ->get(["id", "name", "logo_path"]);
+        $documents = Document::all();
 
-        $jobs = JobPosition::all();
+       $filteredCompanies = $companies->map(function ($company) use ($documents) {
+            $company->jobs->transform(function ($job) use ($company, $documents) {
+                // Find matching PDF for this exact Company + Job Position pair
+                $pdf = $documents->firstWhere(function ($item) use ($company, $job) {
+                    return $item->company_id === $company->id 
+                        && $item->job_position_id === $job->id;
+                });
 
-        $jd_pdf = jd_pdf::where('company_id', $request->company_id)->where('job_position_id', $request->job_position_id)->first('file_path');
+                // Attach jd_pdf object directly to the job object
+                $job->document = $pdf ? [
+                    'id'        => $pdf->id,
+                    'file_path' => $pdf->file_path,
+                    'orig_name' => $pdf->orig_name,
+                ] : null;
+
+                return $job;
+            });
+
+            return $company;
+        });
+
+        $jobs = JobPosition::get();
 
         return Inertia::render("Admin/JobPositions/Assignment/Index", [
-            "companies" => $companies,
-            "positions" => $positions,
+            "companies" => $filteredCompanies,
             "jobs" => $jobs,
-            "jd_pdf" => $jd_pdf
+            "document" => $documents
         ]);
     }
 
@@ -139,7 +155,7 @@ class JobPositionController extends Controller
             $path = Storage::disk('public')->putFile('', $file);
 
             // 2. Save records to the database
-            jd_pdf::create([
+            Document::create([
                 'company_id' => $request->company_id,
                 'job_position_id' => $request->job_position_id,
                 'file_path' => $path,

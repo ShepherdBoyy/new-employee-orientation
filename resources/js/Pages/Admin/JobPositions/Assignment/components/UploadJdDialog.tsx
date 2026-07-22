@@ -32,11 +32,10 @@ interface Props {
     onClose: () => void;
 }
 
-export default function JobDescriptionDialog({
+export default function UploadJdDialog({
     isOpen,
     onClose,
-    companyJobIds,
-    jd_pdf,
+    companyJobIds
 }: Props) {
     const [isClient, setIsClient] = useState(false);
     // useEffect only runs in the browser, safely bypassing SSR
@@ -51,29 +50,13 @@ export default function JobDescriptionDialog({
                     if (!open) onClose();
                 }}
             >
-                <DialogContent
-                    className={cn(
-                        jd_pdf
-                            ? "sm:max-w-6xl w-full h-[90vh] flex flex-col p-6"
-                            : "",
-                    )}
-                >
+                <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Job Description</DialogTitle>
                         <DialogDescription>
                             Job description for this position
                         </DialogDescription>
                     </DialogHeader>
-
-                    {jd_pdf ? (
-                        <div className="flex-1 min-h-0 w-full rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
-                            <iframe
-                                src={`/storage/${jd_pdf.file_path}#toolbar=0&navpanes=0`}
-                                title="Job Description PDF"
-                                className="w-full h-full border-none"
-                            />
-                        </div>
-                    ) : (
                         <Form
                             action="/admin/upload-jd"
                             method="post"
@@ -113,7 +96,6 @@ export default function JobDescriptionDialog({
                                 </>
                             )}
                         </Form>
-                    )}
                 </DialogContent>
             </Dialog>
         </>

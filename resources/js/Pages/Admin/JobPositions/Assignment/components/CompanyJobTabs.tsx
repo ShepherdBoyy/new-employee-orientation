@@ -18,7 +18,8 @@ import {
 
 // 1. Import your fixed RemoveJobDialog component
 import RemoveJobDialog from "./RemoveJobDialog";
-import  JobDescriptionDialog from "./JobDescriptionDialog";
+import ViewJdDialog from "./ViewJdDialog";
+import UploadJdDialog from "./UploadJdDialog"
 
 import type { CompanyWithJobs } from "../../../Types/company";
 import { Badge } from "@/components/ui/badge";
@@ -40,11 +41,13 @@ type Props = {
     companies: CompanyWithJobs[];
 };
 
-export default function CompanyJobTabs({ companies, jd_pdf }: Props) {
+export default function CompanyJobTabs({ companies }: Props) {
     const [activeDeletingJob, setActiveDeletingJob] =
         useState<JobWithPivot | null>(null);
 
-    const [activeJdDialog, setActiveJdDialog] = useState(false);
+    const [uploadDialog, setUploadDialog] = useState(false);
+    const [viewDialog, setViewDialog] = useState(false);
+    const [document, setDocument] = useState('');
     const [activeDeleteDialog, setActiveDeleteDialog ] = useState(false);
 
     if (!companies.length) return null;
@@ -60,24 +63,6 @@ export default function CompanyJobTabs({ companies, jd_pdf }: Props) {
     const activeDeletingCompanyName = companies.find(
         (c) => c.id === activeDeletingJob?.pivot.company_id,
     );
-
-    function jdhandler(job) {
-        setActiveJdDialog(true);
-        setActiveDeletingJob(
-            job as unknown as JobWithPivot,
-        )
-
-        router.visit(
-            '/admin/all-job-positions',
-            {
-                data:{
-                    company_id: job.pivot.company_id,
-                    job_position_id: job.pivot.job_position_id
-                },
-                preserveState:true
-            }
-        )
-    }
 
     return (
         <>
@@ -137,16 +122,35 @@ export default function CompanyJobTabs({ companies, jd_pdf }: Props) {
 
 
                                                     <div className="grid gap-2 sm:grid-cols-2">
-                                                        <Button
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                jdhandler(job)
-                                                            }}
-                                                            variant="outline"
-                                                        >
-                                                            <BriefcaseBusiness />
-                                                            Job Description
-                                                        </Button>
+                                                        { job.document ? (
+                                                            <Button
+                                                                size="sm"
+                                                                onClick={() => {
+                                                                   setViewDialog(true) 
+                                                                   setDocument(job.document.file_path)
+                                                                }}
+                                                                variant="outline"
+                                                            >
+                                                                <BriefcaseBusiness />
+                                                                View JD
+                                                            </Button>
+                                                        ) 
+                                                        :
+                                                        (
+                                                            <Button
+                                                                size="sm"
+                                                                onClick={() => {
+                                                                    setUploadDialog(true);
+                                                                    setActiveDeletingJob(
+                                                                        job as unknown as JobWithPivot,
+                                                                    )
+                                                                }}
+                                                                variant="outline"
+                                                            >
+                                                                <BriefcaseBusiness />
+                                                                Upload JD
+                                                            </Button>
+                                                        )}
                                                         <Button
                                                             size="sm"
                                                             onClick={() => {
@@ -195,11 +199,16 @@ export default function CompanyJobTabs({ companies, jd_pdf }: Props) {
                 onClose={() => setActiveDeleteDialog(false)} // Clear state to shut down the dialog
             />
 
-            <JobDescriptionDialog 
+            <ViewJdDialog 
+                isOpen={viewDialog}
+                onClose={() => setViewDialog(false)}
+                document={document}
+            />
+
+            <UploadJdDialog
                 companyJobIds={activeDeletingJob?.pivot}
-                isOpen={activeJdDialog}
-                onClose={() => setActiveJdDialog(false)}
-                jd_pdf={jd_pdf}
+                isOpen={uploadDialog}
+                onClose={() => setUploadDialog(false)}
             />
         </>
     );
