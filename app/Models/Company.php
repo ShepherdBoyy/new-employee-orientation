@@ -51,33 +51,17 @@ class Company extends Model
 
     public function foldersForEmployee(User $user): Collection
     {
-        $companySpecific = FolderTarget::where("company_id", $user->company_id)
-            ->whereNull("job_position_id")
-            ->orderBy("order")
-            ->pluck("folder_id");
+        $companyWide = Folder::forCompany($user->company_id)
+            ->companyWide()
+            ->get();
 
-        $global = FolderTarget::whereNull("company_id")
-            ->whereNull("job_position_id")
-            ->orderBy("order")
-            ->pluck("folder_id");
+        $jobSpecific = Folder::forCompany($user->company_id)
+            ->forJobPosition($user->job_position_id)
+            ->get();
 
-        $jobSpecific = FolderTarget::where("company_id", $user->company_id)
-            ->where("job_position_id", $user->job_position_id)
-            ->whereNotNull("job_position_id")
-            ->orderBy("order")
-            ->pluck("folder_id");
-
-        $orderedFolderIds = $companySpecific
-            ->concat($global)
+        return $companyWide
             ->concat($jobSpecific)
-            ->unique()
-            ->values();
-        
-        return Folder::whereIn("id", $orderedFolderIds)
-            ->get()
-            ->sortBy(function ($folder) use ($orderedFolderIds) {
-                return $orderedFolderIds->search($folder->id);
-            })
+            ->sortBy("order")
             ->values();
     }
 
@@ -96,8 +80,8 @@ class Company extends Model
         return $this->hasMany(Document::class);
     }
 
-    public function folderTargets(): HasMany
+    public function folders(): HasMany
     {
-        return $this->hasMany(FolderTarget::class);
+        return $this->hasMany(Folder::class);
     }
-}
+} 

@@ -60,9 +60,4 @@ class JobPosition extends Model
     {
         return $this->hasMany(User::class);
     }
-
-    public function folderTargets(): HasMany
-    {
-        return $this->hasMany(FolderTarget::class);
-    }
 }
