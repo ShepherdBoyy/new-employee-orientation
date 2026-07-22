@@ -16,10 +16,10 @@ export default function CompanyCard({
     onDelete,
 }: CompanyCardProps) {
     return (
-        <Card className="">
+        <Card className="overflow-hidden">
             {/* Header Area */}
             <div
-                className={`relative h-32 border-b ${COMPANY_THEMES[company.header_theme]}`}
+                className={`relative -mt-(--card-spacing) h-32 border-b ${COMPANY_THEMES[company.header_theme]}`}
             >
                 <div className="absolute top-1 right-2 z-10">
                     <CompanyCardActions
@@ -40,16 +40,15 @@ export default function CompanyCard({
                     <AvatarFallback> {company.name[0]}</AvatarFallback>
                 </Avatar>
             </div>
-            <CardHeader>
-                <CardContent className="pt-12">
-                    <p className="text-sm text-muted-foreground">
-                        {company.jobs_count}{" "}
-                        {company.jobs_count === 1
-                            ? "Job Position"
-                            : "Job Positions"}
-                    </p>
-                </CardContent>
-            </CardHeader>
+
+            <CardContent className="pt-12">
+                <p className="text-sm text-muted-foreground">
+                    {company.jobs_count}{" "}
+                    {company.jobs_count === 1
+                        ? "Job Position"
+                        : "Job Positions"}
+                </p>
+            </CardContent>
             {/* Body */}
         </Card>
     );
