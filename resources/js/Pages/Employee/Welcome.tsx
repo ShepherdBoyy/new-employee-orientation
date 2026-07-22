@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Onboarding } from "./components/onboarding/OnBoardingDialog";
 import type { OnboardingUser } from "./Types";
-export type User = {
+type User = {
     user: OnboardingUser;
 };
 

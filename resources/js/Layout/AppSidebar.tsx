@@ -32,13 +32,6 @@ export function AppSidebar() {
             path: "/admin/dashboard",
             icon: <LayoutDashboard absoluteStrokeWidth />,
         },
-
-        {
-            type: "link",
-            title: "Requests",
-            path: "/admin/extension-requests",
-            icon: <CalendarRange absoluteStrokeWidth />,
-        },
         {
             type: "group",
             title: "Organization",
@@ -69,8 +62,8 @@ export function AppSidebar() {
                 },
                 ...companies.map((company) => ({
                     title: company.name,
-                    path: `/admin/folders/${company.slug}`
-                }))
+                    path: `/admin/folders/${company.slug}`,
+                })),
             ],
         },
         {
@@ -115,7 +108,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <SidebarGroup>
+                <SidebarGroup className="">
                     <SidebarGroupLabel>Platform</SidebarGroupLabel>
                     <SidebarMenu>
                         {navLinks.map((item) => {
