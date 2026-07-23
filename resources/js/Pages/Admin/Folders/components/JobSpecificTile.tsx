@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { router } from '@inertiajs/react'
-import { Users, ChevronRight, GripVertical, Pencil } from 'lucide-react'
+import { Users, GripVertical, Pencil } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
@@ -64,7 +64,6 @@ export default function JobSpecificTile({ companySlug, name, totalPositions, onE
                     >
                         <Pencil className="h-3.5 w-3.5" />
                     </Button>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                 </div>
             </div>
 
