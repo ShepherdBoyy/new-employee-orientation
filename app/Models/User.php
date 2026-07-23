@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -110,6 +111,15 @@ class User extends Authenticatable
                 "completed" => in_array($folder->id, $completedIds)
             ];
         })->toArray();
+    }
+
+    public static function generateDefaultPassword(string $fullName): string
+    {
+        $parts = preg_split("/\s+/", trim($fullName));
+        $lastName = end($parts);
+        $lastName = Str::lower(Str::slug($lastName, ""));
+
+        return "{$lastName}-neo@" . now()->year;
     }
 
     public function company(): BelongsTo

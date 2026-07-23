@@ -82,7 +82,7 @@ class UserController extends Controller
             "role" => $validated["role"],
             "company_id" => $validated["role"] === "admin" ? null : $validated["company_id"],
             "job_position_id" => $validated['role'] === "admin" ? null : ($validated["job_position_id"] ?? null),
-            "password" => "password",
+            "password" => User::generateDefaultPassword($validated["name"]),
             "expires_at" => $validated["role"] === "employee" ? now()->addDays(2) : null
         ]);
 
