@@ -26,7 +26,7 @@ import {
 import SidebarNavItem from "./SideBarNav/SidebarNavItem";
 import SidebarNavGroup from "./SideBarNav/SidebarNavGroup";
 import type { CompanyNav, NavItem } from "./SideBarNav/navTypes";
-import { usePage } from "@inertiajs/react";
+import { usePage, Link } from "@inertiajs/react";
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -210,8 +210,8 @@ export function AppSidebar() {
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
-                                    <LogOut />
-                                    Log out
+                                    <LogOut/>
+                                    <Link href="/logout">Log out</Link>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
