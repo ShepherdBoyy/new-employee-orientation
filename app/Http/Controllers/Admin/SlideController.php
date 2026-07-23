@@ -59,7 +59,8 @@ class SlideController extends Controller
                 ? "video"
                 : "image";
             
-            $path = $file->store($storageFolder, config("filesystems.default"));
+            // $path = $file->store($storageFolder, config("filesystems.default"));
+           $path = Storage::disk('public')->putFile($storageFolder, $file);
 
             Slide::create([
                 "folder_id" => $folder->id,
