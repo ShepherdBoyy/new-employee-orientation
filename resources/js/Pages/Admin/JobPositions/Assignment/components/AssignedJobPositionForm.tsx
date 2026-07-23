@@ -1,6 +1,6 @@
 import { useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner"
+import { toast } from "sonner";
 import * as React from "react";
 import {
     Card,
@@ -49,10 +49,11 @@ export default function AssignedJobPositionForm({ companies, jobs }: Props) {
         e.preventDefault();
         form.post("/admin/assign-jobs", {
             onSuccess: (message) => {
-                form.reset()
-                toast.success(message.props.success, { position: "top-center" });
+                form.reset();
+                toast.success(message.props.success, {
+                    position: "top-center",
+                });
             },
-            
         });
     }
 
@@ -70,7 +71,7 @@ export default function AssignedJobPositionForm({ companies, jobs }: Props) {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <form onSubmit={handleSubmit} className="max-w-md ">
+                <form onSubmit={handleSubmit} className="max-w-full ">
                     <FieldGroup>
                         <Field className="mt-4">
                             <FieldLabel>Position Name</FieldLabel>

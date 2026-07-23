@@ -10,23 +10,19 @@ import {
     SidebarFooter,
 } from "@/components/ui/sidebar";
 import {
-    LayoutDashboard,
     UsersRound,
-    SwatchBook,
     BriefcaseBusiness,
-    Projector,
     Rotate3d,
-    BadgeCheck,
-    Bell,
     ChevronsUpDown,
-    CreditCard,
     LogOut,
-    Sparkles,
+    Building2,
+    GitBranchPlus,
+    ShieldCheck,
 } from "lucide-react";
 import SidebarNavItem from "./SideBarNav/SidebarNavItem";
 import SidebarNavGroup from "./SideBarNav/SidebarNavGroup";
 import type { CompanyNav, NavItem } from "./SideBarNav/navTypes";
-import { usePage, Link } from "@inertiajs/react";
+import { usePage, Link, router } from "@inertiajs/react";
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -48,56 +44,54 @@ export function AppSidebar() {
     const companies = usePage().props.sidebarCompanies as CompanyNav[];
     const user = usePage().props.auth.user as AdminUser;
     const navLinks: NavItem[] = [
-        /*         {
-            type: "link",
-            title: "Dashboard",
-            path: "/admin/dashboard",
-            icon: <LayoutDashboard absoluteStrokeWidth />,
-        }, */
         {
-            type: "group",
-            title: "Organization",
-            icon: <BriefcaseBusiness absoluteStrokeWidth />,
-            items: [
+            type: "link",
+            group: "Organization",
+            links: [
                 {
+                    icon: <Building2 />,
                     title: "Companies",
                     path: "/admin/companies",
                 },
                 {
+                    icon: <BriefcaseBusiness />,
                     title: "Jobs",
                     path: "/admin/job-positions",
                 },
                 {
+                    icon: <GitBranchPlus />,
                     title: "Job Assignments",
                     path: "/admin/all-job-positions",
                 },
             ],
         },
+
         {
-            type: "group",
-            title: "Presentation",
-            icon: <Projector absoluteStrokeWidth />,
-            items: [
-                ...companies.map((company) => ({
-                    title: company.name,
-                    path: `/admin/folders/${company.slug}`,
-                })),
-            ],
-        },
-        {
-            type: "group",
-            title: "Users",
-            items: [
+            type: "link",
+            group: "Users",
+            links: [
                 {
+                    icon: <ShieldCheck />,
                     title: "Admin",
                     path: "/admin/users/admins",
                 },
                 {
+                    icon: <UsersRound />,
                     title: "Employee",
                     path: "/admin/users/employees",
                 },
             ],
-            icon: <UsersRound />,
+        },
+        {
+            type: "link",
+            group: "Presentation",
+            links: [
+                ...companies.map((company) => ({
+                    logo_path: company.logo_path,
+                    title: company.name,
+                    path: `/admin/folders/${company.slug}`,
+                })),
+            ],
         },
     ];
 
@@ -126,33 +120,22 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <SidebarGroup className="">
-                    <SidebarGroupLabel>Platform</SidebarGroupLabel>
-                    <SidebarMenu>
-                        {navLinks.map((item) => {
-                            switch (item.type) {
-                                case "link":
-                                    return (
-                                        <SidebarNavItem
-                                            key={item.title}
-                                            item={item}
-                                        />
-                                    );
+                {navLinks.map((item) => {
+                    switch (item.type) {
+                        case "link":
+                            return (
+                                <SidebarNavItem key={item.links} item={item} />
+                            );
 
-                                case "group":
-                                    return (
-                                        <SidebarNavGroup
-                                            key={item.title}
-                                            item={item}
-                                        />
-                                    );
+                        case "group":
+                            return (
+                                <SidebarNavGroup key={item.title} item={item} />
+                            );
 
-                                default:
-                                    return null;
-                            }
-                        })}
-                    </SidebarMenu>
-                </SidebarGroup>
+                        default:
+                            return null;
+                    }
+                })}
             </SidebarContent>
             <SidebarFooter>
                 <SidebarMenu>
@@ -209,9 +192,16 @@ export function AppSidebar() {
                                     </div>
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <LogOut/>
-                                    <Link href="/logout">Log out</Link>
+                                <DropdownMenuItem
+                                    onClick={() => router.get("/logout")}
+                                >
+                                    <Link
+                                        href="/logout"
+                                        className="flex gap-2 items-center justify-between"
+                                    >
+                                        <LogOut />
+                                        <span>Log out</span>
+                                    </Link>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

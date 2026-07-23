@@ -2,9 +2,13 @@ import { ReactNode } from "react";
 
 export interface NavLinkItem {
     type: "link";
-    title: string;
-    path: string;
-    icon: ReactNode;
+    group: string;
+    links: {
+        title: string;
+        path: string;
+        icon?: ReactNode;
+        logo_path?: string;
+    }[];
 }
 
 export interface NavGroupItem {
@@ -17,6 +21,7 @@ export interface NavGroupItem {
 export type NavItem = NavLinkItem | NavGroupItem;
 
 export interface CompanyNav {
+    logo_path: string;
     id: number;
     name: string;
     slug: string;
