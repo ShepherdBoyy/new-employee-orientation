@@ -34,7 +34,7 @@ class Slide extends Model
 
     public function fileUrl(): string
     {
-        return match(config("filesystem.default")) {
+        return match(config("filesystems.default")) {
             "s3" => \Storage::disk("s3")->temporaryUrl($this->file_path, now()->addMinutes(30)),
             default => asset("storage/" . $this->file_path),
         };
