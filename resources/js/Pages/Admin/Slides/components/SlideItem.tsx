@@ -37,7 +37,7 @@ export default function SlideItem({ slide, index, onDeleteRequest }: Props) {
                 {slide.type === 'video' ? (
                     <video src={slide.file_url} className="h-full w-full object-cover" muted />
                 ) : (
-                    <img src={slide.file_url} alt={`Slide ${index + 1}`} className="h-full w-full object-cover" />
+                    <img src={`/storage/${slide.file_url}`} alt={`Slide ${index + 1}`} className="h-full w-full object-cover" />
                 )}
 
                 <Badge

@@ -31,7 +31,7 @@ class SlideController extends Controller
             "slides" => $folder->slides->map(fn($slide) => [
                 "id" => $slide->id,
                 "type" => $slide->type,
-                "file_url" => $slide->fileUrl(),
+                "file_url" => $slide->file_path,
                 "order" => $slide->order
             ])
         ]);
