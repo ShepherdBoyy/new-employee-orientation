@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import KeyTopicsInput from './KeyTopicsInput'
 import { type CompanyFolder } from './FolderCard'
 
 interface Props {
@@ -27,6 +28,7 @@ export default function CreateFolderDialog({ open, onClose, folder, companyId, j
     const { data, setData, post, put, processing, errors, reset } = useForm({
         name: '',
         company_id: companyId,
+        key_topics: [''] as string[],
     })
 
     useEffect(() => {
@@ -34,9 +36,11 @@ export default function CreateFolderDialog({ open, onClose, folder, companyId, j
             setData('name', jobSpecificName ?? '')
         } else if (folder) {
             setData('name', folder.name)
+            setData('key_topics', folder.key_topics?.length ? folder.key_topics : [''])
         } else {
             reset()
             setData('company_id', companyId)
+            setData('key_topics', [''])
         }
     }, [folder, jobSpecificName, open])
 
@@ -45,24 +49,15 @@ export default function CreateFolderDialog({ open, onClose, folder, companyId, j
 
         if (isJobSpecificRename) {
             put(`/admin/folders/${companyId}/job-specific-name`, {
-                onSuccess: () => {
-                    reset()
-                    onClose()
-                },
+                onSuccess: () => { reset(); onClose() },
             })
         } else if (folder) {
             put(`/admin/folders/${folder.id}`, {
-                onSuccess: () => {
-                    reset()
-                    onClose()
-                },
+                onSuccess: () => { reset(); onClose() },
             })
         } else {
             post('/admin/folders', {
-                onSuccess: () => {
-                    reset()
-                    onClose()
-                },
+                onSuccess: () => { reset(); onClose() },
             })
         }
     }
@@ -71,8 +66,8 @@ export default function CreateFolderDialog({ open, onClose, folder, companyId, j
     const description = isJobSpecificRename
         ? 'This name applies to every position\'s job-specific training folder for this company.'
         : folder
-          ? 'Update the folder name below.'
-          : 'Give this module a clear, descriptive name.'
+          ? 'Update the folder name and its key topics below.'
+          : 'Give this module a clear, descriptive name and list what it covers.'
 
     return (
         <Dialog open={open} onOpenChange={onClose}>
@@ -94,6 +89,13 @@ export default function CreateFolderDialog({ open, onClose, folder, companyId, j
                         />
                         {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
                     </div>
+
+                    {!isJobSpecificRename && (
+                        <KeyTopicsInput
+                            topics={data.key_topics}
+                            onChange={topics => setData('key_topics', topics)}
+                        />
+                    )}
 
                     <DialogFooter>
                         <Button type="button" variant="outline" onClick={onClose}>
