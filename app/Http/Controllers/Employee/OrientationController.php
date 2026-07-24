@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrientationCompletedMail;
 use App\Models\Folder;
 use App\Models\FolderCompletion;
 use App\Models\OrientationAcknowledgement;
+use App\Models\User;
+use App\Notifications\OrientationCompleted;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
 use Storage;
@@ -192,14 +196,14 @@ class OrientationController extends Controller
             $user->id . "_" . now()->timestamp . "_photo.jpg"
         );
 
-        $acknowledgeAt = now()->toDateTimeString();
+        $acknowledgedAt = now()->format("F j, Y g:i A");
 
         $hash = OrientationAcknowledgement::generateHash(
             $user->id,
             $validated["full_name"],
             $signaturePath,
             $photoPath,
-            $acknowledgeAt
+            $acknowledgedAt
         );
 
         OrientationAcknowledgement::create([
@@ -210,12 +214,16 @@ class OrientationController extends Controller
             "integrity_hash" => $hash,
             "ip_address" => $request->ip(),
             "user_agent" => $request->userAgent(),
-            "acknowledged_at" => $acknowledgeAt
+            "acknowledged_at" => $acknowledgedAt
         ]);
 
         // $admins = User::where("role", "admin")->get();
         // foreach ($admins as $admin) {
         //     $admin->notify(new OrientationCompleted($user));
+
+        //     Mail::to($admin->email)->send(
+        //         new OrientationCompletedMail($user, $acknowledgedAt)
+        //     );
         // }
 
         return redirect()->route("employee.completed");

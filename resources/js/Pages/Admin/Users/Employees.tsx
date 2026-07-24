@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Head, useForm, router } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import { Plus, Pencil, Trash2, Users2, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -176,8 +176,6 @@ export default function Employees({
 
     return (
         <Master>
-            <Head title="Employees" />
-
             <div className="w-full space-y-6 p-6 lg:p-8">
                 <div className="flex items-center justify-between border-b pb-5">
                     <div>

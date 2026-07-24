@@ -3,16 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmployeeWelcomeMail;
 use App\Models\Company;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
-use Storage;
 
 class UserController extends Controller
 {
@@ -76,15 +79,21 @@ class UserController extends Controller
             "job_position_id" => ["nullable", "exists:job_positions,id"],
         ]);
 
-        User::create([
+        $plainPassword = User::generateDefaultPassword($validated["name"]);
+
+        $user = User::create([
             "name" => $validated["name"],
             "email" => $validated["email"],
             "role" => $validated["role"],
             "company_id" => $validated["role"] === "admin" ? null : $validated["company_id"],
             "job_position_id" => $validated['role'] === "admin" ? null : ($validated["job_position_id"] ?? null),
-            "password" => User::generateDefaultPassword($validated["name"]),
+            "password" => $plainPassword,
             "expires_at" => $validated["role"] === "employee" ? now()->addDays(2) : null
         ]);
+
+        // if ($user->isEmployee()) {
+        //     Mail::to($user->email)->send(new EmployeeWelcomeMail($user, $plainPassword));
+        // }
 
         return back()->with("success", "User created successfully");
     }
@@ -198,5 +207,41 @@ class UserController extends Controller
         abort_if(!$acknowledgement, 404);
 
         return Storage::disk("private")->response($acknowledgement->getRawOriginal("photo_path"));
+    }
+
+    public function exportAcknowledgementPdf(User $user)
+    {
+        abort_unless($user->isEmployee(), 404);
+
+        $acknowledgement = $user->orientationAcknowledgement;
+
+        abort_if(!$acknowledgement, 404, "This employee has not submitted their acknowledgement yet");
+
+        $folders = $user->company->foldersForEmployee($user);
+
+        $modules = $folders->map(fn($folder) => [
+            "name" => $folder->name,
+            "key_topics" => $folder->keyTopicsList()
+        ]);
+
+        $signaturePath = Storage::disk("private")->path($acknowledgement->getRawOriginal("signature_path"));
+        $photoPath = Storage::disk("private")->path($acknowledgement->getRawOriginal("photo_path"));
+
+        $pdf = Pdf::loadView("pdf.acknowledgement-certificate", [
+            "employeeName" => $user->name,
+            "jobPosition" => $user->jobPosition?->name,
+            "companyName" => $user->company?->name,
+            "acknowledgedAt" => $acknowledgement->acknowledged_at->format("F j, Y g:i A"),
+            "modules" => $modules,
+            "fullNameConfirmation" => $acknowledgement->full_name_confirmation,
+            "ipAddress" => $acknowledgement->ip_address,
+            "integrityHash" => $acknowledgement->integrity_hash,
+            "signaturePath" => $signaturePath,
+            "photoPath" => $photoPath
+        ]);
+
+        $filename = Str::slug($user->name) . "-orientation-acknowledgement.pdf";
+
+        return $pdf->stream($filename);
     }
 }
