@@ -86,7 +86,9 @@ class FolderController extends Controller
     {
         $validated = $request->validate([
             "name" => ["required", "string", "max:255"],
-            "company_id" => ["required", "exists:companies,id"]
+            "company_id" => ["required", "exists:companies,id"],
+            "key_topics" => ["nullable", "array"],
+            "key_topics.*" => ["required", "string", "max:255"]
         ]);
 
         $lastOrder = Folder::forCompany($validated["company_id"])
@@ -96,6 +98,7 @@ class FolderController extends Controller
         Folder::create([
             "company_id" => $validated["company_id"],
             "name" => $validated["name"],
+            "key_topics" => array_values(array_filter($validated["key_topics"] ?? [])),
             "order" => $lastOrder + 1
         ]);
 
@@ -105,10 +108,15 @@ class FolderController extends Controller
     public function update(Request $request, Folder $folder): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ["required", "string", "max:255"]
+            'name' => ["required", "string", "max:255"],
+            "key_topics" => ["nullable", "array"],
+            "key_topics.*" => ["required", "string", "max:255"]
         ]);
 
-        $folder->update(["name" => $validated["name"]]);
+        $folder->update([
+            "name" => $validated["name"],
+            "key_topics" => array_values(array_filter($validated["key_topics"] ?? [])),
+        ]);
 
         return back()->with("success", "Folder updated successfully");
     }

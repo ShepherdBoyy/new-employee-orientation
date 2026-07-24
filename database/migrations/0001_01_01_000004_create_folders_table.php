@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId("company_id")->constrained()->cascadeOnDelete();
             $table->foreignId("job_position_id")->nullable()->constrained()->cascadeOnDelete();
             $table->string("name");
+            $table->json("key_topics")->nullable();
             $table->string("slug")->unique();
             $table->unsignedInteger("order")->default(1);
             $table->timestamps();

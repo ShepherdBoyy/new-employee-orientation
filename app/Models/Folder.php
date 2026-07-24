@@ -13,6 +13,7 @@ class Folder extends Model
         "company_id",
         "job_position_id",
         "name",
+        "key_topics",
         "slug",
         "order"
     ];
@@ -20,7 +21,8 @@ class Folder extends Model
     protected function casts(): array
     {
         return [
-            "order" => "integer"
+            "order" => "integer",
+            "key_topics" => "array"
         ];
     }
 
@@ -111,6 +113,11 @@ class Folder extends Model
     public function slideCount(): int
     {
         return $this->slides()->count();
+    }
+
+    public function keyTopicsList(): array
+    {
+        return $this->key_topics ?? [];
     }
 
     public function company(): BelongsTo
