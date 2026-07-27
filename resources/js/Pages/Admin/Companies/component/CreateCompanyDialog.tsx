@@ -24,6 +24,7 @@ import { Plus } from "lucide-react";
 type CreateCompanyDialogProps = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    onClose: () => void;
     form: UseFormReturn<{
         name: string;
         logo_path: File | null;
@@ -35,6 +36,7 @@ type CreateCompanyDialogProps = {
 export default function CreateCompanyDialog({
     open,
     onOpenChange,
+    onClose,
     form,
     onSubmit,
 }: CreateCompanyDialogProps) {
@@ -138,6 +140,7 @@ export default function CreateCompanyDialog({
                                     size="lg"
                                     variant="outline"
                                     type="button"
+                                    onClick={() => onClose()}
                                 >
                                     Cancel
                                 </Button>

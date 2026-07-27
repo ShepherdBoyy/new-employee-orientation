@@ -16,7 +16,7 @@ import EditCompanyDialog from "./component/EditCompanyDialog";
 import CompanyCard from "./component/CompanyCard";
 import { Separator } from "@/components/ui/separator";
 import type { CompanyWithJobCount } from "../Types/company";
-import { toast } from "sonner"
+import { toast } from "sonner";
 interface Props {
     companies: CompanyWithJobCount[];
 }
@@ -48,7 +48,9 @@ export default function CompaniesIndex({ companies }: Props) {
                 createForm.reset();
                 createForm.clearErrors();
                 setCreateOpen(false);
-                toast.success(message.props.success, { position: "top-center" });
+                toast.success(message.props.success, {
+                    position: "top-center",
+                });
             },
         });
     }
@@ -57,8 +59,10 @@ export default function CompaniesIndex({ companies }: Props) {
         e.preventDefault();
         editForm.put(`/admin/companies/${editingCompany?.id}`, {
             onSuccess: (message) => {
-                setEditingCompany(null)
-                toast.success(message.props.success, { position: "top-center" });
+                setEditingCompany(null);
+                toast.success(message.props.success, {
+                    position: "top-center",
+                });
             },
         });
     }
@@ -74,7 +78,9 @@ export default function CompaniesIndex({ companies }: Props) {
 
             onSuccess: (message) => {
                 setCompanyToDelete(null);
-                toast.success(message.props.success, { position: "top-center" });
+                toast.success(message.props.success, {
+                    position: "top-center",
+                });
             },
         });
     }
@@ -108,6 +114,7 @@ export default function CompaniesIndex({ companies }: Props) {
                                 }}
                                 form={createForm}
                                 onSubmit={handleCreate}
+                                onClose={() => setCreateOpen(false)}
                             />
                         </div>
 
