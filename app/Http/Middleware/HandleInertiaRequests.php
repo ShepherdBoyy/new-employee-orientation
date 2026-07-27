@@ -49,7 +49,7 @@ class HandleInertiaRequests extends Middleware
                 }
 
                 return Company::orderBy("name")
-                    ->get(["id", "name", "slug"]);
+                    ->get(["id", "name", "slug", "logo_path"]);
             }
         ];
     }

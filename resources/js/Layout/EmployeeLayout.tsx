@@ -88,7 +88,7 @@ export default function EmployeeLayout({ children }: EmployeeLayoutProps) {
 
                         <DropdownMenuItem
                             className=""
-                            onClick={() => router.post("/logout")}
+                            onClick={() => router.get("/logout")}
                         >
                             <LogOut className="mr-2 h-4 w-4" />
                             Sign Out
