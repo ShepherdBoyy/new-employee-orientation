@@ -20,6 +20,7 @@ import {
     AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogHeader,
+    AlertDialogMedia,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
@@ -100,7 +101,7 @@ export default function Admins({ admins: initialAdmins }: Props) {
 
     return (
         <Master>
-            <div className="w-full space-y-6 p-6 lg:p-8">
+            <div className="w-full space-y-6 ">
                 <div className="flex items-center justify-between border-b pb-5">
                     <div>
                         <h1 className="text-xl font-semibold tracking-tight">
@@ -268,9 +269,10 @@ export default function Admins({ admins: initialAdmins }: Props) {
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            Delete "{deletingAdmin?.name}"?
-                        </AlertDialogTitle>
+                        <AlertDialogMedia className="bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive">
+                            <Trash2 />
+                        </AlertDialogMedia>
+                        <AlertDialogTitle>Delete Account?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This will permanently remove this administrator's
                             access. This action cannot be undone.
@@ -279,8 +281,8 @@ export default function Admins({ admins: initialAdmins }: Props) {
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
+                            variant="destructive"
                             onClick={handleDeleteConfirm}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                             Delete
                         </AlertDialogAction>
