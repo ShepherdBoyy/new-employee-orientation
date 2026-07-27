@@ -1,8 +1,8 @@
 import { useForm } from "@inertiajs/react";
-
+import { MapPin, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner"
+import { toast } from "sonner";
 import {
     Dialog,
     DialogContent,
@@ -11,13 +11,17 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-
 import {
     Field,
     FieldDescription,
     FieldError,
     FieldLabel,
+    FieldGroup,
+    FieldContent,
+    FieldTitle,
 } from "@/components/ui/field";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 type Props = {
     open: boolean;
@@ -38,7 +42,9 @@ export default function CreateJobDialog({ open, onOpenChange }: Props) {
             onSuccess: (message) => {
                 form.reset();
                 onOpenChange(false);
-                toast.success(message.props.success, { position: "top-center" });
+                toast.success(message.props.success, {
+                    position: "top-center",
+                });
             },
         });
     }
@@ -56,24 +62,62 @@ export default function CreateJobDialog({ open, onOpenChange }: Props) {
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
-                    <Field>
-                        <FieldLabel>Job Position</FieldLabel>
+                    <FieldGroup>
+                        <Field>
+                            <FieldLabel>Job Position</FieldLabel>
 
-                        <Input
-                            placeholder="e.g. Software Engineer"
-                            value={form.data.name}
-                            onChange={(e) =>
-                                form.setData("name", e.target.value)
-                            }
-                        />
+                            <Input
+                                placeholder="e.g. Software Engineer"
+                                value={form.data.name}
+                                onChange={(e) =>
+                                    form.setData("name", e.target.value)
+                                }
+                            />
+                        </Field>
+                        <Field orientation="vertical">
+                            <FieldLabel>Choose Job Type</FieldLabel>
+                            <FieldDescription>
+                                Select the primary workplace environment for
+                                this role.
+                            </FieldDescription>
 
-                        <FieldDescription>
-                            This will become available when assigning jobs to
-                            companies.
-                        </FieldDescription>
+                            <RadioGroup>
+                                {/* Field-Based Option */}
+                                <FieldLabel>
+                                    <Field orientation="horizontal">
+                                        <MapPin className="h-5 w-5 text-muted-foreground" />
+                                        <FieldContent>
+                                            <FieldTitle>Field-Based</FieldTitle>
+                                            <FieldDescription>
+                                                Requires working on-site,
+                                                traveling, or visiting client
+                                                locations outdoors.
+                                            </FieldDescription>
+                                        </FieldContent>
+                                        <RadioGroupItem value="field_based" />
+                                    </Field>
+                                </FieldLabel>
 
-                        <FieldError>{form.errors.name}</FieldError>
-                    </Field>
+                                {/* Non-Field Option */}
+                                <FieldLabel>
+                                    <Field orientation="horizontal">
+                                        <Building2 className="h-5 w-5 text-muted-foreground" />
+                                        <FieldContent>
+                                            <FieldTitle>
+                                                Desk / Office-Based
+                                            </FieldTitle>
+                                            <FieldDescription>
+                                                Stationary work performed
+                                                primarily indoors from an office
+                                                or desk setting.
+                                            </FieldDescription>
+                                        </FieldContent>
+                                        <RadioGroupItem value="non_field" />
+                                    </Field>
+                                </FieldLabel>
+                            </RadioGroup>
+                        </Field>
+                    </FieldGroup>
 
                     <DialogFooter>
                         <Button
