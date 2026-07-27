@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react'
+import { Link } from '@inertiajs/react'
 import { CheckCircle2, ShieldCheck, Folder, Check } from 'lucide-react'
 
 interface FolderSummary {
@@ -18,8 +18,6 @@ interface Props {
 export default function Completed({ user, acknowledgedAt, folders }: Props) {
     return (
         <>
-            <Head title="Orientation Completed" />
-
             <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center justify-center px-6 py-14 font-poppins">
                 {/* Success header */}
                 <div className="w-full max-w-md text-center">

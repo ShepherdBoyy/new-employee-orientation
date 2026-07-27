@@ -1,5 +1,4 @@
-import { Head, router } from "@inertiajs/react";
-import { Progress } from "@/components/ui/progress";
+import { router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import FolderModuleCard, {

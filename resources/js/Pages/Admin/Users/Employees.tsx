@@ -176,7 +176,7 @@ export default function Employees({
 
     return (
         <Master>
-            <div className="w-full space-y-6 p-6 lg:p-8">
+            <div className="w-full space-y-6">
                 <div className="flex items-center justify-between border-b pb-5">
                     <div>
                         <h1 className="text-xl font-semibold tracking-tight">

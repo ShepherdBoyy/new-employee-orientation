@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Head } from '@inertiajs/react'
 import { ArrowLeft, ArrowRight, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { type Slide } from './components/SlideItem'
@@ -29,7 +28,6 @@ export default function Preview({ folder, slides }: Props) {
     if (slides.length === 0) {
         return (
             <>
-                <Head title={`Preview — ${folder.name}`} />
                 <div className="flex min-h-screen w-full flex-col items-center justify-center gap-4 bg-zinc-950 text-zinc-400">
                     <p>No slides in this folder yet.</p>
                     <Button variant="outline" onClick={handleClose}>
@@ -42,8 +40,6 @@ export default function Preview({ folder, slides }: Props) {
 
     return (
         <>
-            <Head title={`Preview — ${folder.name}`} />
-
             <div className="flex min-h-screen w-full flex-col bg-zinc-950">
                 <div className="flex shrink-0 items-center justify-between bg-indigo-600 px-6 py-2.5 text-sm text-white">
                     <div className="flex items-center gap-2">

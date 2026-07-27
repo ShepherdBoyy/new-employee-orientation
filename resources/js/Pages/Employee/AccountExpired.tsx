@@ -1,4 +1,3 @@
-import { Head } from '@inertiajs/react'
 import { CalendarClock, Mail } from 'lucide-react'
 
 export default function AccountExpired() {

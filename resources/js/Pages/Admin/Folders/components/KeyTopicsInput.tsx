@@ -28,7 +28,7 @@ export default function KeyTopicsInput({ topics, onChange }: Props) {
             <Label>Key topics covered (optional)</Label>
             <div className="space-y-2">
                 {topics.map((topic, index) => (
-                    <div key={index} className="flex items-center gap-2">
+                    <div key={index} className="flex items-center gap-1">
                         <Input
                             value={topic}
                             onChange={e => handleChange(index, e.target.value)}

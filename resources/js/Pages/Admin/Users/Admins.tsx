@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Head, useForm, router } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import { Plus, Pencil, Trash2, KeyRound, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

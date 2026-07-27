@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react'
+import { Link } from '@inertiajs/react'
 import { ArrowLeft, Users } from 'lucide-react'
 import JobPositionListItem, { type PickerPosition } from "./components/JobPositionListItem"
 import Master from '@/Layout/Master'

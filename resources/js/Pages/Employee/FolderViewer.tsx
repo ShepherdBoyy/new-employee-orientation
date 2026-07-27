@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Head, Link, router } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { cn } from "@/lib/utils";
 import {
     ArrowLeft,

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Head, router, Link } from '@inertiajs/react'
+import { router, Link } from '@inertiajs/react'
 import { ArrowLeft, Upload, Eye, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -64,8 +64,6 @@ export default function Index({ folder, slides }: Props) {
 
     return (
         <Master>
-            <Head title={folder.name} />
-
             <div className="w-full space-y-6 p-6 lg:p-8">
                 <Link
                     href={backHref}

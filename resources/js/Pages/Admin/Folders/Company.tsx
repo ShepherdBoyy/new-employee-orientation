@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Head, router, Link } from '@inertiajs/react'
-import { Plus, ArrowLeft, Eye } from 'lucide-react'
+import { router } from '@inertiajs/react'
+import { Plus, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -89,7 +89,7 @@ export default function Company({ company, companyWideFolders: initialFolders, j
 
     return (
         <Master>
-            <div className="w-full space-y-6 p-6 lg:p-8">
+            <div className="w-full space-y-6">
                 <div className="flex flex-col gap-4 border-b pb-5 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-xl font-semibold tracking-tight">{company.name}</h1>
