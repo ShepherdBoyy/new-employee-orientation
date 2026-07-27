@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\EmployeeWelcomeMail;
 use App\Models\Company;
 use App\Models\User;
+use Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -231,13 +232,12 @@ class UserController extends Controller
             "employeeName" => $user->name,
             "jobPosition" => $user->jobPosition?->name,
             "companyName" => $user->company?->name,
-            "acknowledgedAt" => $acknowledgement->acknowledged_at->format("F j, Y g:i A"),
+            "acknowledgedAt" => $acknowledgement->acknowledged_at->format("F j, Y"),
             "modules" => $modules,
             "fullNameConfirmation" => $acknowledgement->full_name_confirmation,
-            "ipAddress" => $acknowledgement->ip_address,
-            "integrityHash" => $acknowledgement->integrity_hash,
             "signaturePath" => $signaturePath,
-            "photoPath" => $photoPath
+            "photoPath" => $photoPath,
+            "hrAdminName" => Auth::user()->name
         ]);
 
         $filename = Str::slug($user->name) . "-orientation-acknowledgement.pdf";

@@ -121,15 +121,25 @@ class FolderController extends Controller
         return back()->with("success", "Folder updated successfully");
     }
 
-    public function updateJobSpecificName(Request $request, Company $company): RedirectResponse
+    public function updateJobSpecific(Request $request, Company $company): RedirectResponse
     {
         $validated = $request->validate([
-            "name" => ["required", "string", "max:255"]
+            "name" => ["required", "string", "max:255"],
+            "key_topics" => ["present", "array"],
+            "key_topics.*" => ["nullable", "string", "max:255"]
         ]);
+
+        $cleanTopics = array_values(array_filter(
+            $validated["key_topics"],
+            fn ($topic) => trim((string) $topic) !== ""
+        ));
 
         Folder::where("company_id", $company->id)
             ->whereNotNull("job_position_id")
-            ->update(["name" => $validated["name"]]);
+            ->update([
+                "name" => $validated["name"],
+                "key_topics" => $cleanTopics
+            ]);
 
         return back()->with("success", "Job-specific training name updated successfully");
     }

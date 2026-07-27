@@ -58,6 +58,13 @@ class Folder extends Model
         return $slug;
     }
 
+    public const DEFAULT_JOB_SPECIFIC_KEY_TOPICS = [
+        'Job description and KPIs',
+        'Tools, systems, and equipment',
+        'Workflows and SOPs',
+        'Performance evaluation process',
+    ];
+
     public static function ensureJobSpecificFolder(int $companyId, int $jobPositionId): self
     {
         $existing = static::where("company_id", $companyId)
@@ -74,6 +81,7 @@ class Folder extends Model
             "company_id" => $companyId,
             "job_position_id" => $jobPositionId,
             "name" => "Job-Specific Training",
+            "key_topics" => static::DEFAULT_JOB_SPECIFIC_KEY_TOPICS,
             "order" => $lastOrder + 1
         ]);
     }

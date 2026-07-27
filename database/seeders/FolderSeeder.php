@@ -11,14 +11,73 @@ class FolderSeeder extends Seeder
     public function run(): void
     {
         $companyWideModules = [
-            'Module 1 — Welcome & Company Overview',
-            'Module 2 — Employment Terms & HR Policies (DOLE‑Aligned)',
-            'Module 3 — Workplace Safety & OSH Compliance (RA 11058)',
-            'Module 4 — Data Privacy & Confidentiality (RA 10173)',
-            // Module 5 is job-specific — handled separately below
-            'Module 6 — Product, Service, and Compliance Training',
-            'Module 7 — Anti‑Harassment, Anti‑Bullying, and Ethics',
-            'Module 8 — IT, Cybersecurity & Acceptable Use',
+            [
+                'name' => 'Module 1 — Welcome & Company Overview',
+                'key_topics' => [
+                    'Company history, mission, vision, values',
+                    'Organizational structure',
+                    'Code of conduct overview',
+                ],
+            ],
+            [
+                'name' => 'Module 2 — Employment Terms & HR Policies (DOLE-Aligned)',
+                'key_topics' => [
+                    'Employment classification (probationary, regular, project-based)',
+                    'Working hours, breaks, overtime rules (Labor Code)',
+                    'Leave benefits (SL/VL, maternity/paternity, solo parent, etc.)',
+                    'Pay periods, deductions, government contributions',
+                    'Company rules on attendance, tardiness, and timekeeping',
+                    'Disciplinary policy and due process (DOLE Handbook)',
+                ],
+            ],
+            [
+                'name' => 'Module 3 — Workplace Safety & OSH Compliance (RA 11058)',
+                'key_topics' => [
+                    'Safety rules and PPE requirements',
+                    'Emergency procedures and evacuation routes',
+                    'Incident reporting',
+                    'Anti-sexual harassment and safe spaces policy',
+                    'Drug-free workplace policy',
+                ],
+            ],
+            [
+                'name' => 'Module 4 — Data Privacy & Confidentiality (RA 10173)',
+                'key_topics' => [
+                    'What personal data the company collects',
+                    'How data is stored, used, and protected',
+                    'Employee responsibilities in handling confidential information',
+                    'Prohibited acts (sharing passwords, exposing client data, etc.)',
+                ],
+            ],
+            [
+                'name' => 'Module 6 — Product, Service, and Compliance Training',
+                'key_topics' => [
+                    'Product portfolio overview',
+                    'Device handling and safety',
+                    'Regulatory compliance (FDA, hospital protocols)',
+                    'Customer interaction standards',
+                    'Documentation and reporting requirements',
+                ],
+            ],
+            [
+                'name' => 'Module 7 — Anti-Harassment, Anti-Bullying, and Ethics',
+                'key_topics' => [
+                    'RA 7877 (Anti-Sexual Harassment Act)',
+                    'Safe Spaces Act',
+                    'Anti-bullying and anti-discrimination',
+                    'Ethics hotline and reporting channels',
+                ],
+            ],
+            [
+                'name' => 'Module 8 - IT, Cybersecurity & Acceptable Use',
+                'key_topics' => [
+                    'Email and system access rules',
+                    'Password policy',
+                    'Device usage',
+                    'Prohibited online behavior',
+                    'Reporting IT incidents',
+                ],
+            ],
         ];
 
         $companies = Company::with('jobs')->get();
@@ -31,11 +90,9 @@ class FolderSeeder extends Seeder
         foreach ($companies as $company) {
             $order = 0;
 
-            foreach ($companyWideModules as $index => $name) {
+            foreach ($companyWideModules as $index => $module) {
                 $order++;
 
-                // Module 5 sits between index 3 (Module 4) and index 4 (Module 6)
-                // in natural numeric order, so we insert it here for each position.
                 if ($index === 4) {
                     if ($company->jobs->isEmpty()) {
                         $this->command->warn(
@@ -44,10 +101,11 @@ class FolderSeeder extends Seeder
                     } else {
                         foreach ($company->jobs as $position) {
                             Folder::create([
-                                'company_id'      => $company->id,
+                                'company_id' => $company->id,
                                 'job_position_id' => $position->id,
-                                'name'            => 'Module 5 — Job-Specific Training',
-                                'order'           => $order,
+                                'name' => 'Module 5 — Job-Specific Training',
+                                "key_topics" => Folder::DEFAULT_JOB_SPECIFIC_KEY_TOPICS,
+                                'order' => $order,
                             ]);
                         }
                         $order++;
@@ -56,8 +114,9 @@ class FolderSeeder extends Seeder
 
                 Folder::create([
                     'company_id' => $company->id,
-                    'name'       => $name,
-                    'order'      => $order,
+                    'name' => $module["name"],
+                    "key_topics" => $module["key_topics"],
+                    'order' => $order,
                 ]);
             }
         }
