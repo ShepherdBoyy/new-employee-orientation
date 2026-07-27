@@ -76,10 +76,10 @@ export default function CompanySelector({
 
             {companies.map((company) => (
                 <FieldLabel key={company.id} className="">
-                    <Field orientation="horizontal">
-                        <FieldContent>
+                    <Field orientation="horizontal" className="">
+                        <FieldContent className="">
                             <div className="flex items-center gap-3">
-                                <Avatar className="h-10 w-10">
+                                <Avatar className="h-8 w-8">
                                     <AvatarImage
                                         src={`/storage/${company.logo_path}`}
                                     />
