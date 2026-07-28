@@ -76,7 +76,7 @@ export function Onboarding({ onFinish, user }: OnboardingProps) {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center p-4">
+        <div className="">
             <AnimatePresence mode="wait">
                 <motion.div
                     layout

@@ -1,5 +1,6 @@
 import { Rotate3d } from "lucide-react";
 import { motion } from "motion/react";
+import OnboardingHeader from "./OnboardingHeader";
 import type { OnboardingUser } from "../../Types";
 
 interface WelcomeStepProps {
@@ -42,16 +43,12 @@ export default function WelcomeStep({ onNext, user }: WelcomeStepProps) {
                 className="flex flex-col"
             >
                 {/* Logo */}
-                <motion.div
-                    variants={item}
-                    className="flex items-center gap-2 px-6 py-6"
-                >
-                    <Rotate3d absoluteStrokeWidth strokeWidth={1.5} size={22} />
-                    <p>NEO</p>
+                <motion.div variants={item}>
+                    <OnboardingHeader />
                 </motion.div>
 
                 {/* Content */}
-                <div className="space-y-12 px-12 py-14">
+                <div className="space-y-12 px-6 md:px-10 lg:px-14 py-8 md:py-10 lg:py-14">
                     <motion.div variants={item} className="flex flex-col gap-4">
                         <p className="text-sm font-semibold">
                             Hello there! {user.name} 👋

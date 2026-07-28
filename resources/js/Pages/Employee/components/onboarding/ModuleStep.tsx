@@ -1,6 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-
+import OnboardingHeader from "./OnboardingHeader";
 import {
     Puzzle,
     Projector,
@@ -49,11 +47,8 @@ export default function ModulesStep({ onBack, onNext }: ModulesStepProps) {
     const Icon = currentInstruction.icon;
     return (
         <div className="flex flex-col">
-            <div className="flex gap-2 items-center px-6 py-6 ">
-                <Rotate3d absoluteStrokeWidth strokeWidth={1.5} size={22} />
-                <p className="">NEO</p>
-            </div>
-            <div className="space-y-12 px-12">
+            <OnboardingHeader />
+            <div className="space-y-12 px-6 md:px-10 lg:px-14">
                 <div className="space-y-6">
                     <h1 className="text-[40px]/snug font-light tracking-tight">
                         Let's get you ready.
