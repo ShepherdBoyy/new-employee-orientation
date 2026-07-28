@@ -11,7 +11,7 @@ import { SortableContext, rectSortingStrategy, arrayMove } from '@dnd-kit/sortab
 import { router } from '@inertiajs/react'
 import { ImageIcon } from 'lucide-react'
 import SlideItem, { type Slide } from './SlideItem'
-import DeleteSlideDialog from '../../Folders/components/DeleteSlideDialog'
+import DeleteSlideDialog from './DeleteSlideDialog'
 
 interface Props {
     slides: Slide[]
