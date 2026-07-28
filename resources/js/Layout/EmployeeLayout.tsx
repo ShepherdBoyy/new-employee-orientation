@@ -23,7 +23,7 @@ export default function EmployeeLayout({ children }: EmployeeLayoutProps) {
     const user = usePage().props.auth.user;
     return (
         <>
-            <nav className="h-16 border-b shrink-0 font-poppins flex justify-between items-center px-10">
+            <nav className="h-16 border-b shrink-0  flex justify-between items-center px-10">
                 <div className="flex items-center gap-1">
                     <Rotate3d absoluteStrokeWidth strokeWidth={1.5} size={22} />
                     <p>NEO</p>
@@ -97,7 +97,7 @@ export default function EmployeeLayout({ children }: EmployeeLayoutProps) {
                 </DropdownMenu>
             </nav>
 
-            <main className="mx-auto w-full max-w-7xl flex-col p-8 font-poppins">
+            <main className="mx-auto w-full max-w-7xl flex-col p-8">
                 {children}
             </main>
 
