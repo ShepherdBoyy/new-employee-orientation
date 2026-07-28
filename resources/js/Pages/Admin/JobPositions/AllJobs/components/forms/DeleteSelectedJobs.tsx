@@ -20,7 +20,6 @@ type Props = {
     open: boolean;
     setIds: React.Dispatch<React.SetStateAction<number[]>>;
 };
-
 export default function DeleteSelectedJobs({
     ids,
     onClose,

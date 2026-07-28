@@ -4,6 +4,7 @@ import { CircleArrowOutUpRight } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { JobPosition } from "@/Pages/Admin/Types/job-position";
+import { Badge } from "@/components/ui/badge"
 import {
     Card,
     CardContent,
@@ -33,14 +34,21 @@ export default function JobCard({
         <>
             <Card className="transition-colors hover:bg-muted/30">
                 <CardHeader className="flex justify-between">
-                    <div className="flex gap-2 items-center">
+                    <div className="flex gap-3 items-start">
+                        {/* Added pt-1 or mt-0.5 to align the checkbox nicely with the title text baseline/height */}
                         <Checkbox
                             checked={selected}
                             onCheckedChange={onToggle}
+                            className="mt-0.5" 
                         />
 
-                        <div>
+                        <div className="space-y-1">
                             <CardTitle>{job.name}</CardTitle>
+                            <CardDescription>
+                                <Badge variant="secondary">
+                                    {job.type === 'field_based' ? 'Field Based' : 'Non-Field Based'}
+                                </Badge>
+                            </CardDescription>
                         </div>
                     </div>
 

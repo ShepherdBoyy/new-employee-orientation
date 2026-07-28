@@ -94,6 +94,7 @@ export default function Index({ jobs }: Props) {
                     sort={sort}
                     onSortChange={setSort}
                 />
+
                 <CreateJobDialog
                     open={createOpen}
                     onOpenChange={setCreateOpen}
@@ -125,17 +126,18 @@ export default function Index({ jobs }: Props) {
                     job={editingJob}
                     onClose={() => setEditingJob(null)}
                 />
-                <DeleteJobDialog
+                {deletingJob && <DeleteJobDialog
                     job={deletingJob}
                     onClose={() => setDeletingJob(null)}
                     onConfirm={handleDelete}
-                />
+                />}
                 <DeleteSelectedJobs
                     ids={selectedJobIds}
                     setIds={setSelectedJobIds}
                     open={deleteSelectedOpen}
                     onClose={() => setDeleteSelectedOpen(false)}
                 />
+                
             </div>
         </Master>
     );

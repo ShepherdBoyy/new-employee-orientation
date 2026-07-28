@@ -29,7 +29,6 @@ export default function DeleteJobDialog({ job, onClose, onConfirm }: Props) {
             },
         });
     }
-
     return (
         <>
             <AlertDialog

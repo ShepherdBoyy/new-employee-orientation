@@ -37,7 +37,6 @@ export default function ViewJdDialog({
     onClose,
     document,
 }: Props) {
-    console.log(document);
     return (
         <>
             <Dialog

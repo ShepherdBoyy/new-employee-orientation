@@ -3,6 +3,7 @@ import type { Company } from "./company";
 export type JobPosition = {
     id: number;
     name: string;
+    type: string;
     companies?: Company[];
     companies_count?: number;
 };

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useForm } from "@inertiajs/react";
-
+import { MapPin, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -20,7 +20,13 @@ import {
     FieldDescription,
     FieldError,
     FieldLabel,
+    FieldGroup,
+    FieldContent,
+    FieldTitle,
 } from "@/components/ui/field";
+
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 import { JobPosition } from "@/Pages/Admin/Types/job-position";
 
 type Props = {
@@ -28,11 +34,12 @@ type Props = {
     onClose: () => void;
 };
 export default function EditJobDialog({ onClose, job }: Props) {
-    const form = useForm({ name: "" });
+    const form = useForm({ name: "", type:null });
     useEffect(() => {
         if (!job) return;
 
         form.setData("name", job.name);
+        form.setData("type", job.type);
     }, [job]);
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -46,6 +53,7 @@ export default function EditJobDialog({ onClose, job }: Props) {
             },
         });
     }
+    
     return (
         <>
             <Dialog
@@ -80,6 +88,45 @@ export default function EditJobDialog({ onClose, job }: Props) {
                                 is assigned.
                             </FieldDescription>
                         </Field>
+
+                            <RadioGroup 
+                                value={form.data.type} 
+                                onValueChange={(value) => form.setData('type', value)}
+                            >
+                                {/* Field-Based Option */}
+                                <FieldLabel>
+                                    <Field orientation="horizontal">
+                                        <MapPin className="h-5 w-5 text-muted-foreground" />
+                                        <FieldContent>
+                                            <FieldTitle>Field-Based</FieldTitle>
+                                            <FieldDescription>
+                                                Requires working on-site,
+                                                traveling, or visiting client
+                                                locations outdoors.
+                                            </FieldDescription>
+                                        </FieldContent>
+                                        <RadioGroupItem value="field_based" />
+                                    </Field>
+                                </FieldLabel>
+
+                                {/* Non-Field Option */}
+                                <FieldLabel>
+                                    <Field orientation="horizontal">
+                                        <Building2 className="h-5 w-5 text-muted-foreground" />
+                                        <FieldContent>
+                                            <FieldTitle>
+                                                Non Field-Based
+                                            </FieldTitle>
+                                            <FieldDescription>
+                                                Stationary work performed
+                                                primarily indoors from an office
+                                                or desk setting.
+                                            </FieldDescription>
+                                        </FieldContent>
+                                        <RadioGroupItem value="non_field" />
+                                    </Field>
+                                </FieldLabel>
+                            </RadioGroup>
 
                         <DialogFooter>
                             <Button

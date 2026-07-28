@@ -29,8 +29,10 @@ type Props = {
 };
 
 export default function CreateJobDialog({ open, onOpenChange }: Props) {
+    
     const form = useForm({
         name: "",
+        type: null,
     });
 
     function handleSubmit(e: React.FormEvent) {
@@ -81,7 +83,10 @@ export default function CreateJobDialog({ open, onOpenChange }: Props) {
                                 this role.
                             </FieldDescription>
 
-                            <RadioGroup>
+                            <RadioGroup 
+                                value={form.data.type} 
+                                onValueChange={(value) => form.setData('type', value)}
+                                >
                                 {/* Field-Based Option */}
                                 <FieldLabel>
                                     <Field orientation="horizontal">
@@ -104,7 +109,7 @@ export default function CreateJobDialog({ open, onOpenChange }: Props) {
                                         <Building2 className="h-5 w-5 text-muted-foreground" />
                                         <FieldContent>
                                             <FieldTitle>
-                                                Desk / Office-Based
+                                                Non Field-Based
                                             </FieldTitle>
                                             <FieldDescription>
                                                 Stationary work performed

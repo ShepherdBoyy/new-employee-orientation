@@ -27,7 +27,8 @@ class JobPositionController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            "name" => ["required", "string", "max:255", 'unique:job_positions']
+            "name" => ["required", "string", "max:255", 'unique:job_positions'],
+            'type' => ['required']
         ]);
 
         $jobPosition = JobPosition::create($validated);
@@ -39,10 +40,11 @@ class JobPositionController extends Controller
     public function update(Request $request, JobPosition $jobPosition): RedirectResponse
     {
         $validated = $request->validate([
-            "name" => ["required", "string", "max:255"]
+            "name" => ["required", "string", "max:255"],
+            'type' => ['required']
         ]);
 
-        $jobPosition->update(["name" => $validated["name"]]);
+        $jobPosition->update(["name" => $validated["name"], 'type' => $validated["type"]]);
 
         return back()->with("success", "Job position updated successfully");
     }
