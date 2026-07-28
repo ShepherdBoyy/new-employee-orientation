@@ -60,7 +60,7 @@ class Folder extends Model
 
     public const DEFAULT_JOB_SPECIFIC_KEY_TOPICS = [
         'Job description and KPIs',
-        'Tools, systems, and equipment',
+        'Tools, Systems, and Equipments (Tarkie Policy and EzLife Roadshow)',
         'Workflows and SOPs',
         'Performance evaluation process',
     ];

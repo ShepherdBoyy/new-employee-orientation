@@ -100,8 +100,6 @@ export default function Employees({
 
     useEffect(() => setEmployees(initialEmployees), [initialEmployees]);
 
-    console.log(companies);
-
     const { data, setData, post, put, processing, errors, reset } = useForm({
         name: "",
         email: "",

@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react'
 import { CheckCircle2, ShieldCheck, Folder, Check } from 'lucide-react'
+import EmployeeLayout from '@/Layout/EmployeeLayout'
 
 interface FolderSummary {
     id: number
@@ -17,8 +18,8 @@ interface Props {
 
 export default function Completed({ user, acknowledgedAt, folders }: Props) {
     return (
-        <>
-            <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center justify-center px-6 py-14 font-poppins">
+        <EmployeeLayout>
+            <div className="mx-auto flex w-full max-w-3xl flex-col items-center justify-center px-6 py-14">
                 {/* Success header */}
                 <div className="w-full max-w-md text-center">
                     <div className="relative mx-auto mb-6 flex h-16 w-16 items-center justify-center">
@@ -89,6 +90,6 @@ export default function Completed({ user, acknowledgedAt, folders }: Props) {
                     A copy of this record has been securely stored. Your administrator has been notified.
                 </p>
             </div>
-        </>
+        </EmployeeLayout>
     )
 }

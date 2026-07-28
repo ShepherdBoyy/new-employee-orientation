@@ -22,48 +22,42 @@ class FolderSeeder extends Seeder
             [
                 'name' => 'Module 2 — Employment Terms & HR Policies (DOLE-Aligned)',
                 'key_topics' => [
-                    'Employment classification (probationary, regular, project-based)',
+                    'Employment classification (probationary, regular)',
                     'Working hours, breaks, overtime rules (Labor Code)',
                     'Leave benefits (SL/VL, maternity/paternity, solo parent, etc.)',
                     'Pay periods, deductions, government contributions',
                     'Company rules on attendance, tardiness, and timekeeping',
-                    'Disciplinary policy and due process (DOLE Handbook)',
+                    'Disciplinary policy and due process',
                 ],
             ],
             [
                 'name' => 'Module 3 — Workplace Safety & OSH Compliance (RA 11058)',
                 'key_topics' => [
-                    'Safety rules and PPE requirements',
                     'Emergency procedures and evacuation routes',
                     'Incident reporting',
-                    'Anti-sexual harassment and safe spaces policy',
                     'Drug-free workplace policy',
                 ],
             ],
             [
                 'name' => 'Module 4 — Data Privacy & Confidentiality (RA 10173)',
                 'key_topics' => [
-                    'What personal data the company collects',
                     'How data is stored, used, and protected',
-                    'Employee responsibilities in handling confidential information',
                     'Prohibited acts (sharing passwords, exposing client data, etc.)',
                 ],
             ],
             [
                 'name' => 'Module 6 — Product, Service, and Compliance Training',
                 'key_topics' => [
+                    'Field Etiquette',
                     'Product portfolio overview',
-                    'Device handling and safety',
-                    'Regulatory compliance (FDA, hospital protocols)',
-                    'Customer interaction standards',
-                    'Documentation and reporting requirements',
+                    'Sales Expectations (Quota and Incentive Scheme)',
+                    'Client Marketing'
                 ],
             ],
             [
                 'name' => 'Module 7 — Anti-Harassment, Anti-Bullying, and Ethics',
                 'key_topics' => [
                     'RA 7877 (Anti-Sexual Harassment Act)',
-                    'Safe Spaces Act',
                     'Anti-bullying and anti-discrimination',
                     'Ethics hotline and reporting channels',
                 ],
@@ -73,7 +67,6 @@ class FolderSeeder extends Seeder
                 'key_topics' => [
                     'Email and system access rules',
                     'Password policy',
-                    'Device usage',
                     'Prohibited online behavior',
                     'Reporting IT incidents',
                 ],
