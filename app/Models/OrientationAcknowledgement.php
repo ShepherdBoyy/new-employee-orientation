@@ -64,24 +64,6 @@ class OrientationAcknowledgement extends Model
         return hash_equals($expectedHash, $this->integrity_hash);
     }
 
-    public function signatureUrl(): string
-    {
-        return URL::temporarySignedRoute(
-            "admin.users.employees.signature-file",
-            now()->addMinutes(5),
-            ["user" => $this->user_id]
-        );
-    }
-
-    public function photoUrl(): string
-    {
-        return URL::temporarySignedRoute(
-            "admin.users.employees.photo-file",
-            now()->addMinutes(5),
-            ["user" => $this->user_id]
-        );
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

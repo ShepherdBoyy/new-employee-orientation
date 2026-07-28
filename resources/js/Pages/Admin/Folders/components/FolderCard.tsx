@@ -11,6 +11,7 @@ export interface CompanyFolder {
     name: string
     slides_count: number
     order: number
+    key_topics: string[]
 }
 
 interface Props {

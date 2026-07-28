@@ -28,14 +28,15 @@ class FolderController extends Controller
 
         $jobSpecificFolders = Folder::forCompany($company->id)
             ->whereNotNull("job_position_id")
-            ->get(["id", "job_position_id", "order", "name"]);
+            ->get(["id", "job_position_id", "order", "name", "key_topics"]);
         
         $firstJobSpecific = $jobSpecificFolders->first();
         
         $jobSpecificSummary = $company->jobs->isNotEmpty() ? [
             "total_positions" => $company->jobs->count(),
             "order" => $firstJobSpecific?->order ?? ($companyWideFolders->max("order") + 1 ?? 1),
-            "name" => $firstJobSpecific?->name ?? "Job-Specific Training"
+            "name" => $firstJobSpecific?->name ?? "Job-Specific Training",
+            "key_topics" => $firstJobSpecific?->key_topics ?? []
         ] : null;
 
         return Inertia::render("Admin/Folders/Company", [
@@ -129,16 +130,11 @@ class FolderController extends Controller
             "key_topics.*" => ["nullable", "string", "max:255"]
         ]);
 
-        $cleanTopics = array_values(array_filter(
-            $validated["key_topics"],
-            fn ($topic) => trim((string) $topic) !== ""
-        ));
-
         Folder::where("company_id", $company->id)
             ->whereNotNull("job_position_id")
             ->update([
                 "name" => $validated["name"],
-                "key_topics" => $cleanTopics
+                "key_topics" => json_encode(array_values(array_filter($validated["key_topics"] ?? [])))
             ]);
 
         return back()->with("success", "Job-specific training name updated successfully");

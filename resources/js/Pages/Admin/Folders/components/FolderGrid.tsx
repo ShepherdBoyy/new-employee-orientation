@@ -20,6 +20,7 @@ interface JobSpecificSummary {
     total_positions: number;
     order: number;
     name: string;
+    key_topics: string[];
 }
 
 type GridItem =

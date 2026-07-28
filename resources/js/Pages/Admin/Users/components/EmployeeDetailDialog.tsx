@@ -10,16 +10,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
     CheckCircle2,
     Circle,
     ShieldCheck,
-    Eye,
-    Loader2,
-    FileSignature,
-    ImageIcon,
+    Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -215,131 +212,36 @@ export default function EmployeeDetailDialog({ employee, onClose }: Props) {
 
                                 <Separator />
 
-                                {/* Acknowledgement */}
                                 <div className="space-y-2">
-                                    <h3 className="flex items-center gap-1.5 text-sm font-semibold">
-                                        <ShieldCheck className="h-4 w-4" />
-                                        Final Acknowledgement
-                                    </h3>
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="flex items-center gap-1.5 text-sm font-semibold">
+                                            <ShieldCheck className="h-4 w-4" />
+                                            Final Acknowledgement
+                                        </h3>
+                                        {data?.acknowledgement && (
+                                            <a
+                                                href={`/admin/users/employees/${employee.id}/acknowledgement/pdf`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <Button variant="outline" size="sm">
+                                                    <Download className="mr-1.5 h-3.5 w-3.5" />
+                                                    Export PDF
+                                                </Button>
+                                            </a>
+                                        )}
+                                    </div>
 
                                     {!data?.acknowledgement ? (
                                         <p className="text-sm text-muted-foreground">
-                                            This employee has not yet submitted
-                                            their final acknowledgement.
+                                            This employee has not yet submitted their final acknowledgement.
                                         </p>
                                     ) : (
-                                        <div className="space-y-3 rounded-xl border bg-muted/20 p-3.5">
-                                            <div className="grid grid-cols-2 gap-3 text-xs">
-                                                <div>
-                                                    <p className="text-muted-foreground">
-                                                        Confirmed name
-                                                    </p>
-                                                    <p className="mt-0.5 font-medium">
-                                                        {
-                                                            data.acknowledgement
-                                                                .full_name_confirmation
-                                                        }
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-muted-foreground">
-                                                        Acknowledged at
-                                                    </p>
-                                                    <p className="mt-0.5 font-medium">
-                                                        {
-                                                            data.acknowledgement
-                                                                .acknowledged_at
-                                                        }
-                                                    </p>
-                                                </div>
-                                                <div className="col-span-2">
-                                                    <p className="text-muted-foreground">
-                                                        IP address
-                                                    </p>
-                                                    <p className="mt-0.5 font-medium">
-                                                        {
-                                                            data.acknowledgement
-                                                                .ip_address
-                                                        }
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <Separator />
-
-                                            <div className="grid grid-cols-2 gap-3">
-                                                {/* Signature */}
-                                                <div className="space-y-1.5">
-                                                    <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                                                        <FileSignature className="h-3 w-3" />
-                                                        Signature
-                                                    </p>
-                                                    {signatureUrl ? (
-                                                        <img
-                                                            src={signatureUrl}
-                                                            alt="Signature"
-                                                            className="h-20 w-full rounded-lg border bg-white object-contain p-1"
-                                                        />
-                                                    ) : (
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="w-full"
-                                                            onClick={
-                                                                handleViewSignature
-                                                            }
-                                                            disabled={
-                                                                loadingSignature
-                                                            }
-                                                        >
-                                                            {loadingSignature ? (
-                                                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                                            ) : (
-                                                                <>
-                                                                    <Eye className="mr-1.5 h-3.5 w-3.5" />
-                                                                    View
-                                                                </>
-                                                            )}
-                                                        </Button>
-                                                    )}
-                                                </div>
-
-                                                {/* Photo */}
-                                                <div className="space-y-1.5">
-                                                    <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                                                        <ImageIcon className="h-3 w-3" />
-                                                        Photo
-                                                    </p>
-                                                    {photoUrl ? (
-                                                        <img
-                                                            src={photoUrl}
-                                                            alt="Employee photo"
-                                                            className="h-20 w-full rounded-lg border object-cover"
-                                                        />
-                                                    ) : (
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="w-full"
-                                                            onClick={
-                                                                handleViewPhoto
-                                                            }
-                                                            disabled={
-                                                                loadingPhoto
-                                                            }
-                                                        >
-                                                            {loadingPhoto ? (
-                                                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                                            ) : (
-                                                                <>
-                                                                    <Eye className="mr-1.5 h-3.5 w-3.5" />
-                                                                    View
-                                                                </>
-                                                            )}
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                            </div>
+                                        <div className="rounded-xl border bg-muted/20 p-3.5 text-xs">
+                                            <p className="text-muted-foreground">Acknowledged on</p>
+                                            <p className="mt-0.5 font-medium text-foreground">
+                                                {data.acknowledgement.acknowledged_at}
+                                            </p>
                                         </div>
                                     )}
                                 </div>

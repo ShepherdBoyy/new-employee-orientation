@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Mail\EmployeeWelcomeMail;
 use App\Models\Company;
 use App\Models\User;
 use Auth;
@@ -11,12 +10,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Log;
 
 class UserController extends Controller
 {
@@ -25,7 +24,7 @@ class UserController extends Controller
         $admins = User::where("role", "admin")
             ->latest()
             ->get();
-        
+
         return Inertia::render("Admin/Users/Admins", [
             "admins" => $admins,
         ]);
@@ -60,7 +59,7 @@ class UserController extends Controller
                     "status" => $status
                 ];
             });
-        
+
         $companies = Company::with("jobs:id,name")
             ->get(["id", "name"]);
 
@@ -110,7 +109,7 @@ class UserController extends Controller
                 Rule::requiredIf($user->role === "employee")
             ],
             "job_position_id" => ["nullable", "exists:job_positions,id"]
-        ]); 
+        ]);
 
         $user->update([
             "name" => $validated["name"],
@@ -136,10 +135,10 @@ class UserController extends Controller
         $folders = $user->company
             ? $user->company->foldersForEmployee($user)
             : collect();
-        
+
         $completions = $user->folderCompletions()
             ->pluck("completed_at", "folder_id");
-        
+
         $folderProgress = $folders->map(function ($folder) use ($completions) {
             return [
                 "id" => $folder->id,
@@ -155,59 +154,9 @@ class UserController extends Controller
         return response()->json([
             "folders" => $folderProgress,
             "acknowledgement" => $acknowledgement ? [
-                "full_name_confirmation" => $acknowledgement->full_name_confirmation,
                 "acknowledged_at" => $acknowledgement->acknowledged_at->format("F j, Y g:i A"),
-                "ip_address" => $acknowledgement->ip_address
             ] : null
         ]);
-    }
-
-    public function viewSignature(User $user): JsonResponse
-    {
-        abort_unless($user->isEmployee(), 404);
-
-        $acknowledgement = $user->orientationAcknowledgement;
-
-        abort_if(!$acknowledgement, 404);
-
-        return response()->json([
-            "url" => $acknowledgement->signatureUrl()
-        ]);
-    }
-
-    public function streamSignature(User $user): \Symfony\Component\HttpFoundation\Response
-    {
-        abort_unless($user->isEmployee(), 404);
-
-        $acknowledgement = $user->orientationAcknowledgement;
-
-        abort_if(!$acknowledgement, 404);
-
-        return Storage::disk("private")->response($acknowledgement->getRawOriginal("signature_path"));
-    }
-
-    public function viewPhoto(User $user): JsonResponse
-    {
-        abort_unless($user->isEmployee(), 404);
-
-        $acknowledgement = $user->orientationAcknowledgement;
-
-        abort_if(!$acknowledgement, 404);
-
-        return response()->json([
-            "url" => $acknowledgement->photoUrl()
-        ]);
-    }
-    
-    public function streamPhoto(User $user): \Symfony\Component\HttpFoundation\Response
-    {
-        abort_unless($user->isEmployee(), 404);
-
-        $acknowledgement = $user->orientationAcknowledgement;
-
-        abort_if(!$acknowledgement, 404);
-
-        return Storage::disk("private")->response($acknowledgement->getRawOriginal("photo_path"));
     }
 
     public function exportAcknowledgementPdf(User $user)
@@ -217,6 +166,13 @@ class UserController extends Controller
         $acknowledgement = $user->orientationAcknowledgement;
 
         abort_if(!$acknowledgement, 404, "This employee has not submitted their acknowledgement yet");
+
+        Log::channel("sensitive_access")->info("Acknowledgement PDF exported", [
+            "admin_id" => auth()->id(),
+            "admin_email" => auth()->user()->email,
+            "employee_id" => $user->id,
+            "timestamp" => now()->toDateTimeString()
+        ]);
 
         $folders = $user->company->foldersForEmployee($user);
 
@@ -237,7 +193,8 @@ class UserController extends Controller
             "fullNameConfirmation" => $acknowledgement->full_name_confirmation,
             "signaturePath" => $signaturePath,
             "photoPath" => $photoPath,
-            "hrAdminName" => Auth::user()->name
+            "hrAdminName" => Auth::user()->name,
+            "generatedAt" => now()->format("F j, Y \\a\\t g:i A")
         ]);
 
         $filename = Str::slug($user->name) . "-orientation-acknowledgement.pdf";
