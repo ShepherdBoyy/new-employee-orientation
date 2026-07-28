@@ -46,7 +46,7 @@ Route::middleware("auth")->group(function () {
         
         Route::post("/folders", [FolderController::class, "store"])->name("folders.store");
         Route::put("/folders/{folder}", [FolderController::class, "update"])->name("folders.update");
-        Route::put("/folders/{company}/job-specific-name", [FolderController::class, "updateJobSpecificName"])->name("folders.job-specific.update-name");
+        Route::put("/folders/{company}/job-specific", [FolderController::class, "updateJobSpecific"])->name("folders.job-specific.update");
         Route::patch("/folders/reorder", [FolderController::class, "reorder"])->name("folders.reorder");
         Route::delete("/folders/{folder}", [FolderController::class, "destroy"])->name("folders.destroy");
 
@@ -62,14 +62,7 @@ Route::middleware("auth")->group(function () {
         Route::put("/users/{user}", [UserController::class, "update"])->name("users.update");
         Route::delete("/users/{user}", [UserController::class, "destroy"])->name("users.destroy");
         Route::get("/users/employees/{user}/progress", [UserController::class, "progress"])->name("users.employees.progress");
-        Route::get("/users/employees/{user}/signature", [UserController::class, "viewSignature"])->name("users.employees.signature");
-        Route::get("/users/employees/{user}/photo", [UserController::class, "viewPhoto"])->name("users.employees.photo");
-        Route::get("/users/employees/{user}/acknowledgement/signature-file", [UserController::class, "streamSignature"])
-            ->name("users.employees.signature-file")
-            ->middleware("signed");
-        Route::get("/users/employees/{user}/acknowledgement/photo-file", [UserController::class, "streamPhoto"])
-            ->name("users.employees.photo-file")
-            ->middleware("signed");
+        Route::get("/users/employees/{user}/acknowledgement/pdf", [UserController::class, "exportAcknowledgementPdf"])->name("users.employees.acknowledgement-pdf");
     });
 
     Route::middleware(["role:employee", "expiry"])->prefix("orientation")->name("employee.")->group(function () {
@@ -82,4 +75,27 @@ Route::middleware("auth")->group(function () {
         Route::get("/completed", [OrientationController::class, "completed"])->name("completed");
         Route::get("/locked", [OrientationController::class, "locked"])->name("account-locked");
     });
+});
+
+Route::get('/preview-welcome-email', function () {
+    return view('emails.employee-welcome', [
+        'employeeName'  => 'Juan Dela Cruz',
+        'companyName'   => 'Acme Corp',
+        'jobPosition'   => 'Software Engineer',
+        'email'         => 'juan@acme.com',
+        'password'      => 'delacruz-neo@2026',
+        'loginUrl'      => url('/login'),
+        'expiresInDays' => 2,
+    ]);
+});
+
+Route::get('/preview-completed-email', function () {
+    return view('emails.orientation-completed', [
+        'employeeName'   => 'Juan Dela Cruz',
+        'employeeEmail'  => 'juan@acme.com',
+        'companyName'    => 'Acme Corp',
+        'jobPosition'    => 'Software Engineer',
+        'acknowledgedAt' => now()->format('F j, Y g:i A'),
+        'viewUrl'        => url('/admin/users/employees'),
+    ]);
 });
