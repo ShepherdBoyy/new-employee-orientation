@@ -66,10 +66,10 @@ export default function Login() {
                                         NEO
                                     </span>
                                 </div>
-                                <h1 className="text-3xl lg:text-3xl tracking-tight">
+                                <h1 className="text-2xl lg:text-3xl tracking-tight lg:text-left text-center">
                                     Welcome Back
                                 </h1>
-                                <p className="mt-2 text-base text-muted-foreground">
+                                <p className="mt-2 text-sm lg:text-base text-muted-foreground lg:text-left text-center lg:max-w-2xl ">
                                     Sign in with your company account to
                                     continue.
                                 </p>
@@ -117,7 +117,7 @@ export default function Login() {
                                 <div className="pt-8">
                                     <Button
                                         type="submit"
-                                        className="w-full h-12 rounded-xl font-semibold"
+                                        className="w-full h-10 lg:h-12 rounded-xl font-semibold"
                                     >
                                         {processing && (
                                             <Spinner data-icon="inline-start" />

@@ -75,7 +75,7 @@ export default function ModulesStep({ onBack, onNext }: ModulesStepProps) {
                             </span>
                         </div>
 
-                        <div className="mt-10 flex justify-center animate-in fade-in slide-in-from-right-4 duration-400">
+                        <div className="lg:mt-10 flex justify-center animate-in fade-in slide-in-from-right-4 duration-400">
                             <div className="flex h-20 w-20 items-center justify-center rounded-full">
                                 <Icon
                                     className="h-14 w-14"
@@ -85,7 +85,7 @@ export default function ModulesStep({ onBack, onNext }: ModulesStepProps) {
                             </div>
                         </div>
 
-                        <div className="mt-8 text-center animate-in fade-in slide-in-from-right-4 duration-400">
+                        <div className="mt-4 lg:mt-8 text-center animate-in fade-in slide-in-from-right-4 duration-400">
                             <h2 className="text-4xl font-light tracking-tight">
                                 {currentInstruction.title}
                             </h2>
@@ -95,7 +95,7 @@ export default function ModulesStep({ onBack, onNext }: ModulesStepProps) {
                             </p>
                         </div>
                     </div>
-                    <div className="mt-8 flex justify-center gap-3">
+                    <div className="lg:mt-8 flex justify-center gap-3">
                         {instructions.map((_, index) => (
                             <button
                                 key={index}
@@ -108,7 +108,7 @@ export default function ModulesStep({ onBack, onNext }: ModulesStepProps) {
                             />
                         ))}
                     </div>
-                    <div className="flex justify-between py-8">
+                    <div className="flex justify-between py-4 lg:py-8">
                         <button
                             onClick={() => {
                                 if (current > 0) {

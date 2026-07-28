@@ -3,9 +3,11 @@ import { Link } from "@inertiajs/react";
 import OnboardingHeader from "./OnboardingHeader";
 import { motion } from "motion/react";
 
+import { cn } from "@/lib/utils";
 const guideSections = [
     {
         title: "Orientation Requirements",
+
         description:
             "These requirements must be completed before your onboarding can be considered successful.",
         items: [
@@ -28,6 +30,7 @@ const guideSections = [
     },
     {
         title: "Learning Expectations",
+
         description:
             "Make the most of your orientation by reviewing each learning material carefully.",
         items: [
@@ -50,6 +53,7 @@ const guideSections = [
     },
     {
         title: "Professional Conduct",
+
         description:
             "These guidelines help protect company information and ensure a professional onboarding experience.",
         items: [
@@ -72,6 +76,7 @@ const guideSections = [
     },
     {
         title: "Acknowledgement",
+
         description:
             "By continuing, you confirm your understanding of the orientation process and company expectations.",
         items: [
@@ -88,7 +93,7 @@ const container = {
     hidden: {},
     show: {
         transition: {
-            staggerChildren: 0.08,
+            staggerChildren: 0.1,
         },
     },
 };
@@ -166,12 +171,10 @@ export default function GuidelinesStep({}) {
                                             key={guide.title}
                                             className="flex gap-4 border-l-2 border-primary/20 pl-5"
                                         >
-                                            <div className="mt-1 h-2 w-2 rounded-full bg-primary" />
-
                                             <motion.div
                                                 className="space-y-1"
                                                 whileHover={{
-                                                    x: 4,
+                                                    x: 6,
                                                 }}
                                             >
                                                 <h3 className="font-medium">
@@ -211,16 +214,15 @@ export default function GuidelinesStep({}) {
                         </label>
                     </div>
                 </div>
-                <div className="py-8">
-                    <Link href="/orientation/folders">
-                        <button
-                            disabled={!agreed}
-                            className="rounded-2xl border px-6 py-3 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                            Begin Orientation
-                        </button>
-                    </Link>
-                </div>
+
+                <Link href="/orientation/folders" className="py-8">
+                    <button
+                        disabled={!agreed}
+                        className="rounded-2xl border px-6 py-3 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        Begin Orientation
+                    </button>
+                </Link>
             </div>
         </div>
     );

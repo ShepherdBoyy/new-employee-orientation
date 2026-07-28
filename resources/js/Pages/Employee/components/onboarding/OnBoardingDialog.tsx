@@ -28,7 +28,7 @@ export function Onboarding({ onFinish, user }: OnboardingProps) {
                     />
 
                     <motion.div
-                        className="h-full w-full rounded-lg p-2"
+                        className="hidden lg:block h-full w-full rounded-lg p-2"
                         initial={{
                             opacity: 0,
                             scale: 1.02,
@@ -68,7 +68,7 @@ export function Onboarding({ onFinish, user }: OnboardingProps) {
 
         case OnboardingStep.Guidelines:
             content = (
-                <div className="w-full max-w-7xl min-h-screen lg:h-200 rounded-none overflow-hidden border bg-background shadow-xl lg:rounded-3xl">
+                <div className="w-full max-w-7xl min-h-screen lg:h-200  overflow-hidden border bg-background shadow-xl rounded-3xl">
                     <GuidelinesStep />
                 </div>
             );
