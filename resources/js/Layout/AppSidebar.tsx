@@ -1,13 +1,10 @@
 import {
     Sidebar,
     SidebarContent,
-    SidebarGroup,
-    SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarFooter,
 } from "@/components/ui/sidebar";
 import {
     UsersRound,
@@ -22,17 +19,7 @@ import {
 import SidebarNavItem from "./SideBarNav/SidebarNavItem";
 import SidebarNavGroup from "./SideBarNav/SidebarNavGroup";
 import type { CompanyNav, NavItem } from "./SideBarNav/navTypes";
-import { usePage, Link, router } from "@inertiajs/react";
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { usePage } from "@inertiajs/react";
 
 type AdminUser = {
     id: number;
@@ -42,7 +29,7 @@ type AdminUser = {
 
 export function AppSidebar() {
     const companies = usePage().props.sidebarCompanies as CompanyNav[];
-    const user = usePage().props.auth.user as AdminUser;
+
     const navLinks: NavItem[] = [
         {
             type: "link",
@@ -137,77 +124,6 @@ export function AppSidebar() {
                     }
                 })}
             </SidebarContent>
-            <SidebarFooter>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton
-                                    size="lg"
-                                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                                >
-                                    <Avatar className="h-8 w-8 rounded-lg  group-data-[collapsible=icon]:ml-10">
-                                        <AvatarImage />
-                                        <AvatarFallback className="rounded-lg">
-                                            {user.name
-                                                .slice(0, 2)
-                                                .toUpperCase()}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="grid flex-1 text-left text-sm leading-tight">
-                                        <span className="truncate font-medium">
-                                            {user.name}
-                                        </span>
-                                        <span className="truncate text-xs">
-                                            {user.email}
-                                        </span>
-                                    </div>
-                                    <ChevronsUpDown className="ml-auto size-4" />
-                                </SidebarMenuButton>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                                align="end"
-                                side="right"
-                                sideOffset={4}
-                            >
-                                <DropdownMenuLabel className="p-0 font-normal">
-                                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                        <Avatar className="h-8 w-8 rounded-lg">
-                                            <AvatarImage />
-                                            <AvatarFallback className="rounded-lg">
-                                                {user.name
-                                                    .slice(0, 2)
-                                                    .toUpperCase()}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <div className="grid flex-1 text-left text-sm leading-tight">
-                                            <span className="truncate font-medium">
-                                                {user.name}
-                                            </span>
-                                            <span className="truncate text-xs">
-                                                {user.email}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                    onClick={() => router.get("/logout")}
-                                >
-                                    <Link
-                                        href="/logout"
-                                        className="flex gap-2 items-center justify-between"
-                                    >
-                                        <LogOut />
-                                        <span>Log out</span>
-                                    </Link>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarFooter>
         </Sidebar>
     );
 }
