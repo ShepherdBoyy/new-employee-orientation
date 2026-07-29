@@ -12,15 +12,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect("/", "/login");
 
-Route::middleware("guest")->group(function () {
+Route::middleware("test")->group(function () {
     Route::get("/login", [AuthController::class, "showLogin"])->name("login");
     Route::post("/login", [AuthController::class, "login"])->name("login.attempt");
-});
-
-Route::middleware("auth")->group(function () {
     Route::get("/logout", [AuthController::class, "logout"])->name("logout");
     
-    Route::middleware("role:admin")->prefix("admin")->name("admin.")->group(function () {
+    Route::prefix("admin")->name("admin.")->group(function () {
         Route::get("/dashboard", [AdminController::class, "index"])->name("dashboard");
 
         Route::get("/companies", [CompanyController::class, "index"])->name("companies.index");
@@ -65,7 +62,7 @@ Route::middleware("auth")->group(function () {
         Route::get("/users/employees/{user}/acknowledgement/pdf", [UserController::class, "exportAcknowledgementPdf"])->name("users.employees.acknowledgement-pdf");
     });
 
-    Route::middleware(["role:employee", "expiry"])->prefix("orientation")->name("employee.")->group(function () {
+    Route::middleware(["expiry"])->prefix("orientation")->name("employee.")->group(function () {
         Route::get("/", [OrientationController::class, "welcome"])->name("welcome");
         Route::get("/folders", [OrientationController::class, "index"])->name("folders.index");
         Route::get("/folders/{folder:slug}", [OrientationController::class, "showFolder"])->name("folders.show");
