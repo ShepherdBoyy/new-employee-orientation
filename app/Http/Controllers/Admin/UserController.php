@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmployeeWelcomeMail;
 use App\Models\Company;
 use App\Models\User;
 use Auth;
@@ -16,6 +17,7 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Log;
+use Mail;
 
 class UserController extends Controller
 {
@@ -91,9 +93,9 @@ class UserController extends Controller
             "expires_at" => $validated["role"] === "employee" ? now()->addDays(2) : null
         ]);
 
-        // if ($user->isEmployee()) {
-        //     Mail::to($user->email)->send(new EmployeeWelcomeMail($user, $plainPassword));
-        // }
+        if ($user->isEmployee()) {
+            Mail::to($user->email)->send(new EmployeeWelcomeMail($user, $plainPassword));
+        }
 
         return back()->with("success", "User created successfully");
     }

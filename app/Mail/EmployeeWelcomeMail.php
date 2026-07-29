@@ -33,7 +33,7 @@ class EmployeeWelcomeMail extends Mailable
                 "employeeName" => $this->employee->name,
                 "companyName" => $this->employee->company?->name,
                 "jobPosition" => $this->employee->jobPosition?->name,
-                "email " => $this->employee->email,
+                "email" => $this->employee->email,
                 "password" => $this->plainPassword,
                 "loginUrl" => url("/login"),
                 "expiresInDays" => 2

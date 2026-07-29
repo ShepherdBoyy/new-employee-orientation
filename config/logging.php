@@ -127,6 +127,13 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        "sensitive_access" => [
+            "driver" => "daily",
+            "path" => storage_path("logs/sensitive-access.log"),
+            "level" => "info",
+            "days" => 365
+        ]
+
     ],
 
 ];

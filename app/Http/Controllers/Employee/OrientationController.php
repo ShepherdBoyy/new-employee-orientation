@@ -217,14 +217,14 @@ class OrientationController extends Controller
             "acknowledged_at" => $acknowledgedAt
         ]);
 
-        // $admins = User::where("role", "admin")->get();
-        // foreach ($admins as $admin) {
-        //     $admin->notify(new OrientationCompleted($user));
+        $admins = User::where("role", "admin")->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new OrientationCompleted($user));
 
-        //     Mail::to($admin->email)->send(
-        //         new OrientationCompletedMail($user, $acknowledgedAt)
-        //     );
-        // }
+            Mail::to($admin->email)->send(
+                new OrientationCompletedMail($user, $acknowledgedAt)
+            );
+        }
 
         return redirect()->route("employee.completed");
     }

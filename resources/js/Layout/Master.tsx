@@ -7,7 +7,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { usePage } from "@inertiajs/react";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/sonner"
+import NotificationBell from "./NotificationBell";
 
 type MasterProps = {
     children: React.ReactNode;
@@ -27,6 +28,7 @@ export default function Master({ children }: MasterProps) {
                                     <SidebarTrigger />
                                     <Separator orientation="vertical" />
                                 </div>
+                                <NotificationBell />
                             </header>
 
                             <main className="flex-1 p-12">{children}</main>
