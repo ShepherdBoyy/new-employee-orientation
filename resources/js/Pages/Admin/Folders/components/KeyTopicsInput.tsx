@@ -1,37 +1,39 @@
-import { Plus, X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Plus, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface Props {
-    topics: string[]
-    onChange: (topics: string[]) => void
+    topics: string[];
+    onChange: (topics: string[]) => void;
 }
 
 export default function KeyTopicsInput({ topics, onChange }: Props) {
     function handleChange(index: number, value: string) {
-        const updated = [...topics]
-        updated[index] = value
-        onChange(updated)
+        const updated = [...topics];
+        updated[index] = value;
+        onChange(updated);
     }
 
     function handleAdd() {
-        onChange([...topics, ''])
+        onChange([...topics, ""]);
     }
 
     function handleRemove(index: number) {
-        onChange(topics.filter((_, i) => i !== index))
+        onChange(topics.filter((_, i) => i !== index));
     }
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-3">
             <Label>Key topics covered (optional)</Label>
-            <div className="space-y-2">
+            <div className="space-y-3">
                 {topics.map((topic, index) => (
                     <div key={index} className="flex items-center gap-1">
                         <Input
                             value={topic}
-                            onChange={e => handleChange(index, e.target.value)}
+                            onChange={(e) =>
+                                handleChange(index, e.target.value)
+                            }
                             placeholder="e.g. Code of Discipline"
                         />
                         {topics.length > 1 && (
@@ -48,10 +50,11 @@ export default function KeyTopicsInput({ topics, onChange }: Props) {
                     </div>
                 ))}
             </div>
-            <Button type="button" variant="outline" size="sm" onClick={handleAdd}>
+
+            <Button type="button" variant="ghost" size="sm" onClick={handleAdd}>
                 <Plus className="mr-1.5 h-3.5 w-3.5" />
                 Add another
             </Button>
         </div>
-    )
+    );
 }

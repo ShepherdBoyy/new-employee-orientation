@@ -1,84 +1,86 @@
-import { useEffect, useRef, useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Eraser, PenLine } from 'lucide-react'
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Eraser, PenLine } from "lucide-react";
 
 interface Props {
-    onChange: (dataUrl: string | null) => void
+    onChange: (dataUrl: string | null) => void;
 }
 
 export default function SignaturePad({ onChange }: Props) {
-    const canvasRef = useRef<HTMLCanvasElement>(null)
-    const drawing = useRef(false)
-    const [isEmpty, setIsEmpty] = useState(true)
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const drawing = useRef(false);
+    const [isEmpty, setIsEmpty] = useState(true);
 
     useEffect(() => {
-        const canvas = canvasRef.current
-        if (!canvas) return
+        const canvas = canvasRef.current;
+        if (!canvas) return;
 
-        const ratio = window.devicePixelRatio || 1
-        canvas.width = canvas.offsetWidth * ratio
-        canvas.height = canvas.offsetHeight * ratio
+        const ratio = window.devicePixelRatio || 1;
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
 
-        const ctx = canvas.getContext('2d')
+        const ctx = canvas.getContext("2d");
         if (ctx) {
-            ctx.scale(ratio, ratio)
-            ctx.lineWidth = 2.5
-            ctx.lineCap = 'round'
-            ctx.lineJoin = 'round'
-            ctx.strokeStyle = '#18181b'
+            ctx.scale(ratio, ratio);
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.strokeStyle = "#18181b";
         }
-    }, [])
+    }, []);
 
     function getPos(e: React.PointerEvent<HTMLCanvasElement>) {
-        const rect = canvasRef.current!.getBoundingClientRect()
-        return { x: e.clientX - rect.left, y: e.clientY - rect.top }
+        const rect = canvasRef.current!.getBoundingClientRect();
+        return { x: e.clientX - rect.left, y: e.clientY - rect.top };
     }
 
     function handlePointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
-        drawing.current = true
-        const ctx = canvasRef.current!.getContext('2d')!
-        const { x, y } = getPos(e)
-        ctx.beginPath()
-        ctx.moveTo(x, y)
+        drawing.current = true;
+        const ctx = canvasRef.current!.getContext("2d")!;
+        const { x, y } = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
     }
 
     function handlePointerMove(e: React.PointerEvent<HTMLCanvasElement>) {
-        if (!drawing.current) return
-        const ctx = canvasRef.current!.getContext('2d')!
-        const { x, y } = getPos(e)
-        ctx.lineTo(x, y)
-        ctx.stroke()
-        if (isEmpty) setIsEmpty(false)
+        if (!drawing.current) return;
+        const ctx = canvasRef.current!.getContext("2d")!;
+        const { x, y } = getPos(e);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        if (isEmpty) setIsEmpty(false);
     }
 
     function handlePointerUp() {
-        if (!drawing.current) return
-        drawing.current = false
-        emitValue()
+        if (!drawing.current) return;
+        drawing.current = false;
+        emitValue();
     }
 
     function emitValue() {
-        const canvas = canvasRef.current
-        if (!canvas) return
-        onChange(isEmpty ? null : canvas.toDataURL('image/png'))
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        onChange(isEmpty ? null : canvas.toDataURL("image/png"));
     }
 
     function handleClear() {
-        const canvas = canvasRef.current
-        const ctx = canvas?.getContext('2d')
+        const canvas = canvasRef.current;
+        const ctx = canvas?.getContext("2d");
         if (canvas && ctx) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
-        setIsEmpty(true)
-        onChange(null)
+        setIsEmpty(true);
+        onChange(null);
     }
 
     return (
         <div className="space-y-2.5">
             <div
                 className={
-                    'relative overflow-hidden rounded-2xl border-2 border-dashed bg-linear-to-br from-muted/30 to-muted/10 transition-colors ' +
-                    (isEmpty ? 'border-muted-foreground/25' : 'border-primary/30')
+                    "relative overflow-hidden rounded-2xl border-2 border-dashed bg-linear-to-br from-muted/30 to-muted/10 transition-colors " +
+                    (isEmpty
+                        ? "border-muted-foreground/25"
+                        : "border-primary/30")
                 }
             >
                 <canvas
@@ -117,5 +119,5 @@ export default function SignaturePad({ onChange }: Props) {
                 </Button>
             </div>
         </div>
-    )
+    );
 }

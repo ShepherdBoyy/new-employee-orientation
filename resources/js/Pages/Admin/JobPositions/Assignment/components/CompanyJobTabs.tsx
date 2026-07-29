@@ -19,7 +19,7 @@ import {
 // 1. Import your fixed RemoveJobDialog component
 import RemoveJobDialog from "./RemoveJobDialog";
 import ViewJdDialog from "./ViewJdDialog";
-import UploadJdDialog from "./UploadJdDialog"
+import UploadJdDialog from "./UploadJdDialog";
 
 import type { CompanyWithJobs } from "../../../Types/company";
 import { Badge } from "@/components/ui/badge";
@@ -29,7 +29,7 @@ import { router } from "@inertiajs/react";
 // Match the type expected by the Dialog component
 interface JobWithPivot {
     id: number;
-    name: string
+    name: string;
     pivot: {
         company_id: number;
         name: string;
@@ -47,8 +47,8 @@ export default function CompanyJobTabs({ companies }: Props) {
 
     const [uploadDialog, setUploadDialog] = useState(false);
     const [viewDialog, setViewDialog] = useState(false);
-    const [document, setDocument] = useState('');
-    const [activeDeleteDialog, setActiveDeleteDialog ] = useState(false);
+    const [document, setDocument] = useState("");
+    const [activeDeleteDialog, setActiveDeleteDialog] = useState(false);
 
     if (!companies.length) return null;
 
@@ -66,7 +66,7 @@ export default function CompanyJobTabs({ companies }: Props) {
 
     return (
         <>
-            <Card className="w-full flex flex-col overflow-hidden">
+            <Card className="w-full h-full flex flex-col overflow-hidden">
                 <CardHeader className="border-b bg-muted/20">
                     <CardTitle>Job Management Matrix</CardTitle>
                     <CardDescription>
@@ -120,30 +120,35 @@ export default function CompanyJobTabs({ companies }: Props) {
                                                         {job.name}
                                                     </h4>
 
-
                                                     <div className="grid gap-2 sm:grid-cols-2">
-                                                        { job.document ? (
+                                                        {job.document ? (
                                                             <Button
                                                                 size="sm"
                                                                 onClick={() => {
-                                                                   setViewDialog(true) 
-                                                                   setDocument(job.document.file_path)
+                                                                    setViewDialog(
+                                                                        true,
+                                                                    );
+                                                                    setDocument(
+                                                                        job
+                                                                            .document
+                                                                            .file_path,
+                                                                    );
                                                                 }}
                                                                 variant="outline"
                                                             >
                                                                 <BriefcaseBusiness />
                                                                 View JD
                                                             </Button>
-                                                        ) 
-                                                        :
-                                                        (
+                                                        ) : (
                                                             <Button
                                                                 size="sm"
                                                                 onClick={() => {
-                                                                    setUploadDialog(true);
+                                                                    setUploadDialog(
+                                                                        true,
+                                                                    );
                                                                     setActiveDeletingJob(
                                                                         job as unknown as JobWithPivot,
-                                                                    )
+                                                                    );
                                                                 }}
                                                                 variant="outline"
                                                             >
@@ -154,13 +159,13 @@ export default function CompanyJobTabs({ companies }: Props) {
                                                         <Button
                                                             size="sm"
                                                             onClick={() => {
-                                                                setActiveDeleteDialog(true)
+                                                                setActiveDeleteDialog(
+                                                                    true,
+                                                                );
                                                                 setActiveDeletingJob(
                                                                     job as unknown as JobWithPivot,
-                                                                )
-                                                            }
-                                                                
-                                                            }
+                                                                );
+                                                            }}
                                                             variant="outline"
                                                         >
                                                             <PinOff />
@@ -190,7 +195,6 @@ export default function CompanyJobTabs({ companies }: Props) {
                 </CardContent>
             </Card>
 
-                            
             {/* 5. Render the AlertDialog globally at the root layout level */}
             <RemoveJobDialog
                 job={activeDeletingJob}
@@ -199,7 +203,7 @@ export default function CompanyJobTabs({ companies }: Props) {
                 onClose={() => setActiveDeleteDialog(false)} // Clear state to shut down the dialog
             />
 
-            <ViewJdDialog 
+            <ViewJdDialog
                 isOpen={viewDialog}
                 onClose={() => setViewDialog(false)}
                 document={document}

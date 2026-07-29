@@ -117,10 +117,10 @@ export default function Login() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="pt-8">
+                                <div className="pt-8 ">
                                     <Button
                                         type="submit"
-                                        className="w-full h-10 lg:h-12 rounded-xl font-semibold"
+                                        className="w-full h-10 lg:h-12 rounded-xl font-semibold shadow-2xl"
                                     >
                                         {processing && (
                                             <Spinner data-icon="inline-start" />

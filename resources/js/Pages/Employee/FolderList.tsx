@@ -27,9 +27,9 @@ export default function FolderList({ folders, allCompleted, user }: Props) {
         <EmployeeLayout>
             <div className="space-y-10">
                 <Header user={user} />
-                <div className="mb-8 space-y-4">
+                <div className="mb-8">
                     <div>
-                        <h1 className="text-3xl tracking-tight">
+                        <h1 className="text-2xl lg:text-3xl tracking-tight">
                             Orientation Modules
                         </h1>
                         <p className="mt-1 text-sm text-muted-foreground">

@@ -12,7 +12,7 @@ import {
     SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import type { NavLinkItem } from "./navTypes";
-
+import { cn } from "@/lib/utils";
 type SidebarNavItemProps = {
     item: NavLinkItem;
 };
@@ -28,29 +28,29 @@ export default function SidebarNavItem({ item }: SidebarNavItemProps) {
             <SidebarMenu>
                 {item.links.map((link) => {
                     const isActive = url.startsWith(link.path);
-
+                    console.log(link.title);
                     return (
                         <SidebarMenuItem key={link.path}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Link href={link.path}>
                                         <SidebarMenuButton
-                                            className={
+                                            className={cn(
+                                                "relative transition-all duration-200 rounded-lg hover:bg-muted hover:translate-x-1",
                                                 isActive
-                                                    ? "bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 text-white"
-                                                    : ""
-                                            }
+                                                    ? "border border-primary/20 bg-primary/8 text-primary"
+                                                    : "hover:bg-muted",
+                                            )}
                                         >
                                             <div className="flex h-5 w-5 items-center justify-center">
                                                 {link.logo_path ? (
                                                     <Avatar className="h-6 w-6 rounded-md">
                                                         <AvatarImage
                                                             src={`/storage/${link.logo_path}`}
-                                                            alt={link.title}
                                                             className=""
                                                         />
 
-                                                        <AvatarFallback className="rounded-md text-[10px]">
+                                                        <AvatarFallback className="rounded-md">
                                                             {link.title
                                                                 .slice(0, 2)
                                                                 .toUpperCase()}

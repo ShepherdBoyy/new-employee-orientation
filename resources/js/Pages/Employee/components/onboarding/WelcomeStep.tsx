@@ -74,7 +74,7 @@ export default function WelcomeStep({ onNext, user }: WelcomeStepProps) {
                         </p>
                     </motion.div>
 
-                    <motion.div variants={item} className="pt-8">
+                    <motion.div variants={item} className="lg:pt-8">
                         <motion.button
                             whileHover={{ scale: 1.08 }}
                             whileTap={{ scale: 0.98 }}

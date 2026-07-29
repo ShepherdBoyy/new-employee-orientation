@@ -62,7 +62,7 @@ export default function EmployeeLayout({ children }: EmployeeLayoutProps) {
                     >
                         <DropdownMenuLabel className="p-0">
                             <div className="flex items-center gap-3 rounded-lg px-2 py-2">
-                                <Avatar className="h-12 w-12">
+                                <Avatar className="h-10 w-10">
                                     <AvatarFallback className="bg-primary/10 text-base font-semibold text-primary">
                                         {user.name
                                             .split(" ")
@@ -97,7 +97,7 @@ export default function EmployeeLayout({ children }: EmployeeLayoutProps) {
                 </DropdownMenu>
             </nav>
 
-            <main className="mx-auto w-full max-w-7xl flex-col p-8">
+            <main className="mx-auto w-full max-w-7xl flex-col p-4 lg:p-8">
                 {children}
             </main>
 
