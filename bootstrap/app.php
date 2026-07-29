@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AuthMiddleware;
 use App\Http\Middleware\CheckAccountExpiry;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -21,7 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             "role" => CheckRole::class,
-            "expiry" => CheckAccountExpiry::class
+            "expiry" => CheckAccountExpiry::class,
+            "test" => AuthMiddleware::class
+
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
