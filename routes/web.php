@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\FolderController;
 use App\Http\Controllers\Admin\JobPositionController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
@@ -19,6 +20,10 @@ Route::middleware("test")->group(function () {
     
     Route::prefix("admin")->name("admin.")->group(function () {
         Route::get("/dashboard", [AdminController::class, "index"])->name("dashboard");
+
+        Route::get("/notifications", [NotificationController::class, "index"])->name("notifications.index");
+        Route::post("/notifications/{id}/read", [NotificationController::class, "markAsRead"])->name("notifications.read");
+        Route::post("/notifications/read-all", [NotificationController::class, "markAllAsRead"])->name("notifications.read-all");
 
         Route::get("/companies", [CompanyController::class, "index"])->name("companies.index");
         Route::post("/companies", [CompanyController::class, "store"])->name("companies.store");
