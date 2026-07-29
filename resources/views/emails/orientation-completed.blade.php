@@ -20,6 +20,7 @@
             <td align="center">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color:#ffffff;">
 
+                    {{-- Header --}}
                     <tr>
                         <td style="background-color: #000000; padding: 40px 40px 36px 40px; border-radius: 20px 20px 0 0; text-align: center;">
                             <h1 style="margin: 0; color: #ffffff; font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; letter-spacing: -0.01em;">
@@ -28,6 +29,7 @@
                         </td>
                     </tr>
 
+                    {{-- Body --}}
                     <tr>
                         <td style="padding: 40px 40px 8px 40px; background-color: #ffffff;">
                             <h2 style="margin: 0 0 22px 0; font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 600; color: #111827; letter-spacing: -0.01em;">
@@ -39,10 +41,10 @@
                                 acknowledgement, including their electronic signature and photo confirmation.
                             </p>
 
-                            {{-- Summary card --}}
+                            {{-- Summary card: 2x2 grid --}}
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fc; border-radius: 16px; margin-bottom: 24px;">
                                 <tr>
-                                    <td style="padding: 22px 24px 18px 24px;">
+                                    <td width="50%" style="padding: 22px 12px 18px 24px; vertical-align: top;">
                                         <p style="margin: 0 0 4px 0; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af;">
                                             Employee
                                         </p>
@@ -53,43 +55,30 @@
                                             {{ $employeeEmail }}
                                         </p>
                                     </td>
+                                    <td width="50%" style="padding: 22px 24px 18px 12px; vertical-align: top;">
+                                        <p style="margin: 0 0 4px 0; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af;">
+                                            Job Position
+                                        </p>
+                                        <p style="margin: 0; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; color: #111827;">
+                                            {{ $jobPosition ?? '—' }}
+                                        </p>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 0 24px;">
+                                    <td colspan="2" style="padding: 0 24px;">
                                         <div style="border-top: 1px solid #eceef2;"></div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 18px 24px;">
-                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td width="50%" style="vertical-align: top;">
-                                                    <p style="margin: 0 0 4px 0; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af;">
-                                                        Company
-                                                    </p>
-                                                    <p style="margin: 0; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; color: #111827;">
-                                                        {{ $companyName }}
-                                                    </p>
-                                                </td>
-                                                <td width="50%" style="vertical-align: top;">
-                                                    <p style="margin: 0 0 4px 0; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af;">
-                                                        Job Position
-                                                    </p>
-                                                    <p style="margin: 0; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; color: #111827;">
-                                                        {{ $jobPosition ?? '—' }}
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                        </table>
+                                    <td width="50%" style="padding: 18px 12px 22px 24px; vertical-align: top;">
+                                        <p style="margin: 0 0 4px 0; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af;">
+                                            Company
+                                        </p>
+                                        <p style="margin: 0; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 500; color: #111827;">
+                                            {{ $companyName }}
+                                        </p>
                                     </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0 24px;">
-                                        <div style="border-top: 1px solid #eceef2;"></div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 18px 24px 22px 24px;">
+                                    <td width="50%" style="padding: 18px 24px 22px 12px; vertical-align: top;">
                                         <p style="margin: 0 0 4px 0; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af;">
                                             Acknowledged At
                                         </p>
@@ -100,6 +89,7 @@
                                 </tr>
                             </table>
 
+                            {{-- CTA --}}
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td align="center">
@@ -116,6 +106,7 @@
                         </td>
                     </tr>
 
+                    {{-- Footer --}}
                     <tr>
                         <td style="padding: 28px 40px; background-color: #ffffff; text-align: center;">
                             <p style="margin: 0; font-family: 'Poppins', sans-serif; font-size: 12px; color: #d1d5db; font-weight: 400;">
