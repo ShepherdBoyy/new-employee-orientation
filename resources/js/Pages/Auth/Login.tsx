@@ -8,7 +8,6 @@ import { usePage } from "@inertiajs/react";
  
 export default function Login() {
     const page = usePage();
-    console.log(page.props.message);
     return (
         <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-linear-to-br from-slate-50 via-white to-slate-100 p-6 lg:p-12 ">
             {/* CONTAINER  */}

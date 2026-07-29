@@ -28,7 +28,6 @@ export default function SidebarNavItem({ item }: SidebarNavItemProps) {
             <SidebarMenu>
                 {item.links.map((link) => {
                     const isActive = url.startsWith(link.path);
-                    console.log(link.title);
                     return (
                         <SidebarMenuItem key={link.path}>
                             <Tooltip>
