@@ -12,12 +12,14 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
     Item,
+    ItemActions,
     ItemContent,
     ItemDescription,
     ItemMedia,
     ItemTitle,
 } from "@/components/ui/item";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 interface NotificationItem {
     id: string;
@@ -143,21 +145,40 @@ export default function NotificationBell() {
                                                 </AvatarFallback>
                                             </Avatar>
                                         </ItemMedia>
-                                        <ItemContent>
-                                            <ItemTitle className="text-sm leading-5">
-                                                {notification.message}
-                                            </ItemTitle>
+                                        <div className="flex flex-1 items-start justify-between gap-3">
+                                            <ItemContent className="flex-1">
+                                                <ItemTitle className="text-sm leading-5">
+                                                    {notification.message}
+                                                </ItemTitle>
 
-                                            <ItemDescription className="mt-1 text-xs">
-                                                {notification.created_at}
-                                            </ItemDescription>
-                                        </ItemContent>
+                                                <ItemDescription className="mt-1 text-xs">
+                                                    {notification.created_at}
+                                                </ItemDescription>
+                                            </ItemContent>
+
+                                            {!notification.read ? (
+                                                <div className="mt-2 h-2 w-2 rounded-full bg-primary shrink-0" />
+                                            ) : (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="size-7 transition-all duration-200 group-hover:opacity-100"
+                                                >
+                                                    <X className="size-3" />
+                                                </Button>
+                                            )}
+                                        </div>
                                     </Item>
                                 </button>
                             ))}
                         </div>
                     )}
                 </ScrollArea>
+                <div className="border-t p-2">
+                    <Button variant="ghost" className="w-full">
+                        Clear all notifications
+                    </Button>
+                </div>
             </PopoverContent>
         </Popover>
     );
