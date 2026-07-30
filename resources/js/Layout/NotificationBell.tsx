@@ -74,6 +74,26 @@ export default function NotificationBell() {
         );
     }
 
+    function handleClearNotification(id: string) {
+        router.delete(
+            `/admin/notifications/${id}`,
+            {
+                preserveScroll: true,
+                onSuccess: fetchNotifications
+            }
+        )
+    }
+
+    function handleClearAllNotifications() {
+        router.delete(
+            `/admin/notifications`,
+            {
+                preserveScroll: true,
+                onSuccess: fetchNotifications
+            }
+        )
+    }
+
     function handleClick(notification: NotificationItem) {
         if (!notification.read) handleMarkAsRead(notification.id);
         router.visit("/admin/users/employees");
@@ -163,6 +183,7 @@ export default function NotificationBell() {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="size-7 transition-all duration-200 group-hover:opacity-100"
+                                                    onClick={() => handleClearNotification(notification.id)}
                                                 >
                                                     <X className="size-3" />
                                                 </Button>
@@ -175,7 +196,11 @@ export default function NotificationBell() {
                     )}
                 </ScrollArea>
                 <div className="border-t p-2">
-                    <Button variant="ghost" className="w-full">
+                    <Button
+                        variant="ghost"
+                        className="w-full"
+                        onClick={handleClearAllNotifications}
+                    >
                         Clear all notifications
                     </Button>
                 </div>

@@ -14,7 +14,7 @@ class NotificationController extends Controller
         $notifications = Auth::user()
             ->notifications()
             ->latest()
-            ->limit(20)
+            ->limit(10)
             ->get()
             ->map(fn($n) => [
                 "id" => $n->id,
@@ -41,6 +41,30 @@ class NotificationController extends Controller
     public function markAllAsRead(): RedirectResponse
     {
         Auth::user()->unreadNotifications()->update(["read_at" => now()]);
+
+        return back();
+    }
+
+    public function clear(string $id): RedirectResponse
+    {
+        $notification = Auth::user()->notifications()->findOrFail($id);
+
+        if ($notification->read_at === null) {
+            return back()->withErrors([
+                "notification" => "Please read this notification before clearing it"
+            ]);
+        }
+
+        $notification->delete();
+
+        return back();
+    }
+
+    public function clearAll(): RedirectResponse
+    {
+        $user = Auth::user();
+
+        $user->notifications()->delete();
 
         return back();
     }

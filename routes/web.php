@@ -24,6 +24,8 @@ Route::middleware("test")->group(function () {
         Route::get("/notifications", [NotificationController::class, "index"])->name("notifications.index");
         Route::post("/notifications/{id}/read", [NotificationController::class, "markAsRead"])->name("notifications.read");
         Route::post("/notifications/read-all", [NotificationController::class, "markAllAsRead"])->name("notifications.read-all");
+        Route::delete("/notifications/{id}", [NotificationController::class, "clear"])->name("notifications.clear");
+        Route::delete("/notifications", [NotificationController::class, "clearAll"])->name("notifications.clear-all");
 
         Route::get("/companies", [CompanyController::class, "index"])->name("companies.index");
         Route::post("/companies", [CompanyController::class, "store"])->name("companies.store");
