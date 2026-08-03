@@ -10,8 +10,6 @@ import {
     UsersRound,
     BriefcaseBusiness,
     Rotate3d,
-    ChevronsUpDown,
-    LogOut,
     Building2,
     GitBranchPlus,
     ShieldCheck,
@@ -21,13 +19,7 @@ import SidebarNavGroup from "./SideBarNav/SidebarNavGroup";
 import type { CompanyNav, NavItem } from "./SideBarNav/navTypes";
 import { usePage } from "@inertiajs/react";
 
-type AdminUser = {
-    id: number;
-    name: string;
-    email: string;
-};
-
-export function AppSidebar() {
+export function AppSidebar({}) {
     const companies = usePage().props.sidebarCompanies as CompanyNav[];
 
     const navLinks: NavItem[] = [
@@ -71,7 +63,7 @@ export function AppSidebar() {
         },
         {
             type: "link",
-            group: "Presentation",
+            group: "Workspace",
             links: [
                 ...companies.map((company) => ({
                     logo_path: company.logo_path,
@@ -83,7 +75,7 @@ export function AppSidebar() {
     ];
 
     return (
-        <Sidebar variant="inset" collapsible="icon">
+        <Sidebar variant="inset" collapsible="icon" className="">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>

@@ -3,7 +3,6 @@ import { AppSidebar } from "./AppSidebar";
 import {
     SidebarProvider,
     SidebarTrigger,
-    SidebarInset,
     SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
@@ -18,28 +17,57 @@ import {
     DropdownMenuItem,
     DropdownMenu,
 } from "@/components/ui/dropdown-menu";
-
+import PresentationPanel from "./PresentationPanel";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ChevronsUpDown, LogOut } from "lucide-react";
-
+import { AnimatePresence, motion, LayoutGroup } from "motion/react";
 type MasterProps = {
     children: React.ReactNode;
     id: number;
     name: string;
     email: string;
 };
-export default function Master({ children, id, name, email }: MasterProps) {
-    const url = usePage();
+export default function Master({ children }: MasterProps) {
+    const { url } = usePage();
     const user = usePage().props.auth.user as MasterProps;
+
+    const showPresentationSidebar = url.startsWith("/admin/folders");
+
     return (
         <>
             <TooltipProvider>
-                <div>
-                    <SidebarProvider>
+                <div className="flex flex-1 overflow-hidden">
+                    <SidebarProvider className="">
                         <AppSidebar />
-                        <SidebarInset>
+                        <AnimatePresence mode="wait">
+                            {showPresentationSidebar && (
+                                <motion.div
+                                    key="presentation-panel"
+                                    initial={{
+                                        x: -24,
+                                        opacity: 0,
+                                    }}
+                                    animate={{
+                                        x: 0,
+                                        opacity: 1,
+                                    }}
+                                    exit={{
+                                        x: -24,
+                                        opacity: 0,
+                                    }}
+                                    transition={{
+                                        duration: 0.22,
+                                        ease: "easeOut",
+                                    }}
+                                    className=""
+                                >
+                                    <PresentationPanel />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        <div className="flex-1 flex flex-col overflow-hidden  bg-background rounded-xl shadow-lg">
                             <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-background px-6">
-                                {/* Left */}
                                 <div className="flex items-center gap-3">
                                     <SidebarTrigger />
 
@@ -48,13 +76,11 @@ export default function Master({ children, id, name, email }: MasterProps) {
                                         className=""
                                     />
 
-                                    {/* Optional breadcrumb/page title */}
                                     <h1 className="text-sm font-medium text-muted-foreground">
                                         Administration
                                     </h1>
                                 </div>
 
-                                {/* Right */}
                                 <div className="flex items-center gap-4">
                                     <NotificationBell />
 
@@ -128,9 +154,12 @@ export default function Master({ children, id, name, email }: MasterProps) {
                                 </div>
                             </header>
 
-                            <main className="flex-1 p-12">{children}</main>
+                            <main className="flex-1 overflow-y-auto p-8">
+                                {children}
+                            </main>
+
                             <Toaster />
-                        </SidebarInset>
+                        </div>
                     </SidebarProvider>
                 </div>
             </TooltipProvider>
