@@ -64,7 +64,7 @@ class FolderKeyTopic extends Model
 
     public function scopeOrdered($query): void
     {
-        $query->orderedBy("order");
+        $query->orderBy("order");
     }
 
     public function folder(): BelongsTo

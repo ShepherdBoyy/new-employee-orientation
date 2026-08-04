@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Company;
 use App\Models\Folder;
 use Illuminate\Database\Seeder;
+use Str;
 
 class FolderSeeder extends Seeder
 {
@@ -93,24 +94,38 @@ class FolderSeeder extends Seeder
                         );
                     } else {
                         foreach ($company->jobs as $position) {
-                            Folder::create([
+                            $folder = Folder::create([
                                 'company_id' => $company->id,
                                 'job_position_id' => $position->id,
                                 'name' => 'Module 5 — Job-Specific Training',
-                                "key_topics" => Folder::DEFAULT_JOB_SPECIFIC_KEY_TOPICS,
                                 'order' => $order,
                             ]);
+
+                            foreach (Folder::DEFAULT_JOB_SPECIFIC_KEY_TOPICS as $topicOrder => $topic) {
+                                $folder->keyTopics()->create([
+                                    "label" => $topic,
+                                    "slug" => Str::slug($topic),
+                                    "order" => $topicOrder + 1
+                                ]);
+                            }
                         }
                         $order++;
                     }
                 }
 
-                Folder::create([
+                $folder = Folder::create([
                     'company_id' => $company->id,
                     'name' => $module["name"],
-                    "key_topics" => $module["key_topics"],
                     'order' => $order,
                 ]);
+
+                foreach ($module["key_topics"] as $topicOrder => $topic) {
+                    $folder->keyTopics()->create([
+                        "label" => $topic,
+                        "slug" => Str::slug($topic),
+                        "order" => $topicOrder + 1
+                    ]);
+                }
             }
         }
     }

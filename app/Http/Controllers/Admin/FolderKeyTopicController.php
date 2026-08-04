@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Folder;
 use App\Models\FolderKeyTopic;
 use Illuminate\Http\RedirectResponse;
@@ -12,7 +13,7 @@ use Inertia\Response;
 
 class FolderKeyTopicController extends Controller
 {
-    public function index(Folder $folder): Response
+    public function index(Company $company, Folder $folder): Response
     {
         $folder->load("company:id,name,slug", "jobPosition:id,name,slug");
 
@@ -44,7 +45,7 @@ class FolderKeyTopicController extends Controller
             "name" => $firstJobSpecific?->name ?? "Job-Specific Training"
         ] : null;
 
-        return Inertia::render("Admin/Folders/Topics", [
+        return Inertia::render("Admin/Topics/Index", [
             "company" => $company,
             "companyWideFolders" => $companyWideFolders,
             "jobSpecificSummary" => $jobSpecificSummary,
