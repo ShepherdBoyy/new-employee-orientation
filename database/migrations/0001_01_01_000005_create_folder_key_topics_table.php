@@ -8,18 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('slides', function (Blueprint $table) {
+        Schema::create('folder_key_topics', function (Blueprint $table) {
             $table->id();
             $table->foreignId("folder_id")->constrained()->cascadeOnDelete();
-            $table->enum("type", ["image", "video"]);
-            $table->string("file_path");
+            $table->string("label");
+            $table->string("slug");
             $table->unsignedInteger("order")->default(1);
             $table->timestamps();
         });
     }
-    
+
     public function down(): void
     {
-        Schema::dropIfExists('slides');
+        Schema::dropIfExists('folder_key_topics');
     }
 };

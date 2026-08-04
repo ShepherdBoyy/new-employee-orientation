@@ -8,19 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('folders', function (Blueprint $table) {
+        Schema::create('slides', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("company_id")->constrained()->cascadeOnDelete();
-            $table->foreignId("job_position_id")->nullable()->constrained()->cascadeOnDelete();
-            $table->string("name");
-            $table->string("slug")->unique();
+            $table->foreignId("folder_id")->constrained()->cascadeOnDelete();
+            $table->foreignId("key_topic_id")->constrained("folder_key_topics")->cascadeOnDelete();
+            $table->enum("type", ["image", "video"]);
+            $table->string("file_path");
             $table->unsignedInteger("order")->default(1);
             $table->timestamps();
         });
     }
-
+    
     public function down(): void
     {
-        Schema::dropIfExists('folders');
+        Schema::dropIfExists('slides');
     }
 };
