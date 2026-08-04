@@ -31,7 +31,15 @@ export interface ModuleNav {
     id: number;
     name: string;
     slug: string;
-    topics_count: number;
+    order: number;
+    key_topics_count: number;
+}
+
+export interface JobSpecificSummary {
+    total_positions: number
+    folders_created: number
+    order: number
+    name: string
 }
 
 export const mockModules: Record<string, ModuleNav[]> = {
