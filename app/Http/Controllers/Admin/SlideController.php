@@ -3,22 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Company;
 use App\Models\Folder;
-use App\Models\JobPosition;
+use App\Models\FolderKeyTopic;
 use App\Models\Slide;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Storage;
 
 class SlideController extends Controller
 {
-    public function index(Folder $folder): Response
+    public function index(Folder $folder, FolderKeyTopic $topic): Response
     {
-        $folder->load("slides", "company:id,name,slug", "jobPosition:id,name,slug");
+        $slides = Slide::where("folder_id", $folder->id)
+            ->where("key_topic_id", $topic->id)
+            ->orderBy("order")
+            ->get();
+
+        $folder->load("company:id,name,slug", "jobPosition:id,name,slug");
 
         return Inertia::render("Admin/Slides/Index", [
             "folder" => [
@@ -28,7 +31,8 @@ class SlideController extends Controller
                 "company" => $folder->company,
                 "job_position" => $folder->jobPosition
             ],
-            "slides" => $folder->slides->map(fn($slide) => [
+            "topic" => $topic,
+            "slides" => $slides->map(fn($slide) => [
                 "id" => $slide->id,
                 "type" => $slide->type,
                 "file_url" => $slide->file_path,
@@ -37,8 +41,10 @@ class SlideController extends Controller
         ]);
     }
 
-    public function store(Request $request, Folder $folder): RedirectResponse
+    public function store(Request $request, Folder $folder, FolderKeyTopic $topic): RedirectResponse
     {
+        abort_if($topic->folder_id !== $folder->id, 403);
+
         $request->validate([
             "files" => ["required", "array", "min:1"],
             "files.*" => [
@@ -50,6 +56,7 @@ class SlideController extends Controller
         ]);
 
         $lastOrder = Slide::where("folder_id", $folder->id)
+            ->where("key_topic_id", $topic->id)
             ->max("order") ?? 0;
 
         $storageFolder = $this->storagePath($folder);
@@ -59,11 +66,11 @@ class SlideController extends Controller
                 ? "video"
                 : "image";
             
-            // $path = $file->store($storageFolder, config("filesystems.default"));
            $path = Storage::disk('public')->putFile($storageFolder, $file);
 
             Slide::create([
                 "folder_id" => $folder->id,
+                "key_topic_id" => $topic->id,
                 "type" => $type,
                 "file_path" => $path,
                 "order" => $lastOrder + $index + 1
@@ -104,7 +111,7 @@ class SlideController extends Controller
 
     public function previewFolder(Folder $folder): Response
     {
-        $folder->load("slides");
+        $folder->load("slides.keyTopic");
 
         return Inertia::render("Admin/Slides/Preview", [
             "folder" => $folder,
@@ -112,17 +119,18 @@ class SlideController extends Controller
                 "id" => $slide->id,
                 "type" => $slide->type,
                 "file_url" => $slide->fileUrl(),
-                "order" => $slide->order
+                "order" => $slide->order,
+                "topic_name" => $slide->keyTopic->label
             ])
         ]);
     }
 
-    private function storagePath(Folder $folder): string
+    private function storagePath(Folder $folder, FolderKeyTopic $topic): string
     {
-        if ($folder->job_position_id) {
-            return "folders/" . $folder->company->slug . "/job-positions/" . $folder->jobPosition->slug . "/" . $folder->slug;
-        }
+        $base = $folder->jobPosition_id
+            ? "folders/" . $folder->company->slug . "/job-positions/" . $folder->jobPosition->slug . "/" . $folder->slug
+            : "folders/" . $folder->company->slug . "/" . $folder->slug;
 
-        return "folders/" . $folder->company->slug . "/" . $folder->slug;
+        return $base . "/" . str($topic->label)->slug();
     }
 }

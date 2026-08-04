@@ -21,14 +21,14 @@ class FolderController extends Controller
         $companyWideFolders = Folder::forCompany($company->id)
             ->companyWide()
             ->ordered()
-            ->withCount("slides")
+            ->withCount("keyTopics")
             ->get();
 
         $company->load("jobs:id,name,slug");
 
         $jobSpecificFolders = Folder::forCompany($company->id)
             ->whereNotNull("job_position_id")
-            ->get(["id", "job_position_id", "order", "name", "key_topics"]);
+            ->get(["id", "job_position_id", "order", "name"]);
         
         $firstJobSpecific = $jobSpecificFolders->first();
         
@@ -36,16 +36,10 @@ class FolderController extends Controller
             "total_positions" => $company->jobs->count(),
             "order" => $firstJobSpecific?->order ?? ($companyWideFolders->max("order") + 1 ?? 1),
             "name" => $firstJobSpecific?->name ?? "Job-Specific Training",
-            "key_topics" => $firstJobSpecific?->key_topics ?? []
         ] : null;
 
-        return Inertia::render("Admin/Folders/Company", [
-            "company" => [
-                "id" => $company->id,
-                "name" => $company->name,
-                "slug" => $company->slug,
-                "jobs" => $company->jobs
-            ],
+        return Inertia::render("Admin/Folders/Empty", [
+            "company" => $company,
             "companyWideFolders" => $companyWideFolders,
             "jobSpecificSummary" => $jobSpecificSummary
         ]); 
@@ -89,7 +83,7 @@ class FolderController extends Controller
             "name" => ["required", "string", "max:255"],
             "company_id" => ["required", "exists:companies,id"],
             "key_topics" => ["nullable", "array"],
-            "key_topics.*" => ["required", "string", "max:255"]
+            "key_topics.*" => ["nullable", "string", "max:255"]
         ]);
 
         $lastOrder = Folder::forCompany($validated["company_id"])
@@ -167,11 +161,9 @@ class FolderController extends Controller
 
     public function destroy(Folder $folder): RedirectResponse
     {
-        $folder->slides->each(function (Slide $slide) {
-            Storage::disk(config("filesystems.default"))
-                ->delete($slide->file_path);
+        Slide::where("folder_id", $folder->id)->get()->each(function (Slide $slide) {
+            Storage::disk(config("filesystems.default"))->delete($slide->file_path);
         });
-
         $folder->delete();
     
         return back()->with("success", "Folder deleted successfully");

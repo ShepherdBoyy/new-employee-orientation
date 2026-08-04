@@ -9,6 +9,7 @@ class Slide extends Model
 {
     protected $fillable = [
         "folder_id",
+        "key_topic_id",
         "type",
         "file_path",
         "order"
@@ -43,5 +44,10 @@ class Slide extends Model
     public function folder(): BelongsTo
     {
         return $this->belongsTo(Folder::class);
+    }
+
+    public function keyTopic(): BelongsTo
+    {
+        return $this->belongsTo(FolderKeyTopic::class);
     }
 }

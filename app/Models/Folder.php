@@ -13,7 +13,6 @@ class Folder extends Model
         "company_id",
         "job_position_id",
         "name",
-        "key_topics",
         "slug",
         "order"
     ];
@@ -22,9 +21,9 @@ class Folder extends Model
     {
         return [
             "order" => "integer",
-            "key_topics" => "array"
         ];
     }
+    
 
     protected static function booted(): void
     {
@@ -56,6 +55,11 @@ class Folder extends Model
         }
 
         return $slug;
+    }
+
+    public function hasKeyTopics(): bool
+    {
+        return $this->keyTopics()->exists();
     }
 
     public const DEFAULT_JOB_SPECIFIC_KEY_TOPICS = [
@@ -123,11 +127,6 @@ class Folder extends Model
         return $this->slides()->count();
     }
 
-    public function keyTopicsList(): array
-    {
-        return $this->key_topics ?? [];
-    }
-
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -136,6 +135,11 @@ class Folder extends Model
     public function jobPosition(): BelongsTo
     {
         return $this->belongsTo(JobPosition::class);
+    }
+
+    public function keyTopics(): HasMany
+    {
+        return $this->hasMany(FolderKeyTopic::class)->orderBy("order");
     }
 
     public function slides(): HasMany
