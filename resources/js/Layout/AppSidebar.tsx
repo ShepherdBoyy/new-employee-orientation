@@ -75,7 +75,7 @@ export function AppSidebar({}) {
     ];
 
     return (
-        <Sidebar variant="inset" collapsible="icon" className="">
+        <Sidebar variant="floating" collapsible="icon" className="">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -103,7 +103,7 @@ export function AppSidebar({}) {
                     switch (item.type) {
                         case "link":
                             return (
-                                <SidebarNavItem key={item.links} item={item} />
+                                <SidebarNavItem key={item.title} item={item} />
                             );
 
                         case "group":

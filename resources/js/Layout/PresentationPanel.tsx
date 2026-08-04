@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/item";
 import { Folder, CirclePlus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Link } from "@inertiajs/react";
 export default function PresentationPanel() {
     const { url, props } = usePage();
 
@@ -26,8 +26,8 @@ export default function PresentationPanel() {
     const modules = mockModules[company.slug] ?? [];
 
     return (
-        <aside className="h-full  w-80 shrink-0 rounded-xl flex-1 ">
-            <div className="px-4 py-6">
+        <aside className="h-full w-80 shrink-0 rounded-xl flex-1">
+            <div className="p-4">
                 <h2 className="font-semibold text-lg">{company.name}</h2>
 
                 <p className="text-sm text-muted-foreground">Presentation</p>
@@ -40,40 +40,45 @@ export default function PresentationPanel() {
                 </Button>
 
                 {modules.map((module) => (
-                    <Item
+                    <Link
                         key={module.id}
-                        className="group rounded-xl transition-all duration-200 hover:bg-amber-100/55 hover:translate-x-1"
+                        href={`/admin/folders/${company.slug}/${module.slug}`}
                     >
-                        <ItemMedia variant="icon">
-                            <Folder className="text-primary" />
-                        </ItemMedia>
+                        <Item
+                            size="xs"
+                            className="group rounded-xl transition-all duration-200 hover:bg-amber-100/55 hover:translate-x-1"
+                        >
+                            <ItemMedia variant="icon">
+                                <Folder className="text-primary" />
+                            </ItemMedia>
 
-                        <ItemContent>
-                            <ItemTitle>{module.name}</ItemTitle>
+                            <ItemContent>
+                                <ItemTitle>{module.name}</ItemTitle>
 
-                            <ItemDescription className="text-xs">
-                                {module.topics_count} Topics
-                            </ItemDescription>
-                        </ItemContent>
+                                <ItemDescription className="text-xs">
+                                    {module.topics_count} Topics
+                                </ItemDescription>
+                            </ItemContent>
 
-                        <ItemActions className="opacity-0 -translate-x-2 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-4 w-4"
-                            >
-                                <Pencil className="h-3.5 w-3.5" />
-                            </Button>
+                            <ItemActions className="opacity-0 -translate-x-2 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-4 w-4"
+                                >
+                                    <Pencil className="h-3.5 w-3.5" />
+                                </Button>
 
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7 text-destructive  hover:text-destructive"
-                            >
-                                <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                        </ItemActions>
-                    </Item>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 text-destructive  hover:text-destructive"
+                                >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                            </ItemActions>
+                        </Item>
+                    </Link>
                 ))}
             </div>
         </aside>

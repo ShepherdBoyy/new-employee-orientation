@@ -39,11 +39,11 @@ export default function Master({ children }: MasterProps) {
                 <div className="">
                     <SidebarProvider className="h-svh overflow-hidden bg-[#FEFEFA]">
                         <AppSidebar />
-                        <div className="flex flex-1 gap-2  p-2">
+                        <div className="flex flex-1 gap-3 p-2">
                             <AnimatePresence mode="wait">
                                 {showPresentationSidebar && (
                                     <motion.div
-                                        className="px-1"
+                                        className=""
                                         key="presentation-panel"
                                         initial={{
                                             x: -24,
