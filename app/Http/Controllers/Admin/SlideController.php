@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\Folder;
 use App\Models\FolderKeyTopic;
 use App\Models\Slide;
+use App\Support\PresentationPanelData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -25,6 +26,7 @@ class SlideController extends Controller
         $folder->load("company:id,name,slug", "jobPosition:id,name,slug");
 
         return Inertia::render("Admin/Slides/Index", [
+            "company" => $company,
             "folder" => [
                 "id" => $folder->id,
                 "name" => $folder->name,
@@ -38,7 +40,8 @@ class SlideController extends Controller
                 "type" => $slide->type,
                 "file_url" => $slide->file_path,
                 "order" => $slide->order
-            ])
+            ]),
+            ...PresentationPanelData::build($company)
         ]);
     }
 
