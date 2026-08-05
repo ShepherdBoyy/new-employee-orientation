@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Folder;
 use App\Models\FolderKeyTopic;
 use App\Models\Slide;
@@ -14,10 +15,10 @@ use Storage;
 
 class SlideController extends Controller
 {
-    public function index(Folder $folder, FolderKeyTopic $topic): Response
+    public function index(Company $company, Folder $folder, FolderKeyTopic $topic): Response
     {
         $slides = Slide::where("folder_id", $folder->id)
-            ->where("key_topic_id", $topic->id)
+            ->where("folder_key_topic_id", $topic->id)
             ->orderBy("order")
             ->get();
 

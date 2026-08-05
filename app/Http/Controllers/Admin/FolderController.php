@@ -55,7 +55,7 @@ class FolderController extends Controller
     {
         $folder = Folder::ensureJobSpecificFolder($company->id, $jobPosition->id);
 
-        return redirect()->route("admin.slides.index", $folder->slug);
+        return redirect()->route("admin.folders.topics.slides.index", $folder->slug);
     }
 
     public function store(Request $request): RedirectResponse
