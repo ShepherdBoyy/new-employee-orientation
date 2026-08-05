@@ -83,10 +83,7 @@ const statusMap = {
     },
 };
 
-export default function Employees({
-    employees: initialEmployees,
-    companies,
-}: Props) {
+function Employees({ employees: initialEmployees, companies }: Props) {
     const [employees, setEmployees] = useState(initialEmployees);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<Employee | null>(
@@ -171,9 +168,8 @@ export default function Employees({
     function isExpired(expiresAt: string | null) {
         return expiresAt ? new Date(expiresAt) < new Date() : false;
     }
-
     return (
-        <Master>
+        <>
             <div className="w-full space-y-6">
                 <div className="flex items-center justify-between border-b pb-5">
                     <div>
@@ -538,6 +534,10 @@ export default function Employees({
                 employee={viewingEmployee}
                 onClose={() => setViewingEmployee(null)}
             />
-        </Master>
+        </>
     );
 }
+
+Employees.layout = (page: React.ReactNode) => <Master>{page}</Master>;
+
+export default Employees;

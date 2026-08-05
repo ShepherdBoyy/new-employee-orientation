@@ -21,7 +21,7 @@ interface Props {
     companies: CompanyWithJobCount[];
 }
 
-export default function CompaniesIndex({ companies }: Props) {
+function CompaniesIndex({ companies }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
     const [editingCompany, setEditingCompany] =
         useState<CompanyWithJobCount | null>(null);
@@ -86,103 +86,104 @@ export default function CompaniesIndex({ companies }: Props) {
     }
     return (
         <>
-            <Master>
-                {companies.length > 0 ? (
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h1 className="text-2xl font-semibold tracking-tight">
-                                    Company
-                                </h1>
-                                <p className="text-sm text-muted-foreground mt-1">
-                                    Reusable roles that can later be assigned to
-                                    one or more companies.
-                                </p>
-                            </div>
+            {companies.length > 0 ? (
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-2xl font-semibold tracking-tight">
+                                Company
+                            </h1>
+                            <p className="text-sm text-muted-foreground mt-1">
+                                Reusable roles that can later be assigned to one
+                                or more companies.
+                            </p>
                         </div>
-                        <Separator />
-                        <div className="">
-                            <CreateCompanyDialog
-                                open={createOpen}
-                                onOpenChange={(open) => {
-                                    setCreateOpen(open);
+                    </div>
+                    <Separator />
+                    <div className="">
+                        <CreateCompanyDialog
+                            open={createOpen}
+                            onOpenChange={(open) => {
+                                setCreateOpen(open);
 
-                                    if (!open) {
-                                        createForm.reset();
-                                        createForm.clearErrors();
-                                    }
-                                }}
-                                form={createForm}
-                                onSubmit={handleCreate}
-                                onClose={() => setCreateOpen(false)}
-                            />
-                        </div>
-
-                        <div className="grid lg:grid-cols-3 gap-4 mt-4">
-                            {companies.map((company) => (
-                                <CompanyCard
-                                    key={company.id}
-                                    company={company}
-                                    onEdit={(company) => {
-                                        setEditingCompany(company);
-                                    }}
-                                    onDelete={(company) => {
-                                        setCompanyToDelete(company);
-                                    }}
-                                />
-                            ))}
-                        </div>
-
-                        {/* Edit */}
-                        <EditCompanyDialog
-                            company={editingCompany}
-                            form={editForm}
-                            onSubmit={handleUpdate}
-                            onClose={() => {
-                                setEditingCompany(null);
-                                editForm.reset();
-                                editForm.clearErrors();
+                                if (!open) {
+                                    createForm.reset();
+                                    createForm.clearErrors();
+                                }
                             }}
-                        />
-                        {/* Delete */}
-                        <DeleteCompanyDialog
-                            company={companyToDelete}
-                            onClose={() => setCompanyToDelete(null)}
-                            onConfirm={confirmDelete}
+                            form={createForm}
+                            onSubmit={handleCreate}
+                            onClose={() => setCreateOpen(false)}
                         />
                     </div>
-                ) : (
-                    <Empty className="h-full">
-                        <EmptyHeader>
-                            <EmptyMedia variant="icon">
-                                <BrushCleaning className="" />
-                            </EmptyMedia>
-                            <EmptyTitle className="text-2xl">
-                                No companies found
-                            </EmptyTitle>
-                            <EmptyDescription>
-                                Add your first company to start setting up your
-                                workspace.
-                            </EmptyDescription>
-                        </EmptyHeader>
-                        <EmptyContent>
-                            <CreateCompanyDialog
-                                open={createOpen}
-                                onOpenChange={(open) => {
-                                    setCreateOpen(open);
 
-                                    if (!open) {
-                                        createForm.reset();
-                                        createForm.clearErrors();
-                                    }
+                    <div className="grid lg:grid-cols-3 gap-4 mt-4">
+                        {companies.map((company) => (
+                            <CompanyCard
+                                key={company.id}
+                                company={company}
+                                onEdit={(company) => {
+                                    setEditingCompany(company);
                                 }}
-                                form={createForm}
-                                onSubmit={handleCreate}
+                                onDelete={(company) => {
+                                    setCompanyToDelete(company);
+                                }}
                             />
-                        </EmptyContent>
-                    </Empty>
-                )}
-            </Master>
+                        ))}
+                    </div>
+
+                    {/* Edit */}
+                    <EditCompanyDialog
+                        company={editingCompany}
+                        form={editForm}
+                        onSubmit={handleUpdate}
+                        onClose={() => {
+                            setEditingCompany(null);
+                            editForm.reset();
+                            editForm.clearErrors();
+                        }}
+                    />
+                    {/* Delete */}
+                    <DeleteCompanyDialog
+                        company={companyToDelete}
+                        onClose={() => setCompanyToDelete(null)}
+                        onConfirm={confirmDelete}
+                    />
+                </div>
+            ) : (
+                <Empty className="h-full">
+                    <EmptyHeader>
+                        <EmptyMedia variant="icon">
+                            <BrushCleaning className="" />
+                        </EmptyMedia>
+                        <EmptyTitle className="text-2xl">
+                            No companies found
+                        </EmptyTitle>
+                        <EmptyDescription>
+                            Add your first company to start setting up your
+                            workspace.
+                        </EmptyDescription>
+                    </EmptyHeader>
+                    <EmptyContent>
+                        <CreateCompanyDialog
+                            open={createOpen}
+                            onOpenChange={(open) => {
+                                setCreateOpen(open);
+
+                                if (!open) {
+                                    createForm.reset();
+                                    createForm.clearErrors();
+                                }
+                            }}
+                            form={createForm}
+                            onSubmit={handleCreate}
+                        />
+                    </EmptyContent>
+                </Empty>
+            )}
         </>
     );
 }
+
+CompaniesIndex.layout = (page: React.ReactNode) => <Master>{page}</Master>;
+export default CompaniesIndex;

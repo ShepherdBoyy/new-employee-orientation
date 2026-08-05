@@ -44,7 +44,7 @@ interface Props {
     admins: Admin[];
 }
 
-export default function Admins({ admins: initialAdmins }: Props) {
+function Admins({ admins: initialAdmins }: Props) {
     const [admins, setAdmins] = useState(initialAdmins);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
@@ -98,9 +98,8 @@ export default function Admins({ admins: initialAdmins }: Props) {
             setDeletingAdmin(null);
         }
     }
-
     return (
-        <Master>
+        <>
             <div className="w-full space-y-6 ">
                 <div className="flex items-center justify-between border-b pb-5">
                     <div>
@@ -289,6 +288,10 @@ export default function Admins({ admins: initialAdmins }: Props) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-        </Master>
+        </>
     );
 }
+
+Admins.layout = (page: React.ReactNode) => <Master>{page}</Master>;
+
+export default Admins;

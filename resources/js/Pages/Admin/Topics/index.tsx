@@ -1,9 +1,13 @@
 import Master from "@/Layout/Master";
-
-export default function Index({}) {
+import TopicCard from "./component/TopicCard";
+function Index({ topics }) {
     return (
-        <Master>
-            <div>Empty State</div>
-        </Master>
+        <>
+            <TopicCard topics={topics} />
+        </>
     );
 }
+
+Index.layout = (page: React.ReactNode) => <Master>{page}</Master>;
+
+export default Index;

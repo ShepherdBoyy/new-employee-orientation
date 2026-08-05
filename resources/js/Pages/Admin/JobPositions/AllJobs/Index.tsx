@@ -14,7 +14,8 @@ import type { Paginated } from "../../Types/job-position";
 type Props = {
     jobs: Paginated<JobPosition>;
 };
-export default function Index({ jobs }: Props) {
+
+function Index({ jobs }: Props) {
     function handleDelete() {
         if (!deletingJob) return;
 
@@ -67,7 +68,7 @@ export default function Index({ jobs }: Props) {
         }
     }
     return (
-        <Master>
+        <>
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
@@ -126,19 +127,23 @@ export default function Index({ jobs }: Props) {
                     job={editingJob}
                     onClose={() => setEditingJob(null)}
                 />
-                {deletingJob && <DeleteJobDialog
-                    job={deletingJob}
-                    onClose={() => setDeletingJob(null)}
-                    onConfirm={handleDelete}
-                />}
+                {deletingJob && (
+                    <DeleteJobDialog
+                        job={deletingJob}
+                        onClose={() => setDeletingJob(null)}
+                        onConfirm={handleDelete}
+                    />
+                )}
                 <DeleteSelectedJobs
                     ids={selectedJobIds}
                     setIds={setSelectedJobIds}
                     open={deleteSelectedOpen}
                     onClose={() => setDeleteSelectedOpen(false)}
                 />
-                
             </div>
-        </Master>
+        </>
     );
 }
+
+Index.layout = (page: React.ReactNode) => <Master>{page}</Master>;
+export default Index;
