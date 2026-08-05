@@ -21,30 +21,32 @@ import PresentationPanel from "./PresentationPanel";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ChevronsUpDown, LogOut } from "lucide-react";
 import { AnimatePresence, motion, LayoutGroup } from "motion/react";
+import type { PageProps } from "./PresentationPanel";
 type MasterProps = {
     children: React.ReactNode;
     id: number;
     name: string;
     email: string;
 };
+
 export default function Master({ children }: MasterProps) {
-    const { url } = usePage();
     const user = usePage().props.auth.user as MasterProps;
 
-    const showPresentationSidebar = url.startsWith("/admin/folders");
+    const { props } = usePage<PageProps>();
+    const company = props.company;
+    const showPresentationPanel = company?.slug ?? "none";
 
     return (
         <>
             <TooltipProvider>
                 <div className="">
-                    <SidebarProvider className="h-svh overflow-hidden bg-[#FEFEFA]">
+                    <SidebarProvider className="h-svh overflow-hidden bg-[#414A4C]">
                         <AppSidebar />
                         <div className="flex flex-1 gap-3 p-2">
                             <AnimatePresence mode="wait">
-                                {showPresentationSidebar && (
+                                {company && (
                                     <motion.div
-                                        className=""
-                                        key="presentation-panel"
+                                        key={showPresentationPanel}
                                         initial={{
                                             x: -24,
                                             opacity: 0,
@@ -67,7 +69,7 @@ export default function Master({ children }: MasterProps) {
                                 )}
                             </AnimatePresence>
 
-                            <div className="flex h-full flex-1 flex-col overflow-hidden rounded-xl  bg-background border">
+                            <div className="flex h-full flex-1 flex-col overflow-hidden rounded-xl  bg-background border shadow-xl">
                                 <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-background px-6">
                                     <div className="flex items-center gap-3">
                                         <SidebarTrigger />

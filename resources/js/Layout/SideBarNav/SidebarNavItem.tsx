@@ -37,7 +37,7 @@ export default function SidebarNavItem({ item }: SidebarNavItemProps) {
                                             className={cn(
                                                 "relative transition-all duration-200 rounded-lg hover:bg-muted hover:translate-x-1",
                                                 isActive
-                                                    ? "border border-primary/20 bg-primary/8 text-primary"
+                                                    ? "border border-primary/20 bg-primary/8 text-primary "
                                                     : "hover:bg-muted",
                                             )}
                                         >

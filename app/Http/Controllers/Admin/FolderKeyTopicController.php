@@ -19,6 +19,7 @@ class FolderKeyTopicController extends Controller
         $folder->load("company:id,name,slug", "jobPosition:id,name,slug");
 
         $topics = $folder->keyTopics()
+            ->with("folder:id,name")
             ->withCount("slides")
             ->ordered()
             ->get();
