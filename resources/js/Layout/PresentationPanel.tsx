@@ -1,4 +1,5 @@
 import { usePage } from "@inertiajs/react";
+import { useState } from "react";
 import type {
     CompanyNav,
     JobSpecificSummary,
@@ -27,6 +28,7 @@ import {
     UsersRound,
     EllipsisVertical,
 } from "lucide-react";
+import CreateFolderDialog from "@/Pages/Admin/Folders/components/CreateFolderDialog";
 import { Button } from "@/components/ui/button";
 import { Link } from "@inertiajs/react";
 import { cn } from "@/lib/utils";
@@ -44,7 +46,8 @@ export interface PageProps {
 }
 
 export default function PresentationPanel() {
-    const { props } = usePage<PageProps>();
+    const [createDialogOpen, setCreateDialogOpen] = useState(false);
+    const { props, url } = usePage<PageProps>();
 
     const companyWideFolders = props.companyWideFolders ?? [];
     const jobSpecificSummary = props.jobSpecificSummary ?? null;
@@ -74,11 +77,15 @@ export default function PresentationPanel() {
     };
 
     const items = buildItems(companyWideFolders);
+    const jobPositionsPath = `/admin/folders/${company.slug}/job-positions`;
 
+    function openCreate() {
+        setCreateDialogOpen(true);
+    }
     return (
-        <aside className="h-full  rounded-xl flex-1 overflow-auto text-white flex flex-col p-3 space-y-3">
+        <aside className="h-full  rounded-xl flex-1 overflow-auto text-white flex flex-col space-y-3">
             <div className="px-3 pt-3 pb-1">
-                <h2 className="font-semibold text-base tracking-tight">
+                <h2 className="font-medium text-lg tracking-tight">
                     {company.name}
                 </h2>
                 <p className="text-xs text-white/60 font-medium uppercase tracking-wider mt-0.5">
@@ -90,22 +97,32 @@ export default function PresentationPanel() {
                 <Button
                     variant="ghost"
                     size="lg"
-                    className="w-full justify-start gap-2 text-white/90 hover:text-white hover:bg-white/10 rounded-lg h-9"
+                    className="w-full justify-start gap-2 text-white/90 hover:text-white hover:bg-white/10 rounded-lg h-10"
+                    onClick={() => openCreate()}
                 >
-                    <CirclePlus className="h-6 w-6 text-primary" />
-                    <span className=" font-medium">New Folder</span>
+                    <CirclePlus
+                        absoluteStrokeWidth
+                        strokeWidth={1.7}
+                        className="size-5 text-white"
+                    />
+                    <span className="font-medium">Create Module</span>
                 </Button>
+                <CreateFolderDialog
+                    open={createDialogOpen}
+                    onClose={() => setCreateDialogOpen(false)}
+                    companyId={company.id}
+                />
             </div>
 
             <div className="space-y-1 overflow-y-auto flex-1">
                 {items.map((item) => {
                     const isJobSpecific = item.type === "job-specific";
                     const active = isJobSpecific
-                        ? false
+                        ? url === jobPositionsPath
                         : activeFolderSlug === item.folder.slug;
 
                     const href = isJobSpecific
-                        ? `/admin/folders/${company.slug}/job-positions`
+                        ? jobPositionsPath
                         : `/admin/folders/${company.slug}/${item.folder.slug}`;
 
                     const title = isJobSpecific
@@ -206,7 +223,10 @@ export default function PresentationPanel() {
 
                                             <DropdownMenuSeparator />
 
-                                            <DropdownMenuItem className="text-xs text-destructive focus:text-destructive">
+                                            <DropdownMenuItem
+                                                variant="destructive"
+                                                className="text-xs text-destructive focus:text-destructive"
+                                            >
                                                 <Trash2 className="mr-2 h-3.5 w-3.5" />
                                                 Delete
                                             </DropdownMenuItem>
