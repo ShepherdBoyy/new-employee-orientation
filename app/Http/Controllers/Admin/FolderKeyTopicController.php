@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Folder;
 use App\Models\FolderKeyTopic;
+use App\Support\PresentationPanelData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -22,35 +23,11 @@ class FolderKeyTopicController extends Controller
             ->ordered()
             ->get();
 
-        $company = $folder->company;
-
-        $companyWideFolders = Folder::forCompany($company->id)
-            ->companyWide()
-            ->ordered()
-            ->withCount("keyTopics")
-            ->get();
-
-        $company->load("jobs:id,name,slug");
-
-        $jobSpecificFolders = Folder::forCompany($company->id)
-            ->whereNotNull("job_position_id")
-            ->get(["id", "job_position_id", "order", "name"]);
-
-        $firstJobSpecific = $jobSpecificFolders->first();
-
-        $jobSpecificSummary = $company->jobs->isNotEmpty() ? [
-            "total_positions" => $company->jobs->count(),
-            "folders_created" => $jobSpecificFolders->count(),
-            "order" => $firstJobSpecific?->order ?? ($companyWideFolders->max("order") + 1 ?? 1),
-            "name" => $firstJobSpecific?->name ?? "Job-Specific Training"
-        ] : null;
-
         return Inertia::render("Admin/Topics/Index", [
             "company" => $company,
-            "companyWideFolders" => $companyWideFolders,
-            "jobSpecificSummary" => $jobSpecificSummary,
             "activeFolder" => $folder,
             "topics" => $topics,
+            ...PresentationPanelData::build($company)
         ]);
     }
 

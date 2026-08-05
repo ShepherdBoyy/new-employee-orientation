@@ -8,6 +8,7 @@ use App\Models\Folder;
 use App\Models\JobPosition;
 use App\Models\Slide;
 use App\Models\User;
+use App\Support\PresentationPanelData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -18,30 +19,9 @@ class FolderController extends Controller
 {
     public function companyIndex(Company $company): Response
     {
-        $companyWideFolders = Folder::forCompany($company->id)
-            ->companyWide()
-            ->ordered()
-            ->withCount("keyTopics")
-            ->get();
-
-        $company->load("jobs:id,name,slug");
-
-        $jobSpecificFolders = Folder::forCompany($company->id)
-            ->whereNotNull("job_position_id")
-            ->get(["id", "job_position_id", "order", "name"]);
-        
-        $firstJobSpecific = $jobSpecificFolders->first();
-        
-        $jobSpecificSummary = $company->jobs->isNotEmpty() ? [
-            "total_positions" => $company->jobs->count(),
-            "order" => $firstJobSpecific?->order ?? ($companyWideFolders->max("order") + 1 ?? 1),
-            "name" => $firstJobSpecific?->name ?? "Job-Specific Training",
-        ] : null;
-
         return Inertia::render("Admin/Folders/Empty", [
             "company" => $company,
-            "companyWideFolders" => $companyWideFolders,
-            "jobSpecificSummary" => $jobSpecificSummary
+            ...PresentationPanelData::build($company)
         ]); 
     }
 
@@ -66,7 +46,8 @@ class FolderController extends Controller
 
         return Inertia::render("Admin/Folders/JobPositionPicker", [
             "company" => $company,
-            "positions" => $positions
+            "positions" => $positions,
+            ...PresentationPanelData::build($company)
         ]);
     }
 
