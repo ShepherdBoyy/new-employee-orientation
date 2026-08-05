@@ -40,7 +40,7 @@ export default function Master({ children }: MasterProps) {
         <>
             <TooltipProvider>
                 <div className="">
-                    <SidebarProvider className="h-svh overflow-hidden bg-[#414A4C]">
+                    <SidebarProvider className="h-svh overflow-hidden bg-linear-to-r from-slate-900 via-slate-800 to-slate-900">
                         <AppSidebar />
                         <div className="flex flex-1 gap-3 p-2">
                             <AnimatePresence mode="wait">

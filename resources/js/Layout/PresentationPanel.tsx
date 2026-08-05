@@ -29,8 +29,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@inertiajs/react";
-import { useEffect, useState } from "react";
-import CreateFolderDialog from "@/Pages/Admin/Folders/components/CreateFolderDialog";
 import { cn } from "@/lib/utils";
 
 type GridItem =
@@ -51,10 +49,10 @@ export default function PresentationPanel() {
     const companyWideFolders = props.companyWideFolders ?? [];
     const jobSpecificSummary = props.jobSpecificSummary ?? null;
     const activeFolderSlug = props.activeFolder?.slug;
-
     const company = props.company;
 
     if (!company) return null;
+
     const buildItems = (folders: ModuleNav[]): GridItem[] => {
         const items: GridItem[] = folders.map((folder) => ({
             type: "folder",
@@ -75,184 +73,148 @@ export default function PresentationPanel() {
         return items;
     };
 
-    const [items, setItems] = useState<GridItem[]>(() =>
-        buildItems(companyWideFolders),
-    );
-
-    useEffect(() => {
-        setItems(buildItems(companyWideFolders));
-    }, [companyWideFolders, jobSpecificSummary]);
+    const items = buildItems(companyWideFolders);
 
     return (
-        <aside className="h-full w-85 shrink-0 rounded-xl flex-1 overflow-auto text-white">
-            <div className="p-6">
-                <h2 className="font-semibold text-lg">{company.name}</h2>
-
-                <p className="text-sm text-muted-foreground">Presentation</p>
+        <aside className="h-full  rounded-xl flex-1 overflow-auto text-white flex flex-col p-3 space-y-3">
+            <div className="px-3 pt-3 pb-1">
+                <h2 className="font-semibold text-base tracking-tight">
+                    {company.name}
+                </h2>
+                <p className="text-xs text-white/60 font-medium uppercase tracking-wider mt-0.5">
+                    Presentation
+                </p>
             </div>
 
-            <div className="space-y-2">
-                {/* <CreateFolderDialog
-                    open={createDialogOpen}
-                    onClose={() => setCreateDialogOpen(false)}
-                    companyId={company.id}
-                /> */}
-                <Button variant="ghost" size="lg" className="gap-2">
-                    <CirclePlus />
-                    New Folder
+            <div className="px-1">
+                <Button
+                    variant="ghost"
+                    size="lg"
+                    className="w-full justify-start gap-2 text-white/90 hover:text-white hover:bg-white/10 rounded-lg h-9"
+                >
+                    <CirclePlus className="h-6 w-6 text-primary" />
+                    <span className=" font-medium">New Folder</span>
                 </Button>
+            </div>
 
+            <div className="space-y-1 overflow-y-auto flex-1">
                 {items.map((item) => {
-                    if (item.type !== "folder") {
-                        return (
-                            <div>
-                                <Link
-                                    key={item.id}
-                                    href={`/admin/folders/${company.slug}/job-positions`}
-                                >
-                                    <Item className="group relative overflow-hidden rounded-xl transition-all duration-200 hover:bg-background">
-                                        <ItemMedia>
-                                            <UsersRound className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-foreground" />
-                                        </ItemMedia>
+                    const isJobSpecific = item.type === "job-specific";
+                    const active = isJobSpecific
+                        ? false
+                        : activeFolderSlug === item.folder.slug;
 
-                                        <ItemContent className="ml-2">
-                                            <ItemTitle>
-                                                {jobSpecificSummary?.name}
-                                            </ItemTitle>
+                    const href = isJobSpecific
+                        ? `/admin/folders/${company.slug}/job-positions`
+                        : `/admin/folders/${company.slug}/${item.folder.slug}`;
 
-                                            <ItemDescription className="text-[11px] text-muted-foreground/50">
-                                                {
-                                                    jobSpecificSummary?.total_positions
-                                                }{" "}
-                                                positions
-                                            </ItemDescription>
-                                        </ItemContent>
+                    const title = isJobSpecific
+                        ? jobSpecificSummary?.name
+                        : item.folder.name;
 
-                                        <ItemActions className="opacity-0 translate-x-2 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8 rounded-lg"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                        }}
-                                                    >
-                                                        <EllipsisVertical className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
+                    const description = isJobSpecific
+                        ? `${jobSpecificSummary?.total_positions ?? 0} positions`
+                        : `${item.folder.key_topics_count} topics`;
 
-                                                <DropdownMenuContent
-                                                    align="end"
-                                                    className="w-44"
-                                                >
-                                                    <DropdownMenuItem>
-                                                        <Pencil className="mr-2 h-4 w-4" />
-                                                        Edit
-                                                    </DropdownMenuItem>
-
-                                                    <DropdownMenuSeparator />
-
-                                                    <DropdownMenuItem
-                                                        variant="destructive"
-                                                        className="text-destructive focus:text-destructive"
-                                                    >
-                                                        <Trash2 className="mr-2 h-4 w-4" />
-                                                        Delete
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </ItemActions>
-                                    </Item>
-                                </Link>
-                            </div>
-                        );
-                    }
-                    const active = activeFolderSlug === item.folder.slug;
                     return (
-                        <div>
-                            <Link
-                                key={item.id}
-                                href={`/admin/folders/${company.slug}/${item.folder.slug}`}
+                        <Link key={item.id} href={href} className="block group">
+                            <Item
+                                className={cn(
+                                    "relative flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-150",
+                                    active
+                                        ? "bg-white text-slate-900 shadow-sm"
+                                        : "border-transparent hover:bg-white/5 text-white/80 hover:text-white",
+                                )}
                             >
-                                <Item
-                                    className={cn(
-                                        "relative group overflow-hidden rounded-xl transition-all duration-200",
-                                        active
-                                            ? "bg-background text-black"
-                                            : "border-transparent hover:bg-sidebar hover:text-black",
-                                    )}
-                                >
-                                    <ItemMedia>
-                                        <Folder
-                                            className={cn(
-                                                "h-5 w-5 transition-colors",
-                                                active
-                                                    ? "text-primary"
-                                                    : "text-muted-foreground group-hover:text-foreground",
-                                            )}
-                                        />
-                                    </ItemMedia>
-
-                                    <ItemContent className="ml-2">
-                                        <ItemTitle className="">
-                                            {item.folder.name}
-                                        </ItemTitle>
-
-                                        <ItemDescription className="text-[11px] text-muted-foreground/80">
-                                            {item.folder.key_topics_count}{" "}
-                                            topics
-                                        </ItemDescription>
-                                    </ItemContent>
-
-                                    <ItemActions
+                                <ItemMedia>
+                                    <div
                                         className={cn(
-                                            "transition-all duration-200",
+                                            "p-2 rounded-lg transition-colors",
                                             active
-                                                ? "opacity-100 translate-x-0"
-                                                : "opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0",
+                                                ? "bg-primary/10 text-primary"
+                                                : "bg-white/5 text-white/70 group-hover:bg-white/10 group-hover:text-white",
                                         )}
                                     >
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 rounded-lg"
-                                                    onClick={(e) =>
-                                                        e.preventDefault()
-                                                    }
-                                                >
-                                                    <EllipsisVertical className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
+                                        {isJobSpecific ? (
+                                            <UsersRound className="h-4 w-4" />
+                                        ) : (
+                                            <Folder className="h-4 w-4" />
+                                        )}
+                                    </div>
+                                </ItemMedia>
 
-                                            <DropdownMenuContent
-                                                align="end"
-                                                className="w-44"
+                                <ItemContent className="ml-3 min-w-0 flex-1">
+                                    <ItemTitle
+                                        className={cn(
+                                            " truncate",
+                                            active
+                                                ? "font-semibold text-slate-900"
+                                                : "font-medium text-white",
+                                        )}
+                                    >
+                                        {title}
+                                    </ItemTitle>
+
+                                    <ItemDescription
+                                        className={cn(
+                                            "text-[12px] truncate mt-0.5",
+                                            active
+                                                ? "text-slate-500"
+                                                : "text-white/50",
+                                        )}
+                                    >
+                                        {description}
+                                    </ItemDescription>
+                                </ItemContent>
+
+                                <ItemActions
+                                    className={cn(
+                                        "shrink-0 ml-2 transition-opacity duration-150",
+                                        active
+                                            ? "opacity-100"
+                                            : "opacity-0 group-hover:opacity-100",
+                                    )}
+                                >
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className={cn(
+                                                    "h-7 w-7 rounded-md",
+                                                    active
+                                                        ? "hover:bg-slate-100 text-slate-600"
+                                                        : "hover:bg-white/10 text-white/70 hover:text-white",
+                                                )}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                }}
                                             >
-                                                <DropdownMenuItem>
-                                                    <Pencil className="mr-2 h-4 w-4" />
-                                                    Edit
-                                                </DropdownMenuItem>
+                                                <EllipsisVertical className="h-3.5 w-3.5" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
 
-                                                <DropdownMenuSeparator />
+                                        <DropdownMenuContent
+                                            align="end"
+                                            className="w-40 shadow-lg"
+                                        >
+                                            <DropdownMenuItem className="text-xs">
+                                                <Pencil className="mr-2 h-3.5 w-3.5" />
+                                                Edit
+                                            </DropdownMenuItem>
 
-                                                <DropdownMenuItem
-                                                    variant="destructive"
-                                                    className="text-destructive focus:text-destructive"
-                                                >
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    Delete
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </ItemActions>
-                                </Item>
-                            </Link>
-                        </div>
+                                            <DropdownMenuSeparator />
+
+                                            <DropdownMenuItem className="text-xs text-destructive focus:text-destructive">
+                                                <Trash2 className="mr-2 h-3.5 w-3.5" />
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </ItemActions>
+                            </Item>
+                        </Link>
                     );
                 })}
             </div>

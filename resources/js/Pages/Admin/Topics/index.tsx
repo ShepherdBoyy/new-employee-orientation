@@ -3,7 +3,9 @@ import TopicCard from "./component/TopicCard";
 function Index({ topics }) {
     return (
         <>
-            <TopicCard topics={topics} />
+            <div className="mx-auto w-full space-y-6 p-6 lg:p-8">
+                <TopicCard topics={topics} />
+            </div>
         </>
     );
 }

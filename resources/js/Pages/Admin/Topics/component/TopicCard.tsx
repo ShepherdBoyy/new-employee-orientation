@@ -18,7 +18,7 @@ interface Props {
 
 export default function TopicCard({ topics }: Props) {
     return (
-        <div>
+        <div className="grid grid-cols-2 gap-4">
             {topics.map((topic) => (
                 <Card key={topic.id}>
                     <CardHeader>
