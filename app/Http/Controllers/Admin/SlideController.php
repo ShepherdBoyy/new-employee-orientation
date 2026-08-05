@@ -16,10 +16,16 @@ use Storage;
 
 class SlideController extends Controller
 {
-    public function index(Company $company, Folder $folder, FolderKeyTopic $topic): Response
+    // Removed the FolderKeyTopic in the parameters since it does not return any data.
+    public function index(Company $company, Folder $folder, $topic): Response
     {
+        //Since the $topic->id is null this will be the alternative for the id that is missing.
+        $topics = FolderKeyTopic::where('folder_id', $folder->id)
+                    ->where('slug', $topic)
+                    ->first();
+
         $slides = Slide::where("folder_id", $folder->id)
-            ->where("folder_key_topic_id", $topic->id)
+            ->where("folder_key_topic_id", $topics->id)
             ->orderBy("order")
             ->get();
 
@@ -34,7 +40,7 @@ class SlideController extends Controller
                 "company" => $folder->company,
                 "job_position" => $folder->jobPosition
             ],
-            "topic" => $topic,
+            "topic" => $topics,
             "slides" => $slides->map(fn($slide) => [
                 "id" => $slide->id,
                 "type" => $slide->type,

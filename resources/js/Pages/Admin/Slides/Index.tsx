@@ -32,7 +32,7 @@ interface Props {
     slides: Slide[]
 }
 
-export default function Index({ folder, slides }: Props) {
+export default function Index({ folder, slides, topic }: Props) {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [uploading, setUploading] = useState(false)
     const [dragOver, setDragOver] = useState(false)
@@ -60,8 +60,7 @@ export default function Index({ folder, slides }: Props) {
 
     const backHref = folder.job_position
         ? `/admin/folders/${folder.company.slug}/job-positions`
-        : `/admin/folders/${folder.company.slug}`
-
+        : `/admin/folders/${folder.company.slug}/${folder.slug}`
     return (
         <Master>
             <div className="w-full space-y-6">
@@ -70,15 +69,15 @@ export default function Index({ folder, slides }: Props) {
                     className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
                 >
                     <ArrowLeft className="h-4 w-4" />
-                    Back to folders
+                    Back to {folder.name}
                 </Link>
 
                 <div className="flex flex-col gap-4 border-b pb-5 sm:flex-row sm:items-start sm:justify-between">
                     <div className="space-y-2">
-                        <h1 className="text-xl font-semibold tracking-tight">{folder.name}</h1>
+                        <h1 className="text-xl font-semibold tracking-tight">{topic.label}</h1>
                         <div className="flex flex-wrap gap-1.5">
                             <Badge variant="secondary" className="text-xs font-normal">
-                                {folder.company.name}
+                                {folder.name}
                             </Badge>
                             {folder.job_position && (
                                 <Badge variant="secondary" className="text-xs font-normal">
