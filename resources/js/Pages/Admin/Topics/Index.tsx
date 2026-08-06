@@ -1,11 +1,16 @@
-import Master from "@/Layout/Master";
-import TopicCard from "./component/TopicCard";
+import { useState } from "react";
 import { Button } from '@/components/ui/button'
 import { Folder, Plus } from "lucide-react";
+
+import AddTopicDialog from "@/Pages/Admin/Topics/component/Dialogs/AddTopicDialog";
+import Master from "@/Layout/Master";
+import TopicCard from "./component/TopicCard";
+
 function Index({ topics, company }) {
+    const [openAddDialog, setOpenAddDialog] = useState(false);
     return (
         <>
-            <div className="mx-auto w-full space-y-6 p-6 lg:p-8">
+            <div className="mx-auto w-full space-y-6">
                 <div className="border-b pb-5">
                     <h1 className="flex justify-between">
                         <div className="flex items-center gap-2 text-xl font-semibold tracking-tight">
@@ -17,7 +22,7 @@ function Index({ topics, company }) {
                             {topics[0].folder.name}
                         </div>
                         <div>
-                            <Button variant="outline" onClick={() => console.log('HELLO')}>
+                            <Button variant="outline" onClick={() => setOpenAddDialog(true)}>
                                 <Plus />
                                 Add Topic
                             </Button>
@@ -29,6 +34,11 @@ function Index({ topics, company }) {
                 </div>
 
                 <TopicCard topics={topics} company={company} />
+
+                <AddTopicDialog
+                    open={openAddDialog}
+                    onOpenChange={setOpenAddDialog}
+                />
             </div>
         </>
     );
