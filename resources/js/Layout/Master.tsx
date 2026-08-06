@@ -35,14 +35,13 @@ export default function Master({ children }: MasterProps) {
     const { props } = usePage<PageProps>();
     const company = props.company;
     const showPresentationPanel = company?.slug ?? "none";
-
     return (
         <>
             <TooltipProvider>
                 <div className="">
                     <SidebarProvider className="h-svh overflow-hidden bg-linear-to-r from-slate-900 via-slate-800 to-slate-900">
                         <AppSidebar />
-                        <div className="flex flex-1 gap-3 p-2">
+                        <div className="flex flex-1 min-h-0 gap-3 p-2">
                             <AnimatePresence mode="wait">
                                 {company && (
                                     <motion.div
@@ -69,7 +68,7 @@ export default function Master({ children }: MasterProps) {
                                 )}
                             </AnimatePresence>
 
-                            <div className="flex h-full flex-1 flex-col overflow-hidden rounded-xl  bg-background border shadow-xl">
+                            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border bg-background shadow-xl">
                                 <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-background px-6">
                                     <div className="flex items-center gap-3">
                                         <SidebarTrigger />

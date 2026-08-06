@@ -18,7 +18,7 @@ function Index({ topics, company, activeFolder }) {
                         </div>
                         <div>
                             <Button
-                                variant="outline"
+                                size="lg"
                                 onClick={() => setOpenAddDialog(true)}
                             >
                                 <Plus />
