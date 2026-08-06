@@ -25,4 +25,28 @@ export default defineConfig({
             ignored: ['**/storage/framework/views/**'],
         },
     },
+    build: {
+        rollupOptions: {
+        output: {
+            manualChunks(id) {
+            if (id.includes('node_modules')) {
+                // Group Radix UI primitives (the core of shadcn/ui)
+                if (id.includes('@radix-ui')) {
+                return 'vendor-radix';
+                }
+                // Group Lucide icons (commonly used with shadcn)
+                if (id.includes('lucide-react')) {
+                return 'vendor-icons';
+                }
+                // Group React ecosystem code
+                if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
+                return 'vendor-react';
+                }
+                // Catch-all for other node_modules dependencies
+                return 'vendor';
+            }
+            }
+        }
+        }
+    }
 });
