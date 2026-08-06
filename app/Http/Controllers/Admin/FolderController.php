@@ -33,16 +33,12 @@ class FolderController extends Controller
             ->whereNotNull("job_position_id")
             ->get(["id", "job_position_id", "slug"]);
 
-        $positions = $company->jobs->map(function (JobPosition $position) use ($folders) {
-            $folder = $folders->firstWhere("job_position_id", $position->id);
-
-            return [
-                "id" => $position->id,
-                "name" => $position->name,
-                "has_folder" => $folder !== null,
-                "folder_slug" => $folder?->slug
-            ]; 
-        });
+        $positions = $company->jobs->map(fn(JobPosition $position) => [
+            "id" => $position->id,
+            "name" => $position->name,
+            "has_folder" => $folders->contains("job_position_id", $position->id),
+            "folder_slug" => $folders->firstWhere("job_position_id", $position->id)?->slug,
+        ]);
 
         return Inertia::render("Admin/Folders/JobPositionPicker", [
             "company" => $company,
@@ -55,7 +51,10 @@ class FolderController extends Controller
     {
         $folder = Folder::ensureJobSpecificFolder($company->id, $jobPosition->id);
 
-        return redirect()->route("admin.folders.topics.slides.index", $folder->slug);
+        return redirect()->route("admin.folders.topics.index", [
+            "company" => $company->slug,
+            "folder" => $folder->slug
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -63,8 +62,6 @@ class FolderController extends Controller
         $validated = $request->validate([
             "name" => ["required", "string", "max:255"],
             "company_id" => ["required", "exists:companies,id"],
-            "key_topics" => ["nullable", "array"],
-            "key_topics.*" => ["nullable", "string", "max:255"]
         ]);
 
         $lastOrder = Folder::forCompany($validated["company_id"])
@@ -74,7 +71,6 @@ class FolderController extends Controller
         Folder::create([
             "company_id" => $validated["company_id"],
             "name" => $validated["name"],
-            "key_topics" => array_values(array_filter($validated["key_topics"] ?? [])),
             "order" => $lastOrder + 1
         ]);
 
@@ -85,14 +81,9 @@ class FolderController extends Controller
     {
         $validated = $request->validate([
             'name' => ["required", "string", "max:255"],
-            "key_topics" => ["nullable", "array"],
-            "key_topics.*" => ["required", "string", "max:255"]
         ]);
 
-        $folder->update([
-            "name" => $validated["name"],
-            "key_topics" => array_values(array_filter($validated["key_topics"] ?? [])),
-        ]);
+        $folder->update(["name" => $validated["name"]]);
 
         return back()->with("success", "Folder updated successfully");
     }
@@ -101,16 +92,11 @@ class FolderController extends Controller
     {
         $validated = $request->validate([
             "name" => ["required", "string", "max:255"],
-            "key_topics" => ["present", "array"],
-            "key_topics.*" => ["nullable", "string", "max:255"]
         ]);
 
         Folder::where("company_id", $company->id)
             ->whereNotNull("job_position_id")
-            ->update([
-                "name" => $validated["name"],
-                "key_topics" => json_encode(array_values(array_filter($validated["key_topics"] ?? [])))
-            ]);
+            ->update(["name" => $validated["name"]]);
 
         return back()->with("success", "Job-specific training name updated successfully");
     }

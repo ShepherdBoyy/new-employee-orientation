@@ -40,7 +40,7 @@ class FolderKeyTopicController extends Controller
 
         $lastOrder = $folder->keyTopics()->max("order") ?? 0;
 
-        $folder->keyTopics->create([
+        $folder->keyTopics()->create([
             'label' => $validated["label"],
             "order" => $lastOrder + 1
         ]);
