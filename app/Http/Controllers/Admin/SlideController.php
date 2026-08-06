@@ -18,8 +18,6 @@ class SlideController extends Controller
 {
     public function index(Company $company, Folder $folder, FolderKeyTopic $keyTopic): Response
     {
-        abort_if($keyTopic->folder_id !== $folder->id, 403);
-
         $slides = Slide::where('folder_id', $folder->id)
             ->where('folder_key_topic_id', $keyTopic->id)
             ->orderBy('order')
@@ -49,8 +47,6 @@ class SlideController extends Controller
 
     public function store(Request $request, Folder $folder, FolderKeyTopic $topic): RedirectResponse
     {
-        abort_if($topic->folder_id !== $folder->id, 403);
-
         $request->validate([
             "files" => ["required", "array", "min:1"],
             "files.*" => [
