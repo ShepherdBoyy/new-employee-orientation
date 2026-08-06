@@ -17,15 +17,24 @@ import { toast } from "sonner"
 type Props = {
     module: {
         id: number,
-        name: string
+        name: string,
+        slug: string
+        companySlug: string
     }
     open: boolean;
     onOpenChange: (open: boolean) => void;
 };
 
-export default function DeleteModuleDialog({ module ,open, onOpenChange }: Props) {
+export default function DeleteModuleDialog({ module, open, onOpenChange }: Props) {
     function deleteHandle() {
+        const currentPath = window.location.pathname;
+        const itemPath = `/admin/folders/${module.companySlug}/${module.slug}/`;
+        const isCurrentlyViewing = currentPath === itemPath;
+
         router.visit(`/admin/folders/${module.id}`, {
+            data: {
+                isLinkActive: isCurrentlyViewing
+            },
             method: "delete",
             onSuccess: (message) => {
                 toast.success(message.props.success, { position: "top-center" });

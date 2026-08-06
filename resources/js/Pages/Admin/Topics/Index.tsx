@@ -14,7 +14,7 @@ function Index({ topics, company, activeFolder }) {
                 <div className="border-b pb-5">
                     <h1 className="flex justify-between">
                         <div className="flex items-center gap-2 text-xl font-semibold tracking-tight">
-                            {topics[0].folder.name}
+                            {activeFolder.name}
                         </div>
                         <div>
                             <Button

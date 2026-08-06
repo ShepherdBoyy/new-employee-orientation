@@ -87,7 +87,6 @@ export default function PresentationPanel() {
 
     const items = buildItems(companyWideFolders);
     const jobPositionsPath = `/admin/folders/${company.slug}/job-positions`;
-
     function openCreate() {
         setCreateDialogOpen(true);
     }
@@ -232,7 +231,9 @@ export default function PresentationPanel() {
                                                         e.stopPropagation();
                                                         setModule({
                                                             id: item.id,
-                                                            name: item.folder.name
+                                                            name: item.folder.name,
+                                                            slug: item.folder.slug,
+                                                            companySlug: company.slug
                                                         })
                                                         setOpenEditDialog(true);
                                                     }}
@@ -250,7 +251,9 @@ export default function PresentationPanel() {
                                                         e.stopPropagation();
                                                         setModule({
                                                             id: item.id,
-                                                            name: item.folder.name
+                                                            name: item.folder.name,
+                                                            slug: item.folder.slug,
+                                                            companySlug: company.slug
                                                         })
                                                         setOpenDeleteDialog(true);
                                                     }}

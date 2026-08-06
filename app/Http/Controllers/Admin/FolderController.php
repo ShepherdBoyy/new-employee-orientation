@@ -85,7 +85,16 @@ class FolderController extends Controller
 
         $folder->update(["name" => $validated["name"]]);
 
-        return back()->with("success", "Folder updated successfully");
+        $company = Company::findOrFail($folder->company_id);
+
+        if($request->isLinkActive){
+            return redirect()->route('admin.folders.topics.index', [
+                'company' => $company->slug, // or pass the $company model instance directly
+                'folder' => $folder->slug,
+            ])->with('success', 'Folder deleted successfully.');
+        }
+
+        // return back()->with("success", "Folder updated successfully");
     }
 
     public function updateJobSpecific(Request $request, Company $company): RedirectResponse
@@ -126,12 +135,19 @@ class FolderController extends Controller
         return back()->with("success", "Folders reordered successfully");
     }
 
-    public function destroy(Folder $folder): RedirectResponse
+    public function destroy(Folder $folder, Request $request): RedirectResponse
     {
         Slide::where("folder_id", $folder->id)->get()->each(function (Slide $slide) {
             Storage::disk(config("filesystems.default"))->delete($slide->file_path);
         });
         $folder->delete();
+
+        $company = Company::findOrFail($folder->company_id);
+
+        if($request->isLinkActive){
+            return redirect()->route('admin.folders.company', $company->slug) // Adjust to your index route name
+            ->with('success', 'Folder deleted successfully.');
+        }
     
         return back()->with("success", "Folder deleted successfully");
     }

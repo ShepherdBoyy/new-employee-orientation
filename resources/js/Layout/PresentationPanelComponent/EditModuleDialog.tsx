@@ -16,12 +16,13 @@ import {
     FieldGroup,
 } from "@/components/ui/field";
 
-
 type Props = {
     module: {
         id: number,
-        label: string,
-    };
+        name: string,
+        slug: string
+        companySlug: string
+    }
     open: boolean;
     onOpenChange: (open: boolean) => void;
 };
@@ -35,13 +36,22 @@ export default function EditModuleDialog({ module, open, onOpenChange }: Props) 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
+        const currentPath = window.location.pathname;
+        const itemPath = `/admin/folders/${module.companySlug}/${module.slug}/`;
+        const isCurrentlyViewing = currentPath === itemPath;
+
+        form.transform((data) => ({
+            ...data,
+            isLinkActive: isCurrentlyViewing,
+        }));
+
+        // 2. Then execute the put request normally
         form.put(`/admin/folders/${module.id}`, {
             preserveScroll: true,
-
-            onSuccess: (message) => {
+            onSuccess: (page) => {
                 form.reset();
                 onOpenChange(false);
-                toast.success(message.props.success, {
+                toast.success(page.props.success, {
                     position: "top-center",
                 });
             },
