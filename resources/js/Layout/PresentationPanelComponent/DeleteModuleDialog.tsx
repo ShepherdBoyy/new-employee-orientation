@@ -33,7 +33,7 @@ export default function DeleteModuleDialog({
     function deleteHandle() {
         const currentPath = window.location.pathname;
         const itemPath = `/admin/folders/${module.companySlug}/${module.slug}/`;
-        const isCurrentlyViewing = currentPath === itemPath;
+        const isCurrentlyViewing = currentPath === itemPath || currentPath.includes('topic');
 
         router.visit(`/admin/folders/${module.id}`, {
             data: {

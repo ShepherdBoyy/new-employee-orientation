@@ -38,7 +38,7 @@ export default function EditModuleDialog({ module, open, onOpenChange }: Props) 
 
         const currentPath = window.location.pathname;
         const itemPath = `/admin/folders/${module.companySlug}/${module.slug}/`;
-        const isCurrentlyViewing = currentPath === itemPath;
+        const isCurrentlyViewing = currentPath === itemPath || currentPath.includes('topic');
 
         form.transform((data) => ({
             ...data,

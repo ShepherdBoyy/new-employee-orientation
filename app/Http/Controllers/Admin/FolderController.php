@@ -94,7 +94,7 @@ class FolderController extends Controller
             ])->with('success', 'Folder deleted successfully.');
         }
 
-        // return back()->with("success", "Folder updated successfully");
+        return back()->with("success", "Folder updated successfully");
     }
 
     public function updateJobSpecific(Request $request, Company $company): RedirectResponse
