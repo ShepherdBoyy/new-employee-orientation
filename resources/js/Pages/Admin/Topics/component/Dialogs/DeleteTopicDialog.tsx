@@ -25,12 +25,12 @@ type Props = {
 
 export default function DeleteTopicDialog({ topic ,open, onOpenChange }: Props) {
     function deleteHandle() {
-        // router.visit(`/admin/job-positions/${topic?.id}`, {
-        //     method: "delete",
-        //     onSuccess: (message) => {
-        //         toast.success(message.props.success, { position: "top-center" });
-        //     },
-        // });
+        router.visit(`/admin/topics/${topic.id}`, {
+            method: "delete",
+            onSuccess: (message) => {
+                toast.success(message.props.success, { position: "top-center" });
+            },
+        });
     }
     return (
         <>

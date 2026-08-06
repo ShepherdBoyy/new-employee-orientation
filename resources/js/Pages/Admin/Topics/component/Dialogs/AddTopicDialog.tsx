@@ -15,21 +15,22 @@ import { Field, FieldLabel, FieldGroup } from "@/components/ui/field";
 type Props = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    folderId: number
 };
 
-export default function EditTopicDialog({ open, onOpenChange }: Props) {
-    const form = useForm({
-        name: "",
-    });
+export default function AddTopicDialog({ open, onOpenChange, folderId }: Props) {
+    const { data, setData, post, processing, errors, reset } = useForm({
+        label: ""
+    })
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        form.post("", {
+        post(`/admin/folders/${folderId}/topics`, {
             preserveScroll: true,
 
             onSuccess: (message) => {
-                form.reset();
+                reset();
                 onOpenChange(false);
                 toast.success(message.props.success, {
                     position: "top-center",
@@ -56,9 +57,9 @@ export default function EditTopicDialog({ open, onOpenChange }: Props) {
 
                             <Input
                                 placeholder=""
-                                value={form.data.name}
+                                value={data.label}
                                 onChange={(e) =>
-                                    form.setData("name", e.target.value)
+                                    setData("label", e.target.value)
                                 }
                             />
                         </Field>
@@ -75,9 +76,9 @@ export default function EditTopicDialog({ open, onOpenChange }: Props) {
 
                         <Button
                             type="submit"
-                            disabled={form.processing || !form.data.name.trim()}
+                            disabled={processing || !data.label.trim()}
                         >
-                            {form.processing ? "Adding..." : "Add Topic"}
+                            {processing ? "Adding..." : "Add Topic"}
                         </Button>
                     </DialogFooter>
                 </form>

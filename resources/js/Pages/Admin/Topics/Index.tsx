@@ -6,7 +6,7 @@ import AddTopicDialog from "@/Pages/Admin/Topics/component/Dialogs/AddTopicDialo
 import Master from "@/Layout/Master";
 import TopicCard from "./component/TopicCard";
 
-function Index({ topics, company }) {
+function Index({ topics, company, activeFolder }) {
     const [openAddDialog, setOpenAddDialog] = useState(false);
     return (
         <>
@@ -36,6 +36,7 @@ function Index({ topics, company }) {
                 <AddTopicDialog
                     open={openAddDialog}
                     onOpenChange={setOpenAddDialog}
+                    folderId={activeFolder.id}
                 />
             </div>
         </>

@@ -10,6 +10,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Field, FieldLabel, FieldGroup } from "@/components/ui/field";
+import { toast } from "sonner";
 
 type Props = {
     topic: {
@@ -20,26 +21,25 @@ type Props = {
     onOpenChange: (open: boolean) => void;
 };
 
-export default function AddTopicDialog({ topic, open, onOpenChange }: Props) {
-    const form = useForm({
-        name: "",
+export default function EditTopicDialog({ topic, open, onOpenChange }: Props) {
+    const { data, setData, put, processing, errors, reset } = useForm({
+        label: "",
     });
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        console.log(topic);
+        if (!topic) return;
 
-        // form.post("", {
-        //     preserveScroll: true,
-
-        //     onSuccess: (message) => {
-        //         form.reset();
-        //         onOpenChange(false);
-        //         toast.success(message.props.success, {
-        //             position: "top-center",
-        //         });
-        //     },
-        // });
+        put(`/admin/topics/${topic.id}`, {
+            preserveScroll: true,
+            onSuccess: (message) => {
+                reset();
+                onOpenChange(false);
+                toast.success(message.props.success, {
+                    position: "top-center",
+                });
+            },
+        });
     }
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -59,9 +59,9 @@ export default function AddTopicDialog({ topic, open, onOpenChange }: Props) {
 
                             <Input
                                 placeholder={topic.label}
-                                value={form.data.name}
+                                value={data.label}
                                 onChange={(e) =>
-                                    form.setData("name", e.target.value)
+                                    setData("label", e.target.value)
                                 }
                             />
                         </Field>
@@ -77,7 +77,7 @@ export default function AddTopicDialog({ topic, open, onOpenChange }: Props) {
                         </Button>
 
                         <Button type="submit">
-                            {form.processing ? "Editing..." : "Edit Topic"}
+                            {processing ? "Editing..." : "Edit Topic"}
                         </Button>
                     </DialogFooter>
                 </form>
