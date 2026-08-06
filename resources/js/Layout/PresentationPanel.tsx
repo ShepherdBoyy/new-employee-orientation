@@ -52,6 +52,7 @@ export default function PresentationPanel() {
     const companyWideFolders = props.companyWideFolders ?? [];
     const jobSpecificSummary = props.jobSpecificSummary ?? null;
     const activeFolderSlug = props.activeFolder?.slug;
+
     const company = props.company;
 
     if (!company) return null;
@@ -75,6 +76,8 @@ export default function PresentationPanel() {
 
         return items;
     };
+    const segments = url.split("/");
+    const activeModuleSlug = segments[4];
 
     const items = buildItems(companyWideFolders);
     const jobPositionsPath = `/admin/folders/${company.slug}/job-positions`;
@@ -83,7 +86,7 @@ export default function PresentationPanel() {
         setCreateDialogOpen(true);
     }
     return (
-        <aside className="h-full  rounded-xl flex-1 overflow-auto text-white flex flex-col space-y-3">
+        <aside className="h-full rounded-xl flex-1 overflow-auto text-white flex flex-col space-y-3">
             <div className="px-3 pt-3 pb-1">
                 <h2 className="font-medium text-lg tracking-tight">
                     {company.name}
@@ -119,11 +122,11 @@ export default function PresentationPanel() {
                     const isJobSpecific = item.type === "job-specific";
                     const active = isJobSpecific
                         ? url === jobPositionsPath
-                        : activeFolderSlug === item.folder.slug;
+                        : item.folder.slug === activeModuleSlug;
 
                     const href = isJobSpecific
                         ? jobPositionsPath
-                        : `/admin/folders/${company.slug}/${item.folder.slug}`;
+                        : `/admin/folders/${company.slug}/${item.folder.slug}/`;
 
                     const title = isJobSpecific
                         ? jobSpecificSummary?.name

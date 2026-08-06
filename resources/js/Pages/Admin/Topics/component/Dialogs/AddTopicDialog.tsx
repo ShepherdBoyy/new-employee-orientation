@@ -10,20 +10,14 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import {
-    Field,
-    FieldLabel,
-    FieldGroup,
-} from "@/components/ui/field";
-
+import { Field, FieldLabel, FieldGroup } from "@/components/ui/field";
 
 type Props = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
 };
 
-export default function AddTopicDialog({ open, onOpenChange }: Props) {
-    
+export default function EditTopicDialog({ open, onOpenChange }: Props) {
     const form = useForm({
         name: "",
     });

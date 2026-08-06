@@ -1,7 +1,6 @@
 import { useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import {
     Dialog,
     DialogContent,
@@ -10,31 +9,25 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import {
-    Field,
-    FieldLabel,
-    FieldGroup,
-} from "@/components/ui/field";
-
+import { Field, FieldLabel, FieldGroup } from "@/components/ui/field";
 
 type Props = {
     topic: {
-        id: number,
-        label: string,
+        id: number;
+        label: string;
     };
     open: boolean;
     onOpenChange: (open: boolean) => void;
 };
 
 export default function AddTopicDialog({ topic, open, onOpenChange }: Props) {
-    
     const form = useForm({
         name: "",
     });
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        console.log(topic)
+        console.log(topic);
 
         // form.post("", {
         //     preserveScroll: true,
@@ -83,10 +76,7 @@ export default function AddTopicDialog({ topic, open, onOpenChange }: Props) {
                             Cancel
                         </Button>
 
-                        <Button
-                            type="submit"
-                           
-                        >
+                        <Button type="submit">
                             {form.processing ? "Editing..." : "Edit Topic"}
                         </Button>
                     </DialogFooter>

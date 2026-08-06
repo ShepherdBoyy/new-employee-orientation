@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import { Folder, Plus } from "lucide-react";
 
 import AddTopicDialog from "@/Pages/Admin/Topics/component/Dialogs/AddTopicDialog";
@@ -14,15 +14,13 @@ function Index({ topics, company }) {
                 <div className="border-b pb-5">
                     <h1 className="flex justify-between">
                         <div className="flex items-center gap-2 text-xl font-semibold tracking-tight">
-                            <Folder
-                                absoluteStrokeWidth
-                                strokeWidth={1.7}
-                                className="h-6 w-6"
-                            />{" "}
                             {topics[0].folder.name}
                         </div>
                         <div>
-                            <Button variant="outline" onClick={() => setOpenAddDialog(true)}>
+                            <Button
+                                variant="outline"
+                                onClick={() => setOpenAddDialog(true)}
+                            >
                                 <Plus />
                                 Add Topic
                             </Button>
