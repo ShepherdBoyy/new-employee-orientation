@@ -16,36 +16,32 @@ use Storage;
 
 class SlideController extends Controller
 {
-    // Removed the FolderKeyTopic in the parameters since it does not return any data.
-    public function index(Company $company, Folder $folder, $topic): Response
+    public function index(Company $company, Folder $folder, FolderKeyTopic $keyTopic): Response
     {
-        //Since the $topic->id is null this will be the alternative for the id that is missing.
-        $topics = FolderKeyTopic::where('folder_id', $folder->id)
-                    ->where('slug', $topic)
-                    ->first();
+        abort_if($keyTopic->folder_id !== $folder->id, 403);
 
-        $slides = Slide::where("folder_id", $folder->id)
-            ->where("folder_key_topic_id", $topics->id)
-            ->orderBy("order")
+        $slides = Slide::where('folder_id', $folder->id)
+            ->where('folder_key_topic_id', $keyTopic->id)
+            ->orderBy('order')
             ->get();
 
-        $folder->load("company:id,name,slug", "jobPosition:id,name,slug");
+        $folder->load('company:id,name,slug', 'jobPosition:id,name,slug');
 
-        return Inertia::render("Admin/Slides/Index", [
+        return Inertia::render('Admin/Slides/Index', [
             "company" => $company,
-            "folder" => [
-                "id" => $folder->id,
-                "name" => $folder->name,
-                "slug" => $folder->slug,
-                "company" => $folder->company,
-                "job_position" => $folder->jobPosition
+            'folder' => [
+                'id'           => $folder->id,
+                'name'         => $folder->name,
+                'slug'         => $folder->slug,
+                'company'      => $folder->company,
+                'job_position' => $folder->jobPosition,
             ],
-            "topic" => $topics,
-            "slides" => $slides->map(fn($slide) => [
-                "id" => $slide->id,
-                "type" => $slide->type,
-                "file_url" => $slide->file_path,
-                "order" => $slide->order
+            'topic'  => $keyTopic,
+            'slides' => $slides->map(fn($slide) => [
+                'id'       => $slide->id,
+                'type'     => $slide->type,
+                'file_url' => $slide->file_path,
+                'order'    => $slide->order,
             ]),
             ...PresentationPanelData::build($company)
         ]);
@@ -66,10 +62,11 @@ class SlideController extends Controller
         ]);
 
         $lastOrder = Slide::where("folder_id", $folder->id)
-            ->where("key_topic_id", $topic->id)
+            ->where("folder_key_topic_id", $topic->id)
             ->max("order") ?? 0;
 
-        $storageFolder = $this->storagePath($folder);
+
+        $storageFolder = $this->storagePath($folder, $topic);
 
         foreach ($request->file("files") as $index => $file) {
              $type = str_starts_with($file->getMimeType(), "video")
@@ -80,7 +77,7 @@ class SlideController extends Controller
 
             Slide::create([
                 "folder_id" => $folder->id,
-                "key_topic_id" => $topic->id,
+                "folder_key_topic_id" => $topic->id,
                 "type" => $type,
                 "file_path" => $path,
                 "order" => $lastOrder + $index + 1

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import SlideGrid from "./components/SlideGrid";
 import { type Slide } from "./components/SlideItem";
 import Master from "@/Layout/Master";
+import UploadSlidesDialog from "./components/UploadSlidesDialog";
 
 interface Company {
     id: number;
@@ -33,34 +34,7 @@ interface Props {
 }
 
 function Index({ folder, slides, topic }: Props) {
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [uploading, setUploading] = useState(false);
-    const [dragOver, setDragOver] = useState(false);
-
-    function handleFiles(files: FileList | null) {
-        if (!files || files.length === 0) return;
-        setUploading(true);
-        router.post(
-            `/admin/folders/${folder.id}/slides`,
-            { files: Array.from(files) },
-            {
-                forceFormData: true,
-                preserveScroll: true,
-                onFinish: () => setUploading(false),
-            },
-        );
-    }
-
-    function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
-        handleFiles(e.target.files);
-        e.target.value = "";
-    }
-
-    function handleDrop(e: React.DragEvent) {
-        e.preventDefault();
-        setDragOver(false);
-        handleFiles(e.dataTransfer.files);
-    }
+    const [uploadOpen, setUploadOpen] = useState(false)
 
     const backHref = folder.job_position
         ? `/admin/folders/${folder.company.slug}/job-positions`
@@ -90,58 +64,21 @@ function Index({ folder, slides, topic }: Props) {
                                     {folder.job_position.name}
                                 </Badge>
                             )}
+                            <Badge variant="outline" className="text-xs font-normal">
+                                {folder.name}
+                            </Badge>
                         </div>
                     </div>
-                    <Button
-                        variant="outline"
-                        onClick={() =>
-                            router.visit(
-                                `/admin/folders/${folder.slug}/preview`,
-                            )
-                        }
-                    >
-                        <Eye className="mr-2 h-4 w-4" />
-                        Preview
-                    </Button>
-                </div>
-
-                <div
-                    onDrop={handleDrop}
-                    onDragOver={(e) => {
-                        e.preventDefault();
-                        setDragOver(true);
-                    }}
-                    onDragLeave={() => setDragOver(false)}
-                    onClick={() => fileInputRef.current?.click()}
-                    className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-14 text-center transition ${
-                        dragOver
-                            ? "border-primary bg-primary/5"
-                            : "border-muted-foreground/20 hover:border-muted-foreground/40 hover:bg-muted/40"
-                    }`}
-                >
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*,video/*"
-                        multiple
-                        className="hidden"
-                        onChange={handleFileInput}
-                    />
-                    {uploading ? (
-                        <Loader2 className="h-7 w-7 animate-spin text-muted-foreground" />
-                    ) : (
-                        <Upload
-                            className={`h-7 w-7 ${dragOver ? "text-primary" : "text-muted-foreground/50"}`}
-                        />
-                    )}
-                    <p className="text-sm font-medium">
-                        {uploading
-                            ? "Uploading..."
-                            : "Drop files here or click to upload"}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                        Images and videos up to 100MB each
-                    </p>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" onClick={() => router.visit(`/admin/folders/${folder.slug}/preview`)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            Preview
+                        </Button>
+                        <Button onClick={() => setUploadOpen(true)}>
+                            <Upload className="mr-2 h-4 w-4" />
+                            Upload Slides
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="space-y-3">
@@ -157,6 +94,13 @@ function Index({ folder, slides, topic }: Props) {
                     <SlideGrid slides={slides} folderId={folder.id} />
                 </div>
             </div>
+
+            <UploadSlidesDialog
+                open={uploadOpen}
+                onClose={() => setUploadOpen(false)}
+                folderId={folder.id}
+                topicId={topic.id}
+            />
         </>
     );
 }

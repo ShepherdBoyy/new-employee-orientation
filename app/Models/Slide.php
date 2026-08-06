@@ -9,7 +9,7 @@ class Slide extends Model
 {
     protected $fillable = [
         "folder_id",
-        "key_topic_id",
+        "folder_key_topic_id",
         "type",
         "file_path",
         "order"
