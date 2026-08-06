@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import KeyTopicsInput from './KeyTopicsInput'
+import { toast } from 'sonner'
 
 interface Props {
     open: boolean
@@ -23,14 +24,12 @@ export default function CreateFolderDialog({ open, onClose, companyId }: Props) 
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         company_id: companyId,
-        key_topics: [''] as string[],
     })
 
     useEffect(() => {
         if (open) {
             reset()
             setData('company_id', companyId)
-            setData('key_topics', [''])
         }
     }, [open])
 
@@ -38,9 +37,12 @@ export default function CreateFolderDialog({ open, onClose, companyId }: Props) 
         e.preventDefault()
 
         post('/admin/folders', {
-            onSuccess: () => {
-                reset()
-                onClose()
+            onSuccess: (message) => {
+                reset(),
+                onClose(),
+                toast.success(message.props.success, {
+                    position: "top-center",
+                });
             },
         })
     }
@@ -67,11 +69,6 @@ export default function CreateFolderDialog({ open, onClose, companyId }: Props) 
                         />
                         {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
                     </div>
-
-                    <KeyTopicsInput
-                        topics={data.key_topics}
-                        onChange={topics => setData('key_topics', topics)}
-                    />
 
                     <DialogFooter>
                         <Button type="button" variant="outline" onClick={onClose}>

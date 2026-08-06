@@ -34,19 +34,18 @@ export default function EditModuleDialog({ module, open, onOpenChange }: Props) 
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        console.log(module)
 
-        // form.post("", {
-        //     preserveScroll: true,
+        form.put(`/admin/folders/${module.id}`, {
+            preserveScroll: true,
 
-        //     onSuccess: (message) => {
-        //         form.reset();
-        //         onOpenChange(false);
-        //         toast.success(message.props.success, {
-        //             position: "top-center",
-        //         });
-        //     },
-        // });
+            onSuccess: (message) => {
+                form.reset();
+                onOpenChange(false);
+                toast.success(message.props.success, {
+                    position: "top-center",
+                });
+            },
+        });
     }
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
