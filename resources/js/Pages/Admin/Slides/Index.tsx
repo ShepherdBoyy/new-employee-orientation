@@ -28,9 +28,16 @@ interface Folder {
     job_position: JobPosition | null;
 }
 
+interface Topic {
+    id: number
+    slug: string
+    label: string
+}
+
 interface Props {
     folder: Folder;
     slides: Slide[];
+    topic: Topic
 }
 
 function Index({ folder, slides, topic }: Props) {
@@ -41,7 +48,7 @@ function Index({ folder, slides, topic }: Props) {
         : `/admin/folders/${folder.company.slug}/${folder.slug}`;
     return (
         <>
-            <div className="w-full space-y-6 p-6">
+            <div className="w-full space-y-6">
                 <Link
                     href={backHref}
                     className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
