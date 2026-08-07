@@ -11,7 +11,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import FolderGrid from "./components/FolderGrid";
-import CreateFolderDialog from "./components/CreateFolderDialog";
+import CreateFolderDialog from "../../../Layout/PresentationPanelComponent/CreateModuleDialog";
 import DeleteFolderDialog from "./components/DeleteFolderDialog";
 import { type CompanyFolder } from "./components/FolderCard";
 import Master from "@/Layout/Master";

@@ -10,25 +10,24 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import {
-    Field,
-    FieldLabel,
-    FieldGroup,
-} from "@/components/ui/field";
+import { Field, FieldLabel, FieldGroup } from "@/components/ui/field";
 
 type Props = {
     module: {
-        id: number,
-        name: string,
-        slug: string
-        companySlug: string
-    }
+        id: number;
+        name: string;
+        slug: string;
+        companySlug: string;
+    };
     open: boolean;
     onOpenChange: (open: boolean) => void;
 };
 
-export default function EditModuleDialog({ module, open, onOpenChange }: Props) {
-    
+export default function EditModuleDialog({
+    module,
+    open,
+    onOpenChange,
+}: Props) {
     const form = useForm({
         name: "",
     });
@@ -36,15 +35,21 @@ export default function EditModuleDialog({ module, open, onOpenChange }: Props) 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
-        const currentPath = window.location.pathname;
         const itemPath = `/admin/folders/${module.companySlug}/${module.slug}/`;
-        const isCurrentlyViewing = currentPath === itemPath || currentPath.includes('topic');
+
+        const isCurrentlyViewing = window.location.pathname.includes(
+            `/${module.slug}`,
+        );
 
         form.transform((data) => ({
             ...data,
             isLinkActive: isCurrentlyViewing,
         }));
-
+        console.log({
+            currentPath: window.location.pathname,
+            itemPath,
+            module,
+        });
         // 2. Then execute the put request normally
         form.put(`/admin/folders/${module.id}`, {
             preserveScroll: true,
@@ -92,9 +97,7 @@ export default function EditModuleDialog({ module, open, onOpenChange }: Props) 
                             Cancel
                         </Button>
 
-                        <Button
-                            type="submit"
-                        >
+                        <Button type="submit">
                             {form.processing ? "Editing..." : "Edit Module"}
                         </Button>
                     </DialogFooter>
