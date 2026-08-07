@@ -58,7 +58,7 @@ Route::middleware("test")->group(function () {
 
         // Job Specific
         Route::get("/folders/{company:slug}/job-positions", [FolderController::class, "jobPositionPicker"])->name("folders.job-position-picker");
-        Route::post("/folders/{company}/job-positions/{jobPosition}/resolve", [FolderController::class, "resolveJobSpecificFolder"])->name("folders.resolve-job-specific");
+        Route::get("/folders/{company}/job-positions/{jobPosition}/resolve", [FolderController::class, "resolveJobSpecificFolder"])->name("folders.resolve-job-specific");
         
         // Topics
         Route::get("/folders/{company:slug}/{folder:slug}", [FolderKeyTopicController::class, "index"])->name("folders.topics.index");

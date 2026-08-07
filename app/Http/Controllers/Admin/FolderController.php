@@ -49,7 +49,11 @@ class FolderController extends Controller
 
     public function resolveJobSpecificFolder(Company $company, JobPosition $jobPosition): RedirectResponse
     {
-        $folder = Folder::ensureJobSpecificFolder($company->id, $jobPosition->id);
+        // $folder = Folder::ensureJobSpecificFolder($company->id, $jobPosition->id);
+
+        $folder = Folder::where("company_id", $company->id)
+            ->where("job_position_id", $jobPosition->id)
+            ->first();
 
         return redirect()->route("admin.folders.topics.index", [
             "company" => $company->slug,
