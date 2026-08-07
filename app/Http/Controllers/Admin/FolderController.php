@@ -22,7 +22,7 @@ class FolderController extends Controller
         return Inertia::render("Admin/Folders/Empty", [
             "company" => $company,
             ...PresentationPanelData::build($company)
-        ]); 
+        ]);
     }
 
     public function jobPositionPicker(Company $company): Response
@@ -91,7 +91,7 @@ class FolderController extends Controller
 
         $company = Company::findOrFail($folder->company_id);
 
-        if($request->isLinkActive){
+        if ($request->isLinkActive) {
             return redirect()->route('admin.folders.topics.index', [
                 'company' => $company->slug, // or pass the $company model instance directly
                 'folder' => $folder->slug,
@@ -123,7 +123,7 @@ class FolderController extends Controller
             "items.*.id" => ["nullable", "integer"],
             "items.*.order" => ["required", "integer", "min:1"]
         ]);
-        
+
         foreach ($validated["items"] as $item) {
             if ($item["type"] === "job-specific") {
                 Folder::where("company_id", $validated["company_id"])
@@ -148,25 +148,25 @@ class FolderController extends Controller
 
         $company = Company::findOrFail($folder->company_id);
 
-        if($request->isLinkActive){
+        if ($request->isLinkActive) {
             return redirect()->route('admin.folders.company', $company->slug) // Adjust to your index route name
-            ->with('success', 'Folder deleted successfully.');
+                ->with('success', 'Folder deleted successfully.');
         }
-    
+
         return back()->with("success", "Folder deleted successfully");
     }
 
     public function previewFolderList(Request $request): Response
     {
         $request->validate([
-            'company_id'      => ['required', 'exists:companies,id'],
+            'company_id' => ['required', 'exists:companies,id'],
             'job_position_id' => ['nullable', 'exists:job_positions,id'],
         ]);
 
         $company = Company::findOrFail($request->company_id);
 
         $simulatedUser = new User([
-            'company_id'      => $request->company_id,
+            'company_id' => $request->company_id,
             'job_position_id' => $request->job_position_id,
         ]);
 

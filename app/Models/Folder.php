@@ -116,7 +116,7 @@ class Folder extends Model
 
     public function slideCount(): int
     {
-        return $this->slides()->count();
+        return Slide::where("folder_id", $this->id)->count();
     }
 
     public function company(): BelongsTo
