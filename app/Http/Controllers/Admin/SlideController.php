@@ -28,18 +28,18 @@ class SlideController extends Controller
         return Inertia::render('Admin/Slides/Index', [
             "company" => $company,
             'folder' => [
-                'id'           => $folder->id,
-                'name'         => $folder->name,
-                'slug'         => $folder->slug,
-                'company'      => $folder->company,
+                'id' => $folder->id,
+                'name' => $folder->name,
+                'slug' => $folder->slug,
+                'company' => $folder->company,
                 'job_position' => $folder->jobPosition,
             ],
-            'topic'  => $keyTopic,
+            'topic' => $keyTopic,
             'slides' => $slides->map(fn($slide) => [
-                'id'       => $slide->id,
-                'type'     => $slide->type,
+                'id' => $slide->id,
+                'type' => $slide->type,
                 'file_url' => $slide->file_path,
-                'order'    => $slide->order,
+                'order' => $slide->order,
             ]),
             ...PresentationPanelData::build($company)
         ]);
@@ -65,11 +65,11 @@ class SlideController extends Controller
         $storageFolder = $this->storagePath($folder, $topic);
 
         foreach ($request->file("files") as $index => $file) {
-             $type = str_starts_with($file->getMimeType(), "video")
+            $type = str_starts_with($file->getMimeType(), "video")
                 ? "video"
                 : "image";
-            
-           $path = Storage::disk('public')->putFile($storageFolder, $file);
+
+            $path = Storage::disk('public')->putFile($storageFolder, $file);
 
             Slide::create([
                 "folder_id" => $folder->id,
@@ -106,7 +106,7 @@ class SlideController extends Controller
 
         Storage::disk(config("filesystems.default"))
             ->delete($slide->file_path);
-        
+
         $slide->delete();
 
         return back()->with("success", "Slide deleted successfully");

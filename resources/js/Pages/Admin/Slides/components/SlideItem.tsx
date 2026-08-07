@@ -35,7 +35,7 @@ export default function SlideItem({ slide, index, onDeleteRequest }: Props) {
         >
             <div className="relative aspect-video bg-muted">
                 {slide.type === 'video' ? (
-                    <video src={slide.file_url} className="h-full w-full object-cover" muted />
+                    <video src={`/storage/${slide.file_url}`} className="h-full w-full object-cover" muted />
                 ) : (
                     <img src={`/storage/${slide.file_url}`} alt={`Slide ${index + 1}`} className="h-full w-full object-cover" />
                 )}
