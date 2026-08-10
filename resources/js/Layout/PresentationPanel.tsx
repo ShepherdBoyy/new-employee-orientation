@@ -37,7 +37,7 @@ export interface PageProps {
     company: CompanyNav;
     companyWideFolders?: ModuleNav[];
     jobSpecificSummary: JobSpecificSummary | null;
-    activeFolder?: { slug: string, is_job_specific?: boolean };
+    activeFolder?: { slug: string; is_job_specific?: boolean };
     [key: string]: unknown;
 }
 
@@ -78,23 +78,25 @@ export default function PresentationPanel() {
     };
     const segments = url.split("/");
     const activeModuleSlug = segments[4];
-    const [items, setItems] = useState<GridItem[]>(() => buildItems(companyWideFolders));
+    const [items, setItems] = useState<GridItem[]>(() =>
+        buildItems(companyWideFolders),
+    );
 
     useEffect(() => {
-        setItems(buildItems(companyWideFolders))
+        setItems(buildItems(companyWideFolders));
     }, [companyWideFolders, jobSpecificSummary]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
-                distance: 4,
+                distance: 2,
             },
         }),
     );
 
     function handleDragStart(event: DragStartEvent) {
         setIsDragging(true);
-        const item = items.find(i => i.id === event.active.id)
+        const item = items.find((i) => i.id === event.active.id);
         setActiveItem(item ?? null);
     }
 
@@ -107,11 +109,11 @@ export default function PresentationPanel() {
             return;
         }
 
-        const oldIndex = items.findIndex(i => i.id === active.id);
-        const newIndex = items.findIndex(i => i.id === over.id);
-        const reordered = arrayMove(items, oldIndex, newIndex)
+        const oldIndex = items.findIndex((i) => i.id === active.id);
+        const newIndex = items.findIndex((i) => i.id === over.id);
+        const reordered = arrayMove(items, oldIndex, newIndex);
 
-        setItems(reordered)
+        setItems(reordered);
 
         router.patch(
             "/admin/folders/reorder",
@@ -120,11 +122,11 @@ export default function PresentationPanel() {
                 items: reordered.map((item, index) => ({
                     type: item.type,
                     id: item.type === "folder" ? item.id : null,
-                    order: index + 1 
+                    order: index + 1,
                 })),
             },
-            { preserveScroll: true }
-        )
+            { preserveScroll: true },
+        );
     }
 
     function handleDragCancel() {
@@ -138,7 +140,9 @@ export default function PresentationPanel() {
     if (!company) return null;
 
     const jobPositionsPath = `/admin/folders/${company.slug}/job-positions`;
-    const isJobSpecificActive = url === jobPositionsPath || props.activeFolder?.is_job_specific === true;    
+    const isJobSpecificActive =
+        url === jobPositionsPath ||
+        props.activeFolder?.is_job_specific === true;
 
     return (
         <>
@@ -162,7 +166,7 @@ export default function PresentationPanel() {
                         onClick={openCreate}
                     >
                         <CirclePlus className="size-5" />
-                        <span>Create Module</span>
+                        Create Module
                     </Button>
                 </div>
                 <ScrollArea className="mt-2 min-h-0 flex-1 pr-2">

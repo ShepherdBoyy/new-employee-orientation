@@ -26,26 +26,25 @@ interface Folder {
     slug: string;
     company: Company;
     job_position: JobPosition | null;
+    is_job_specific: boolean;
 }
 
 interface Topic {
-    id: number
-    slug: string
-    label: string
+    id: number;
+    slug: string;
+    label: string;
 }
 
 interface Props {
     activeFolder: Folder;
     slides: Slide[];
-    topic: Topic
+    topic: Topic;
 }
 
 function Index({ activeFolder, slides, topic }: Props) {
-    const [uploadOpen, setUploadOpen] = useState(false)
+    const [uploadOpen, setUploadOpen] = useState(false);
 
-    const backHref = activeFolder.job_position
-        ? `/admin/folders/${activeFolder.company.slug}/job-positions`
-        : `/admin/folders/${activeFolder.company.slug}/${activeFolder.slug}`;
+    const backHref = `/admin/folders/${activeFolder.company.slug}/${activeFolder.slug}`;
     return (
         <>
             <div className="w-full space-y-6">
@@ -54,7 +53,11 @@ function Index({ activeFolder, slides, topic }: Props) {
                     className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
                 >
                     <ArrowLeft className="h-4 w-4" />
-                    Back to {activeFolder.name}
+                    {activeFolder.is_job_specific ? (
+                        <div>Back to {activeFolder.job_position?.name}</div>
+                    ) : (
+                        <div>Back to {activeFolder.name}</div>
+                    )}
                 </Link>
 
                 <div className="flex flex-col gap-4 border-b pb-5 sm:flex-row sm:items-start sm:justify-between">
@@ -71,13 +74,23 @@ function Index({ activeFolder, slides, topic }: Props) {
                                     {activeFolder.job_position.name}
                                 </Badge>
                             )}
-                            <Badge variant="outline" className="text-xs font-normal">
+                            <Badge
+                                variant="outline"
+                                className="text-xs font-normal"
+                            >
                                 {activeFolder.name}
                             </Badge>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Button variant="outline" onClick={() => router.visit(`/admin/folders/${activeFolder.slug}/preview?topic=${topic.slug}`)}>
+                        <Button
+                            variant="outline"
+                            onClick={() =>
+                                router.visit(
+                                    `/admin/folders/${activeFolder.slug}/preview?topic=${topic.slug}`,
+                                )
+                            }
+                        >
                             <Eye className="mr-2 h-4 w-4" />
                             Preview
                         </Button>
