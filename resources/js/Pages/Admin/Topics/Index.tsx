@@ -7,7 +7,7 @@ import AddTopicDialog from "@/Pages/Admin/Topics/component/Dialogs/AddTopicDialo
 import TopicCard from "./component/TopicCard";
 import Master from "@/Layout/Master";
 
-function Index({ topics, company, activeFolder, jobPosition }) {
+function Index({ topics, company, activeFolder }) {
     const [openAddDialog, setOpenAddDialog] = useState(false);
 
     return (

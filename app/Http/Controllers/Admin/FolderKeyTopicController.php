@@ -26,7 +26,13 @@ class FolderKeyTopicController extends Controller
 
         return Inertia::render("Admin/Topics/Index", [
             "company" => $company,
-            "activeFolder" => $folder,
+            "activeFolder" => [
+                "id" => $folder->id,
+                "slug" => $folder->slug,
+                "name" => $folder->name,
+                "is_job_specific" => $folder->job_position_id !== null,
+                "job_position" => $folder->jobPosition
+            ],
             "topics" => $topics,
             ...PresentationPanelData::build($company)
         ]);

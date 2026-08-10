@@ -35,7 +35,7 @@ export interface PageProps {
     company: CompanyNav;
     companyWideFolders?: ModuleNav[];
     jobSpecificSummary: JobSpecificSummary | null;
-    activeFolder?: { slug: string };
+    activeFolder?: { slug: string, is_job_specific?: boolean };
     [key: string]: unknown;
 }
 
@@ -111,6 +111,7 @@ export default function PresentationPanel() {
     if (!company) return null;
 
     const jobPositionsPath = `/admin/folders/${company.slug}/job-positions`;
+    const isJobSpecificActive = url === jobPositionsPath || props.activeFolder?.is_job_specific === true;    
 
     return (
         <>
@@ -163,7 +164,7 @@ export default function PresentationPanel() {
                                                 key={item.id}
                                                 company={company}
                                                 summary={jobSpecificSummary}
-                                                active={active}
+                                                active={isJobSpecificActive}
                                             />
                                         );
                                     }

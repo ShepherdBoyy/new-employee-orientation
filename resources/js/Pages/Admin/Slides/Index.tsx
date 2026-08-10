@@ -35,17 +35,17 @@ interface Topic {
 }
 
 interface Props {
-    folder: Folder;
+    activeFolder: Folder;
     slides: Slide[];
     topic: Topic
 }
 
-function Index({ folder, slides, topic }: Props) {
+function Index({ activeFolder, slides, topic }: Props) {
     const [uploadOpen, setUploadOpen] = useState(false)
 
-    const backHref = folder.job_position
-        ? `/admin/folders/${folder.company.slug}/job-positions`
-        : `/admin/folders/${folder.company.slug}/${folder.slug}`;
+    const backHref = activeFolder.job_position
+        ? `/admin/folders/${activeFolder.company.slug}/job-positions`
+        : `/admin/folders/${activeFolder.company.slug}/${activeFolder.slug}`;
     return (
         <>
             <div className="w-full space-y-6">
@@ -54,7 +54,7 @@ function Index({ folder, slides, topic }: Props) {
                     className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
                 >
                     <ArrowLeft className="h-4 w-4" />
-                    Back to {folder.name}
+                    Back to {activeFolder.name}
                 </Link>
 
                 <div className="flex flex-col gap-4 border-b pb-5 sm:flex-row sm:items-start sm:justify-between">
@@ -63,21 +63,21 @@ function Index({ folder, slides, topic }: Props) {
                             {topic.label}
                         </h1>
                         <div className="flex flex-wrap gap-1.5">
-                            {folder.job_position && (
+                            {activeFolder.job_position && (
                                 <Badge
                                     variant="secondary"
                                     className="text-xs font-normal"
                                 >
-                                    {folder.job_position.name}
+                                    {activeFolder.job_position.name}
                                 </Badge>
                             )}
                             <Badge variant="outline" className="text-xs font-normal">
-                                {folder.name}
+                                {activeFolder.name}
                             </Badge>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Button variant="outline" onClick={() => router.visit(`/admin/folders/${folder.slug}/preview`)}>
+                        <Button variant="outline" onClick={() => router.visit(`/admin/folders/${activeFolder.slug}/preview?topic=${topic.slug}`)}>
                             <Eye className="mr-2 h-4 w-4" />
                             Preview
                         </Button>
@@ -98,14 +98,14 @@ function Index({ folder, slides, topic }: Props) {
                             {slides.length === 1 ? "slide" : "slides"}
                         </span>
                     </div>
-                    <SlideGrid slides={slides} folderId={folder.id} />
+                    <SlideGrid slides={slides} folderId={activeFolder.id} />
                 </div>
             </div>
 
             <UploadSlidesDialog
                 open={uploadOpen}
                 onClose={() => setUploadOpen(false)}
-                folderId={folder.id}
+                folderId={activeFolder.id}
                 topicId={topic.id}
             />
         </>
