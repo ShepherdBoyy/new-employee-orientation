@@ -27,12 +27,13 @@ class SlideController extends Controller
 
         return Inertia::render('Admin/Slides/Index', [
             "company" => $company,
-            'folder' => [
+            'activeFolder' => [
                 'id' => $folder->id,
                 'name' => $folder->name,
                 'slug' => $folder->slug,
                 'company' => $folder->company,
                 'job_position' => $folder->jobPosition,
+                "is_job_specific" => $folder->job_position_id !== null
             ],
             'topic' => $keyTopic,
             'slides' => $slides->map(fn($slide) => [
@@ -112,19 +113,36 @@ class SlideController extends Controller
         return back()->with("success", "Slide deleted successfully");
     }
 
-    public function previewFolder(Folder $folder): Response
+    public function previewFolder(Request $request, Folder $folder): Response
     {
-        $folder->load("slides.keyTopic");
+        $folder->load("keyTopics.slides");
 
+        $slides = $folder->keyTopics
+            ->sortBy("order")
+            ->flatMap(function ($topic) {
+                return $topic->slides->sortBy("order")->map(fn($slide) => [
+                    "id" => $slide->id,
+                    "type" => $slide->type,
+                    "file_url" => $slide->fileUrl(),
+                    "order" => $slide->order,
+                    "topic_id" => $topic->id,
+                    "topic_slug" => $topic->slug,
+                    "topic_name" => $topic->label
+                ]);
+            })->values();
+
+        $startTopicSlug = $request->query("topic");
+        $startIndex = 0;
+
+        if ($startTopicSlug) {
+            $foundIndex = $slides->search(fn($s) => $s["topic_slug"] === $startTopicSlug);
+            $startIndex = $foundIndex !== false ? $foundIndex : 0;
+        }
+        
         return Inertia::render("Admin/Slides/Preview", [
             "folder" => $folder,
-            "slides" => $folder->slides->map(fn($slide) => [
-                "id" => $slide->id,
-                "type" => $slide->type,
-                "file_url" => $slide->fileUrl(),
-                "order" => $slide->order,
-                "topic_name" => $slide->keyTopic->label
-            ])
+            "slides" => $slides,
+            "startIndex" => $startIndex
         ]);
     }
 
