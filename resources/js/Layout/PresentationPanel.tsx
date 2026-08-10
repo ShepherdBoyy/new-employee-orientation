@@ -1,4 +1,4 @@
-import { usePage } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import type {
     CompanyNav,
     JobSpecificSummary,
@@ -13,7 +13,7 @@ import DeleteModuleDialog from "./PresentationPanelComponent/DeleteModuleDialog"
 import EditModuleDialog from "./PresentationPanelComponent/EditModuleDialog";
 import ModuleItem from "./PresentationPanelComponent/ModuleItem";
 import ModuleJobItem from "./PresentationPanelComponent/ModuleJobItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     DndContext,
     closestCenter,
@@ -21,8 +21,10 @@ import {
     useSensor,
     useSensors,
     DragEndEvent,
+    DragStartEvent,
 } from "@dnd-kit/core";
 import {
+    arrayMove,
     SortableContext,
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
@@ -45,6 +47,7 @@ export default function PresentationPanel() {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [activeItem, setActiveItem] = useState<GridItem | null>(null);
 
     const [isDragging, setIsDragging] = useState(false);
 
@@ -75,29 +78,53 @@ export default function PresentationPanel() {
     };
     const segments = url.split("/");
     const activeModuleSlug = segments[4];
-    const items = buildItems(companyWideFolders);
+    const [items, setItems] = useState<GridItem[]>(() => buildItems(companyWideFolders));
+
+    useEffect(() => {
+        setItems(buildItems(companyWideFolders))
+    }, [companyWideFolders, jobSpecificSummary]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
-                distance: 6,
+                distance: 4,
             },
         }),
     );
 
-    function handleDragStart() {
+    function handleDragStart(event: DragStartEvent) {
         setIsDragging(true);
+        const item = items.find(i => i.id === event.active.id)
+        setActiveItem(item ?? null);
     }
 
     function handleDragEnd(event: DragEndEvent) {
         setIsDragging(false);
+        setActiveItem(null);
         const { active, over } = event;
 
         if (!over || active.id === over.id) {
             return;
         }
 
-        console.log("Moved:", active.id, "to:", over.id);
+        const oldIndex = items.findIndex(i => i.id === active.id);
+        const newIndex = items.findIndex(i => i.id === over.id);
+        const reordered = arrayMove(items, oldIndex, newIndex)
+
+        setItems(reordered)
+
+        router.patch(
+            "/admin/folders/reorder",
+            {
+                company_id: company.id,
+                items: reordered.map((item, index) => ({
+                    type: item.type,
+                    id: item.type === "folder" ? item.id : null,
+                    order: index + 1 
+                })),
+            },
+            { preserveScroll: true }
+        )
     }
 
     function handleDragCancel() {
