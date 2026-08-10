@@ -4,19 +4,16 @@ import type {
     JobSpecificSummary,
     ModuleNav,
 } from "./SideBarNav/navTypes";
-
 import { SelectedModule } from "./PresentationPanelComponent/ModuleItem";
 import { CirclePlus } from "lucide-react";
 import CreateFolderDialog from "@/Layout/PresentationPanelComponent/CreateModuleDialog";
 import { Button } from "@/components/ui/button";
-import { Link } from "@inertiajs/react";
-import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import DeleteModuleDialog from "./PresentationPanelComponent/DeleteModuleDialog";
 import EditModuleDialog from "./PresentationPanelComponent/EditModuleDialog";
 import ModuleItem from "./PresentationPanelComponent/ModuleItem";
 import ModuleJobItem from "./PresentationPanelComponent/ModuleJobItem";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
     DndContext,
     closestCenter,
@@ -27,9 +24,9 @@ import {
 } from "@dnd-kit/core";
 import {
     SortableContext,
-    rectSortingStrategy,
-    arrayMove,
+    verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+
 type GridItem =
     | { type: "folder"; id: number; folder: ModuleNav }
     | { type: "job-specific"; id: "job-specific" };
@@ -43,18 +40,19 @@ export interface PageProps {
 }
 
 export default function PresentationPanel() {
+    const { props, url } = usePage<PageProps>();
+
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+    const [isDragging, setIsDragging] = useState(false);
+
     const [module, setModule] = useState<SelectedModule | null>(null);
-    const { props, url } = usePage<PageProps>();
 
     const companyWideFolders = props.companyWideFolders ?? [];
     const jobSpecificSummary = props.jobSpecificSummary ?? null;
-
     const company = props.company;
-
-    if (!company) return null;
 
     const buildItems = (folders: ModuleNav[]): GridItem[] => {
         const items: GridItem[] = folders.map((folder) => ({
@@ -77,17 +75,46 @@ export default function PresentationPanel() {
     };
     const segments = url.split("/");
     const activeModuleSlug = segments[4];
-
     const items = buildItems(companyWideFolders);
 
-    const jobPositionsPath = `/admin/folders/${company.slug}/job-positions`;
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 6,
+            },
+        }),
+    );
+
+    function handleDragStart() {
+        setIsDragging(true);
+    }
+
+    function handleDragEnd(event: DragEndEvent) {
+        setIsDragging(false);
+        const { active, over } = event;
+
+        if (!over || active.id === over.id) {
+            return;
+        }
+
+        console.log("Moved:", active.id, "to:", over.id);
+    }
+
+    function handleDragCancel() {
+        setIsDragging(false);
+    }
 
     function openCreate() {
         setCreateDialogOpen(true);
     }
+
+    if (!company) return null;
+
+    const jobPositionsPath = `/admin/folders/${company.slug}/job-positions`;
+
     return (
         <>
-            <aside className="flex h-full  shrink-0 flex-col rounded-xl text-white">
+            <aside className="flex h-full w-125  shrink-0 flex-col rounded-xl text-white">
                 <div className="px-3 pt-4 pb-1 shrink-0">
                     <h2 className="font-medium text-lg tracking-tight">
                         {company.name}
@@ -110,48 +137,61 @@ export default function PresentationPanel() {
                         <span>Create Module</span>
                     </Button>
                 </div>
-
                 <ScrollArea className="mt-2 min-h-0 flex-1 pr-2">
-                    <div className="space-y-1 pb-4 pr-2">
-                        {items.map((item) => {
-                            if (item.type === "job-specific") {
-                                const active = url === jobPositionsPath;
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragStart={handleDragStart}
+                        onDragEnd={handleDragEnd}
+                        onDragCancel={handleDragCancel}
+                    >
+                        <SortableContext
+                            items={items.map((item) => item.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <div className="space-y-1 pb-4 pr-2">
+                                {items.map((item) => {
+                                    if (item.type === "job-specific") {
+                                        const active = url === jobPositionsPath;
 
-                                if (!jobSpecificSummary) {
-                                    return null;
-                                }
+                                        if (!jobSpecificSummary) {
+                                            return null;
+                                        }
 
-                                return (
-                                    <ModuleJobItem
-                                        key={item.id}
-                                        company={company}
-                                        summary={jobSpecificSummary}
-                                        active={active}
-                                    />
-                                );
-                            }
+                                        return (
+                                            <ModuleJobItem
+                                                key={item.id}
+                                                company={company}
+                                                summary={jobSpecificSummary}
+                                                active={active}
+                                            />
+                                        );
+                                    }
 
-                            const active =
-                                item.folder.slug === activeModuleSlug;
+                                    const active =
+                                        item.folder.slug === activeModuleSlug;
 
-                            return (
-                                <ModuleItem
-                                    key={item.id}
-                                    company={company}
-                                    module={item.folder}
-                                    active={active}
-                                    onEdit={(module) => {
-                                        setModule(module);
-                                        setOpenEditDialog(true);
-                                    }}
-                                    onDelete={(module) => {
-                                        setModule(module);
-                                        setOpenDeleteDialog(true);
-                                    }}
-                                />
-                            );
-                        })}
-                    </div>
+                                    return (
+                                        <ModuleItem
+                                            key={item.id}
+                                            company={company}
+                                            module={item.folder}
+                                            active={active}
+                                            isDragging={isDragging}
+                                            onEdit={(module) => {
+                                                setModule(module);
+                                                setOpenEditDialog(true);
+                                            }}
+                                            onDelete={(module) => {
+                                                setModule(module);
+                                                setOpenDeleteDialog(true);
+                                            }}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        </SortableContext>
+                    </DndContext>
                 </ScrollArea>
             </aside>
 

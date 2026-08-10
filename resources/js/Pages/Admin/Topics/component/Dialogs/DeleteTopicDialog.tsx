@@ -49,7 +49,7 @@ export default function DeleteTopicDialog({
 
                         <AlertDialogDescription>
                             Are you sure you want to delete{" "}
-                            <strong>{topic.label}</strong>?
+                            <strong>{topic?.label}</strong>?
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 

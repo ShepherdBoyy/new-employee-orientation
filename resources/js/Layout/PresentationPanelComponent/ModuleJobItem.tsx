@@ -1,5 +1,6 @@
 import {
     Item,
+    ItemActions,
     ItemContent,
     ItemDescription,
     ItemMedia,
@@ -7,8 +8,11 @@ import {
 } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
 import { Link } from "@inertiajs/react";
-import { UsersRound } from "lucide-react";
+import { GripVertical, UsersRound } from "lucide-react";
 import type { CompanyNav, JobSpecificSummary } from "../SideBarNav/navTypes";
+import { Button } from "@/components/ui/button";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface Props {
     company: CompanyNav;
@@ -17,31 +21,57 @@ interface Props {
 }
 
 export default function ModuleJobItem({ company, summary, active }: Props) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({
+        id: "job-specific",
+    });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
     const href = `/admin/folders/${company.slug}/job-positions`;
 
     return (
-        <Link href={href} className="group block">
-            <Item
-                className={cn(
-                    "relative flex items-center justify-between rounded-xl px-3 py-2.5 transition-all duration-150",
-                    active
-                        ? "bg-white text-slate-900 shadow-sm"
-                        : "text-white/80 hover:bg-white/5 hover:text-white",
-                )}
+        <Item
+            ref={setNodeRef}
+            style={style}
+            className={cn(
+                "relative flex items-center justify-between rounded-xl px-3 py-2.5 transition-all duration-150",
+                active
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-white/80 hover:bg-white/5 hover:text-white",
+                isDragging && "z-50 opacity-50",
+            )}
+        >
+            <ItemMedia>
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className={cn(
+                        "h-7 w-7 rounded-md cursor-grabbing",
+                        active
+                            ? "text-slate-600 hover:bg-slate-100"
+                            : "text-white/70 hover:bg-white/10 hover:text-white",
+                    )}
+                    {...attributes}
+                    {...listeners}
+                >
+                    <GripVertical className="h-4 w-4" />
+                </Button>
+            </ItemMedia>
+            <Link
+                href={href}
+                className="group flex min-w-0 flex-1 items-center"
             >
-                <ItemMedia>
-                    <div
-                        className={cn(
-                            "rounded-lg p-2 transition-colors",
-                            active
-                                ? "bg-primary/10 text-primary"
-                                : "bg-white/5 text-white/70 group-hover:bg-white/10 group-hover:text-white",
-                        )}
-                    >
-                        <UsersRound className="h-4 w-4" />
-                    </div>
-                </ItemMedia>
-
                 <ItemContent className="ml-3 min-w-0 flex-1">
                     <ItemTitle
                         className={cn(
@@ -62,7 +92,9 @@ export default function ModuleJobItem({ company, summary, active }: Props) {
                         {summary.total_positions} positions
                     </ItemDescription>
                 </ItemContent>
-            </Item>
-        </Link>
+            </Link>
+
+            <ItemActions></ItemActions>
+        </Item>
     );
 }
