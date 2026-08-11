@@ -38,18 +38,6 @@ export default function FolderList({ folders, allCompleted, user }: Props) {
                             acknowledgement.
                         </p>
                     </div>
-
-                    {/*  <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                            <span className="font-medium">
-                                {completedCount} of {folders.length} completed
-                            </span>
-                            <div className="text-muted-foreground ">
-                                {Math.round(progress)}%
-                            </div>
-                        </div>
-                        <Progress value={progress} className="h-2" />
-                    </div> */}
                 </div>
 
                 <div className="grid flex-1 gap-6 content-start sm:grid-cols-2 lg:grid-cols-3">

@@ -101,7 +101,20 @@ class OrientationController extends Controller
             }
         }
 
-        $folder->load("slides");
+        $folder->load("keyTopics.slides");
+
+        $slides = $folder->keyTopics
+            ->sortBy("order")
+            ->flatMap(function ($topic) {
+                return $topic->slides->sortBy("order")->map(fn($slide) => [
+                    "id" => $slide->id,
+                    "type" => $slide->type,
+                    "file_url" => $slide->fileUrl(),
+                    "order" => $slide->order,
+                    "topic_id" => $topic->id,
+                    "topic_name" => $topic->label
+                ]);
+            })->values();
 
         return Inertia::render("Employee/FolderViewer", [
             "folder" => [
@@ -109,12 +122,7 @@ class OrientationController extends Controller
                 "slug" => $folder->slug,
                 "name" => $folder->name
             ],
-            "slides" => $folder->slides->map(fn($slide) => [
-                "id" => $slide->id,
-                "type" => $slide->type,
-                "file_url" => $slide->fileUrl(),
-                "order" => $slide->order
-            ]),
+            "slides" => $slides,
             "isCompleted" => in_array($folder->id, $completedIds)
         ]);
     }
