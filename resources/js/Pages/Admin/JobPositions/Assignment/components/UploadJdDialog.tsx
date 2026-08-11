@@ -1,12 +1,10 @@
 import {
     Dialog,
-    DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
 import {
     Field,
@@ -16,10 +14,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { router, Form } from "@inertiajs/react";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import React, { useEffect, useState } from "react";
+import { Form } from "@inertiajs/react";
 
 interface CompanyJobIds {
     company_id: number;
@@ -35,13 +30,8 @@ interface Props {
 export default function UploadJdDialog({
     isOpen,
     onClose,
-    companyJobIds
+    companyJobIds,
 }: Props) {
-    const [isClient, setIsClient] = useState(false);
-    // useEffect only runs in the browser, safely bypassing SSR
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
     return (
         <>
             <Dialog
@@ -57,45 +47,45 @@ export default function UploadJdDialog({
                             Job description for this position
                         </DialogDescription>
                     </DialogHeader>
-                        <Form
-                            action="/admin/upload-jd"
-                            method="post"
-                            transform={(data) => ({
-                                ...data,
-                                company_id: companyJobIds?.company_id,
-                                job_position_id: companyJobIds?.job_position_id,
-                            })}
-                            className="space-y-5"
-                        >
-                            {({ errors }) => (
-                                <>
-                                    <Field>
-                                        <FieldLabel htmlFor="pdf_file">
-                                            Attach Job Description
-                                        </FieldLabel>
+                    <Form
+                        action="/admin/upload-jd"
+                        method="post"
+                        transform={(data) => ({
+                            ...data,
+                            company_id: companyJobIds?.company_id,
+                            job_position_id: companyJobIds?.job_position_id,
+                        })}
+                        className="space-y-5"
+                    >
+                        {({ errors }) => (
+                            <>
+                                <Field>
+                                    <FieldLabel htmlFor="pdf_file">
+                                        Attach Job Description
+                                    </FieldLabel>
 
-                                        <Input
-                                            id="pdf_file"
-                                            name="pdf_file"
-                                            type="file"
-                                        />
-                                        <FieldDescription>
-                                            Select a pdf to upload.
-                                        </FieldDescription>
-                                        <FieldError>
-                                            {errors.pdf_file && (
-                                                <div className="text-red-500 text-sm">
-                                                    {errors.pdf_file}
-                                                </div>
-                                            )}
-                                        </FieldError>
-                                    </Field>
-                                    <DialogFooter>
-                                        <Button type="submit">Submit</Button>
-                                    </DialogFooter>
-                                </>
-                            )}
-                        </Form>
+                                    <Input
+                                        id="pdf_file"
+                                        name="pdf_file"
+                                        type="file"
+                                    />
+                                    <FieldDescription>
+                                        Select a pdf to upload.
+                                    </FieldDescription>
+                                    <FieldError>
+                                        {errors.pdf_file && (
+                                            <div className="text-red-500 text-sm">
+                                                {errors.pdf_file}
+                                            </div>
+                                        )}
+                                    </FieldError>
+                                </Field>
+                                <DialogFooter>
+                                    <Button type="submit">Submit</Button>
+                                </DialogFooter>
+                            </>
+                        )}
+                    </Form>
                 </DialogContent>
             </Dialog>
         </>

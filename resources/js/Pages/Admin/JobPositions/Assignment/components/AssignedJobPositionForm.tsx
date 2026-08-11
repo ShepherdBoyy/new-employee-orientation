@@ -65,10 +65,6 @@ export default function AssignedJobPositionForm({ companies, jobs }: Props) {
         <Card className="w-full  flex flex-col overflow-hidden">
             <CardHeader className="border-b bg-muted/20">
                 <CardTitle>Assign Job Position</CardTitle>
-                <CardDescription>
-                    Select a job position and assign it to one or more
-                    companies.
-                </CardDescription>
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="max-w-full ">

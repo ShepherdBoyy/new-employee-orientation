@@ -1,32 +1,28 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
     Empty,
     EmptyHeader,
     EmptyTitle,
     EmptyDescription,
 } from "@/components/ui/empty";
-
-// 1. Import your fixed RemoveJobDialog component
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import RemoveJobDialog from "./RemoveJobDialog";
 import ViewJdDialog from "./ViewJdDialog";
 import UploadJdDialog from "./UploadJdDialog";
-
 import type { CompanyWithJobs } from "../../../Types/company";
 import { Badge } from "@/components/ui/badge";
-import { PinOff, BriefcaseBusiness } from "lucide-react";
-import { router } from "@inertiajs/react";
-
-// Match the type expected by the Dialog component
+import { PinOff } from "lucide-react";
+import { EllipsisVertical, Eye, Upload, RefreshCw } from "lucide-react";
 interface JobWithPivot {
     id: number;
     name: string;
@@ -56,36 +52,76 @@ export default function CompanyJobTabs({ companies }: Props) {
         company.name.toLowerCase(),
     );
 
+    const activeDeletingCompanyName = companies.find(
+        (c) => c.id === activeDeletingJob?.pivot.company_id,
+    );
     const defaultTab = filteredCompanies[0]?.id
         ? String(filteredCompanies[0].id)
         : String(companies[0].id);
 
-    const activeDeletingCompanyName = companies.find(
-        (c) => c.id === activeDeletingJob?.pivot.company_id,
+    const [activeCompanyId, setActiveCompanyId] = useState(defaultTab);
+
+    const activeCompany = filteredCompanies.find(
+        (company) => String(company.id) === activeCompanyId,
     );
 
+    const activeJobs = activeCompany?.jobs ?? [];
+
+    const totalJobs = activeJobs.length;
+
+    const uploadedCount = activeJobs.filter((job) =>
+        Boolean(job.document),
+    ).length;
+
+    const missingCount = totalJobs - uploadedCount;
     return (
         <>
-            <Card className="w-full h-full flex flex-col overflow-hidden">
+            <Card className="w-full  flex flex-col ">
                 <CardHeader className="border-b bg-muted/20">
-                    <CardTitle>Job Management Matrix</CardTitle>
-                    <CardDescription>
-                        Review and detach active job positions across your
-                        companies.
-                    </CardDescription>
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                            <CardTitle className="text-base">
+                                Assigned Job Positions
+                            </CardTitle>
+
+                            <p className="mt-1 text-sm text-muted-foreground">
+                                Manage positions assigned to{" "}
+                                {activeCompany?.name}.
+                            </p>
+                        </div>
+
+                        <Badge variant="secondary" className="shrink-0">
+                            {totalJobs}{" "}
+                            {totalJobs === 1 ? "position" : "positions"}
+                        </Badge>
+                    </div>
+
+                    <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1.5">
+                            <span className="size-1.5 rounded-full bg-emerald-500" />
+                            {uploadedCount} JD uploaded
+                        </span>
+
+                        {missingCount > 0 && (
+                            <span className="flex items-center gap-1.5">
+                                <span className="size-1.5 rounded-full bg-amber-500" />
+                                {missingCount} need attention
+                            </span>
+                        )}
+                    </div>
                 </CardHeader>
 
-                <CardContent className="p-6">
+                <CardContent>
                     <Tabs
-                        defaultValue={defaultTab}
-                        className="w-full space-y-6"
+                        value={activeCompanyId}
+                        onValueChange={(value) => {
+                            setActiveCompanyId(value);
+                        }}
+                        className="w-full space-y-2 pt-2"
                     >
                         {/* Horizontal Tab Track Container */}
                         <div className="w-full border-b overflow-x-auto scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                            <TabsList
-                                variant="line"
-                                className="bg-transparent p-0 gap-4 whitespace-nowrap min-w-max"
-                            >
+                            <TabsList className="bg-transparent p-0 gap-4 whitespace-nowrap min-w-max">
                                 {filteredCompanies.map((company) => (
                                     <TabsTrigger
                                         key={company.id}
@@ -93,109 +129,201 @@ export default function CompanyJobTabs({ companies }: Props) {
                                         className=" rounded-none bg-transparent text-muted-foreground transition-all hover:text-foreground data-[state=active]:border-b-primary data-[state=active]:text-foreground data-[state=active]:shadow-none group"
                                     >
                                         <span>{company.name}</span>
-                                        <Badge className=" bg-muted  text-xs font-semibold text-muted-foreground group-data-[state=active]:bg-primary/10 group-data-[state=active]:text-primary transition-colors">
-                                            {company.jobs?.length || 0}
-                                        </Badge>
                                     </TabsTrigger>
                                 ))}
                             </TabsList>
                         </div>
 
-                        {/* Main Content Grid Area */}
-                        {filteredCompanies.map((company) => (
-                            <TabsContent
-                                key={company.id}
-                                value={String(company.id)}
-                                className="mt-0 focus-visible:outline-none"
-                            >
-                                {company.jobs?.length ? (
-                                    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-2">
-                                        {company.jobs.map((job) => (
-                                            <Card
-                                                key={job.id}
-                                                className="shadow-sm hover:shadow-md transition-all border-muted/60 flex flex-col justify-between"
-                                            >
-                                                <CardContent className="flex items-center justify-between">
-                                                    <h4 className="font-semibold text-sm text-foreground tracking-tight truncate">
-                                                        {job.name}
-                                                    </h4>
+                        <ScrollArea className="max-h-118 overflow-y-auto pr-2">
+                            {filteredCompanies.map((company) => (
+                                <TabsContent
+                                    key={company.id}
+                                    value={String(company.id)}
+                                    className="mt-0 focus-visible:outline-none"
+                                >
+                                    {company.jobs?.length ? (
+                                        <div className="overflow-hidden rounded-xl border">
+                                            <div className="divide-y">
+                                                {company.jobs.map((job) => (
+                                                    <div
+                                                        key={job.id}
+                                                        className=" flex items-center justify-between gap-6 px-5 py-4 transition-colors hover:bg-muted/40"
+                                                    >
+                                                        {/* Job information */}
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex items-center ">
+                                                                <p className="truncate text-sm font-medium">
+                                                                    {job.name}
+                                                                </p>
+                                                            </div>
 
-                                                    <div className="grid gap-2 sm:grid-cols-2">
-                                                        {job.document ? (
-                                                            <Button
-                                                                size="sm"
-                                                                onClick={() => {
-                                                                    setViewDialog(
-                                                                        true,
-                                                                    );
-                                                                    setDocument(
-                                                                        job
-                                                                            .document
-                                                                            .file_path,
-                                                                    );
-                                                                }}
-                                                                variant="outline"
-                                                            >
-                                                                <BriefcaseBusiness />
-                                                                View JD
-                                                            </Button>
-                                                        ) : (
-                                                            <Button
-                                                                size="sm"
-                                                                onClick={() => {
-                                                                    setUploadDialog(
-                                                                        true,
-                                                                    );
-                                                                    setActiveDeletingJob(
-                                                                        job as unknown as JobWithPivot,
-                                                                    );
-                                                                }}
-                                                                variant="outline"
-                                                            >
-                                                                <BriefcaseBusiness />
-                                                                Upload JD
-                                                            </Button>
-                                                        )}
-                                                        <Button
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                setActiveDeleteDialog(
-                                                                    true,
-                                                                );
-                                                                setActiveDeletingJob(
-                                                                    job as unknown as JobWithPivot,
-                                                                );
-                                                            }}
-                                                            variant="outline"
-                                                        >
-                                                            <PinOff />
-                                                            Remove
-                                                        </Button>
+                                                            <div className="mt-2 flex items-center gap-2">
+                                                                {job.document ? (
+                                                                    <>
+                                                                        <span className="size-1.5 rounded-full bg-emerald-500" />
+
+                                                                        <span className="text-xs text-muted-foreground">
+                                                                            Job
+                                                                            description
+                                                                            available
+                                                                        </span>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <span className="size-1.5 rounded-full bg-amber-500" />
+
+                                                                        <span className="text-xs text-muted-foreground">
+                                                                            Job
+                                                                            description
+                                                                            not
+                                                                            uploaded
+                                                                        </span>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Actions */}
+                                                        <div className="flex shrink-0 items-center gap-1.5">
+                                                            {job.document ? (
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                    className="gap-2"
+                                                                    onClick={() => {
+                                                                        setViewDialog(
+                                                                            true,
+                                                                        );
+                                                                        setDocument(
+                                                                            job
+                                                                                .document
+                                                                                .file_path,
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    <Eye className="size-4" />
+                                                                    View JD
+                                                                </Button>
+                                                            ) : (
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                    className="gap-2"
+                                                                    onClick={() => {
+                                                                        setUploadDialog(
+                                                                            true,
+                                                                        );
+                                                                        setActiveDeletingJob(
+                                                                            job as unknown as JobWithPivot,
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    <Upload className="size-4" />
+                                                                    Upload JD
+                                                                </Button>
+                                                            )}
+
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger
+                                                                    asChild
+                                                                >
+                                                                    <Button
+                                                                        size="icon"
+                                                                        variant="ghost"
+                                                                        className="size-8 text-muted-foreground hover:text-foreground"
+                                                                    >
+                                                                        <EllipsisVertical className="size-4" />
+                                                                        <span className="sr-only">
+                                                                            Actions
+                                                                            for{" "}
+                                                                            {
+                                                                                job.name
+                                                                            }
+                                                                        </span>
+                                                                    </Button>
+                                                                </DropdownMenuTrigger>
+
+                                                                <DropdownMenuContent
+                                                                    align="end"
+                                                                    className="w-56"
+                                                                >
+                                                                    {job.document ? (
+                                                                        <DropdownMenuItem
+                                                                            onClick={() => {
+                                                                                setUploadDialog(
+                                                                                    true,
+                                                                                );
+                                                                                setActiveDeletingJob(
+                                                                                    job as unknown as JobWithPivot,
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            <RefreshCw className="mr-2 size-4" />
+                                                                            Replace
+                                                                            JD
+                                                                        </DropdownMenuItem>
+                                                                    ) : (
+                                                                        <DropdownMenuItem
+                                                                            onClick={() => {
+                                                                                setUploadDialog(
+                                                                                    true,
+                                                                                );
+                                                                                setActiveDeletingJob(
+                                                                                    job as unknown as JobWithPivot,
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            <Upload className="mr-2 size-4" />
+                                                                            Upload
+                                                                            JD
+                                                                        </DropdownMenuItem>
+                                                                    )}
+
+                                                                    <DropdownMenuSeparator />
+
+                                                                    <DropdownMenuItem
+                                                                        variant="destructive"
+                                                                        className="text-destructive focus:text-destructive"
+                                                                        onClick={() => {
+                                                                            setActiveDeleteDialog(
+                                                                                true,
+                                                                            );
+                                                                            setActiveDeletingJob(
+                                                                                job as unknown as JobWithPivot,
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <PinOff className="mr-2 size-4" />
+                                                                        Remove
+                                                                        assignment
+                                                                    </DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </div>
                                                     </div>
-                                                </CardContent>
-                                            </Card>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <Empty className="border border-dashed bg-muted/5 rounded-xl py-12">
-                                        <EmptyHeader>
-                                            <EmptyTitle className="text-base font-medium text-muted-foreground">
-                                                No active assignments
-                                            </EmptyTitle>
-                                            <EmptyDescription className="text-xs max-w-60 mx-auto mt-1">
-                                                Use your assignment form to map
-                                                roles to this profile.
-                                            </EmptyDescription>
-                                        </EmptyHeader>
-                                    </Empty>
-                                )}
-                            </TabsContent>
-                        ))}
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <Empty className="border border-dashed bg-muted/5 rounded-xl py-12">
+                                            <EmptyHeader>
+                                                <EmptyTitle className="text-base font-medium text-muted-foreground">
+                                                    No active assignments
+                                                </EmptyTitle>
+                                                <EmptyDescription className="text-xs max-w-60 mx-auto mt-1">
+                                                    Use your assignment form to
+                                                    map roles to this profile.
+                                                </EmptyDescription>
+                                            </EmptyHeader>
+                                        </Empty>
+                                    )}
+                                </TabsContent>
+                            ))}
+                        </ScrollArea>
                     </Tabs>
                 </CardContent>
             </Card>
 
-            {/* 5. Render the AlertDialog globally at the root layout level */}
             <RemoveJobDialog
                 job={activeDeletingJob}
                 companyName={activeDeletingCompanyName?.name}

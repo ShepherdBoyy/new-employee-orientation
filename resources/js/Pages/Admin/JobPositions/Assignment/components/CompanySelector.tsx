@@ -33,7 +33,6 @@ export default function CompanySelector({
     const allSelected =
         companies.length > 0 && selected.length === companies.length;
 
-    const someSelected = selected.length > 0 && !allSelected;
     function toggleAll() {
         if (allSelected) {
             onChange([]);

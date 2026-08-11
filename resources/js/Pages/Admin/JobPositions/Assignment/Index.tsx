@@ -17,16 +17,16 @@ function Index({ companies, jobs }: Props) {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-semibold tracking-tight">
-                            Job Positions
+                            Job Assignment
                         </h1>
                         <p className="text-sm text-muted-foreground mt-1">
-                            Reusable roles that can later be assigned to one or
-                            more companies.
+                            Assign job positions to companies and manage their
+                            job descriptions.
                         </p>
                     </div>
                 </div>
                 <Separator />
-                <div className="grid lg:grid-cols-[450px_1fr] gap-3 items-start">
+                <div className="grid lg:grid-cols-[380px_minmax(0,1fr)] gap-6 items-start">
                     <AssignedJobPositionForm
                         companies={companies}
                         jobs={jobs}
