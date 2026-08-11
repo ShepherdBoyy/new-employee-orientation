@@ -133,7 +133,7 @@ function Index({ topics, company, activeFolder }: Props) {
                     </span>
                 </div>
 
-                <TopicList topics={topics} company={company} />
+                <TopicList topics={topics} company={company} folderId={activeFolder.id} />
             </motion.section>
 
             <AddTopicDialog

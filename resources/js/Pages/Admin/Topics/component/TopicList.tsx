@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Company } from "../../Types/company";
 import type { Topic } from "./TopicCard";
 import TopicCard from "./TopicCard";
+import { router } from "@inertiajs/react";
 
 import EditTopicDialog from "./Dialogs/EditTopicDialog";
 import DeleteTopicDialog from "./Dialogs/DeleteTopicDialog";
@@ -16,24 +17,24 @@ import {
 } from "@dnd-kit/core";
 
 import {
+    arrayMove,
     rectSortingStrategy,
     SortableContext,
-    verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { distance } from "motion/react";
-import { MoveDiagonal } from "lucide-react";
 
 interface Props {
     topics: Topic[];
     company: Company;
+    folderId: number
 }
 
-export default function TopicList({ topics, company }: Props) {
+export default function TopicList({ topics: initalTopics, company, folderId }: Props) {
+    const [topics, setTopics] = useState(initalTopics);
     const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
-
     const [openEditDialog, setOpenEditDialog] = useState(false);
-
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+    useEffect(() => setTopics(initalTopics), [initalTopics]);
 
     function handleEdit(topic: Topic) {
         setSelectedTopic(topic);
@@ -55,12 +56,24 @@ export default function TopicList({ topics, company }: Props) {
 
     function handleDragEnd(event: DragEndEvent) {
         const { active, over } = event;
+        if (!over || active.id === over.id) return;
+        
+        const oldIndex = topics.findIndex((t) => t.id === active.id);
+        const newIndex = topics.findIndex((t) => t.id === over.id);
+        const reordered = arrayMove(topics, oldIndex, newIndex);
 
-        if (!over || active.id === "over.id") {
-            return;
-        }
+        setTopics(reordered);
 
-        console.log("Moved:", active.id, "to:", over.id);
+        router.patch(
+            `/admin/folders/${folderId}/topics/reorder`,
+            {
+                topics: reordered.map((topic, index) => ({
+                    id: topic.id,
+                    order: index + 1
+                }))
+            },
+            { preserveScroll: true }
+        )
     }
     return (
         <>

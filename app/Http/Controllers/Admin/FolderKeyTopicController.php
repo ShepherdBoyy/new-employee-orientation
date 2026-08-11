@@ -69,7 +69,7 @@ class FolderKeyTopicController extends Controller
     {
         $validated = $request->validate([
             "topics" => ["required", "array"],
-            "topics.*.label" => ["required", "exists:folder_key_topics,id"],
+            "topics.*.id" => ["required", "exists:folder_key_topics,id"],
             "topics.*.order" => ["required", "integer", "min:1"]
         ]);
 
