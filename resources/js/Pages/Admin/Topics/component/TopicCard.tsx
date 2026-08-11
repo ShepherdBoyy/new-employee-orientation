@@ -19,6 +19,7 @@ import { motion } from "motion/react";
 import type { Company } from "../../Types/company";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+
 export interface Topic {
     id: number;
     label: string;
@@ -32,13 +33,20 @@ export interface Topic {
 }
 
 interface Props {
+    index: number;
     topic: Topic;
     company: Company;
     onEdit: (topic: Topic) => void;
     onDelete: (topic: Topic) => void;
 }
 
-export default function TopicCard({ topic, company, onEdit, onDelete }: Props) {
+export default function TopicCard({
+    topic,
+    index,
+    company,
+    onEdit,
+    onDelete,
+}: Props) {
     const {
         attributes,
         listeners,
@@ -54,73 +62,76 @@ export default function TopicCard({ topic, company, onEdit, onDelete }: Props) {
         transform: CSS.Transform.toString(transform),
         transition,
     };
+
     return (
         <div
             ref={setNodeRef}
             style={style}
             className={cn("relative", isDragging && "z-50")}
         >
-            {" "}
             <motion.div
-                ref={setNodeRef}
-                style={style}
                 initial={{
                     opacity: 0,
-                    y: 12,
+                    scale: 0.98,
                 }}
                 animate={{
                     opacity: 1,
-                    y: 0,
+                    scale: 1,
                 }}
                 transition={{
                     duration: 0.3,
+                    delay: index * 0.05,
                     ease: "easeOut",
                 }}
-                className={cn(
-                    "group relative",
-                    isDragging && "z-50 opacity-50",
-                )}
+                className={cn("group relative", isDragging && "opacity-50")}
             >
-                <div className="relative h-full overflow-hidden rounded-xl border border-border/60 bg-card transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
-                    <div className="relative z-10 p-5">
-                        {/* Main navigation */}
-                        <Link
-                            href={`/admin/folders/${company.slug}/${topic.folder.slug}/topics/${topic.slug}`}
-                            className="
-                            absolute
-                            inset-0
-                            z-0
-                            rounded-xl
-                            focus:outline-none
-                            focus-visible:ring-2
-                            focus-visible:ring-ring
-                            focus-visible:ring-offset-2
-                        "
-                            aria-label={`View topic ${topic.label}`}
-                        />
+                <div
+                    className={cn(
+                        "relative h-full overflow-hidden rounded-xl",
+                        "border border-border/60 bg-card",
+                        "transition-all duration-200",
+                        "hover:-translate-y-0.5",
+                        "hover:border-primary/30",
+                        "hover:shadow-lg hover:shadow-primary/5",
+                    )}
+                >
+                    {/* Main clickable area */}
 
+                    <div className="relative z-10 p-5">
                         {/* Header */}
-                        <div className="flex items-center justify-between gap-2">
-                            <div className="flex min-w-0 items-center">
+                        <div className="flex items-center justify-between gap-3">
+                            <div className="flex min-w-0 items-center gap-2">
                                 {/* Drag handle */}
                                 <Button
                                     type="button"
                                     variant="ghost"
                                     size="icon"
                                     className={cn(
-                                        "relative z-20 h-7 w-7 shrink-0 cursor-grab",
-                                        "text-muted-foreground hover:bg-muted hover:text-foreground",
+                                        "relative z-20 h-7 w-7 shrink-0",
+                                        "cursor-grab",
+                                        "text-muted-foreground",
+                                        "hover:bg-muted",
+                                        "hover:text-foreground",
                                         isDragging && "cursor-grabbing",
                                     )}
                                     {...attributes}
                                     {...listeners}
                                 >
                                     <GripVertical className="h-4 w-4" />
+
+                                    <span className="sr-only">
+                                        Drag {topic.label}
+                                    </span>
                                 </Button>
 
                                 {/* Topic information */}
-                                <div className="ml-2 min-w-0">
-                                    <h3 className="truncate text-base font-semibold tracking-tight">
+                                <Link
+                                    href={`/admin/folders/${company.slug}/${topic.folder.slug}/topics/${topic.slug}`}
+                                    className="absolute inset-0 z-0 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                    aria-label={`View topic ${topic.label}`}
+                                />
+                                <div className="min-w-0">
+                                    <h3 className="truncate text-sm font-semibold tracking-tight">
                                         {topic.label}
                                     </h3>
 
@@ -138,15 +149,15 @@ export default function TopicCard({ topic, company, onEdit, onDelete }: Props) {
                                             variant="ghost"
                                             size="icon"
                                             className="
-                                            h-8 w-8
-                                            text-muted-foreground
-                                            opacity-60
-                                            transition-opacity
-                                            hover:bg-muted
-                                            hover:text-foreground
-                                            hover:opacity-100
-                                            group-hover:opacity-100
-                                        "
+                                                h-8 w-8
+                                                text-muted-foreground
+                                                opacity-60
+                                                transition-opacity
+                                                hover:bg-muted
+                                                hover:text-foreground
+                                                hover:opacity-100
+                                                group-hover:opacity-100
+                                            "
                                         >
                                             <EllipsisVertical className="h-4 w-4" />
 
@@ -183,8 +194,8 @@ export default function TopicCard({ topic, company, onEdit, onDelete }: Props) {
                             </div>
                         </div>
 
-                        {/* Slide count */}
-                        <div className="mt-6 flex items-center justify-between">
+                        {/* Footer */}
+                        <div className="mt-6 flex items-center">
                             <div className="inline-flex items-center gap-1.5 rounded-md bg-muted/70 px-2 py-1">
                                 <Layers3 className="h-3.5 w-3.5 text-muted-foreground" />
 

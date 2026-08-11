@@ -25,16 +25,18 @@ import {
 interface Props {
     topics: Topic[];
     company: Company;
-    folderId: number
+    folderId: number;
 }
 
-export default function TopicList({ topics: initalTopics, company, folderId }: Props) {
+export default function TopicList({
+    topics: initalTopics,
+    company,
+    folderId,
+}: Props) {
     const [topics, setTopics] = useState(initalTopics);
     const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-
-    useEffect(() => setTopics(initalTopics), [initalTopics]);
 
     function handleEdit(topic: Topic) {
         setSelectedTopic(topic);
@@ -57,7 +59,7 @@ export default function TopicList({ topics: initalTopics, company, folderId }: P
     function handleDragEnd(event: DragEndEvent) {
         const { active, over } = event;
         if (!over || active.id === over.id) return;
-        
+
         const oldIndex = topics.findIndex((t) => t.id === active.id);
         const newIndex = topics.findIndex((t) => t.id === over.id);
         const reordered = arrayMove(topics, oldIndex, newIndex);
@@ -69,11 +71,11 @@ export default function TopicList({ topics: initalTopics, company, folderId }: P
             {
                 topics: reordered.map((topic, index) => ({
                     id: topic.id,
-                    order: index + 1
-                }))
+                    order: index + 1,
+                })),
             },
-            { preserveScroll: true }
-        )
+            { preserveScroll: true },
+        );
     }
     return (
         <>
@@ -87,8 +89,9 @@ export default function TopicList({ topics: initalTopics, company, folderId }: P
                     strategy={rectSortingStrategy}
                 >
                     <div className="grid grid-cols-2 gap-2">
-                        {topics.map((item) => (
+                        {topics.map((item, index) => (
                             <TopicCard
+                                index={index}
                                 key={item.id}
                                 topic={item}
                                 company={company}

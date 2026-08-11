@@ -132,10 +132,12 @@ function Index({ topics, company, activeFolder }: Props) {
                         {topics.length === 1 ? "topic" : "topics"}
                     </span>
                 </div>
-
-                <TopicList topics={topics} company={company} folderId={activeFolder.id} />
             </motion.section>
-
+            <TopicList
+                topics={topics}
+                company={company}
+                folderId={activeFolder.id}
+            />
             <AddTopicDialog
                 open={openAddDialog}
                 onOpenChange={setOpenAddDialog}
