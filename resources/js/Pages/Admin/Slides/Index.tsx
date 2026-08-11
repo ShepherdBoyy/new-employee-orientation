@@ -20,7 +20,7 @@ interface JobPosition {
     slug: string;
 }
 
-interface Folder {
+export interface Folder {
     id: number;
     name: string;
     slug: string;
