@@ -13,7 +13,7 @@ import DeleteModuleDialog from "./PresentationPanelComponent/DeleteModuleDialog"
 import EditModuleDialog from "./PresentationPanelComponent/EditModuleDialog";
 import ModuleItem from "./PresentationPanelComponent/ModuleItem";
 import ModuleJobItem from "./PresentationPanelComponent/ModuleJobItem";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     DndContext,
     closestCenter,
@@ -53,38 +53,43 @@ export default function PresentationPanel() {
 
     const [module, setModule] = useState<SelectedModule | null>(null);
 
-    const companyWideFolders = props.companyWideFolders ?? [];
-    const jobSpecificSummary = props.jobSpecificSummary ?? null;
+    const companyWideFolders = props.companyWideFolders;
+    const jobSpecificSummary = props.jobSpecificSummary;
     const company = props.company;
 
-    const buildItems = (folders: ModuleNav[]): GridItem[] => {
-        const items: GridItem[] = folders.map((folder) => ({
-            type: "folder",
-            id: folder.id,
-            folder,
-        }));
+    const buildItems = useCallback(
+        (folders: ModuleNav[]): GridItem[] => {
+            const items: GridItem[] = folders.map((folder) => ({
+                type: "folder",
+                id: folder.id,
+                folder,
+            }));
 
-        if (jobSpecificSummary) {
-            const insertAt = folders.filter(
-                (f) => f.order < jobSpecificSummary.order,
-            ).length;
-            items.splice(insertAt, 0, {
-                type: "job-specific",
-                id: "job-specific",
-            });
-        }
+            if (jobSpecificSummary) {
+                const insertAt = folders.filter(
+                    (f) => f.order < jobSpecificSummary.order,
+                ).length;
 
-        return items;
-    };
+                items.splice(insertAt, 0, {
+                    type: "job-specific",
+                    id: "job-specific",
+                });
+            }
+
+            return items;
+        },
+        [jobSpecificSummary],
+    );
+
     const segments = url.split("/");
     const activeModuleSlug = segments[4];
     const [items, setItems] = useState<GridItem[]>(() =>
-        buildItems(companyWideFolders),
+        buildItems(companyWideFolders ?? []),
     );
 
     useEffect(() => {
-        setItems(buildItems(companyWideFolders));
-    }, [companyWideFolders, jobSpecificSummary]);
+        setItems(buildItems(companyWideFolders ?? []));
+    }, [companyWideFolders, buildItems]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {

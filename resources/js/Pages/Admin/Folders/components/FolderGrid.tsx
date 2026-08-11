@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
     DndContext,
     closestCenter,
@@ -46,33 +46,36 @@ export default function FolderGrid({
     onEditJobSpecific,
     onDeleteRequest,
 }: Props) {
-    const buildItems = (folderList: CompanyFolder[]): GridItem[] => {
-        const items: GridItem[] = folderList.map((folder) => ({
-            type: "folder",
-            id: folder.id,
-            folder,
-        }));
+    const buildItems = useCallback(
+        (folderList: CompanyFolder[]): GridItem[] => {
+            const items: GridItem[] = folderList.map((folder) => ({
+                type: "folder",
+                id: folder.id,
+                folder,
+            }));
 
-        if (jobSpecificSummary) {
-            const insertAt = folderList.filter(
-                (f) => f.order < jobSpecificSummary.order,
-            ).length;
+            if (jobSpecificSummary) {
+                const insertAt = folderList.filter(
+                    (f) => f.order < jobSpecificSummary.order,
+                ).length;
 
-            items.splice(insertAt, 0, {
-                type: "job-specific",
-                id: "job-specific",
-            });
-        }
+                items.splice(insertAt, 0, {
+                    type: "job-specific",
+                    id: "job-specific",
+                });
+            }
 
-        return items;
-    };
+            return items;
+        },
+        [jobSpecificSummary],
+    );
 
     const [items, setItems] = useState<GridItem[]>(() =>
-        buildItems(initialFolders),
+        buildItems(initialFolders ?? []),
     );
 
     useEffect(() => {
-        setItems(buildItems(initialFolders));
+        setItems(buildItems(initialFolders ?? []));
     }, [initialFolders, jobSpecificSummary]);
 
     const sensors = useSensors(
