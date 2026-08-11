@@ -9,6 +9,9 @@ export interface Slide {
     type: 'image' | 'video'
     file_url: string
     order: number
+    topic_id: number
+    topic_slug: string
+    topic_name: string
 }
 
 interface Props {

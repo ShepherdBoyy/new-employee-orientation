@@ -56,6 +56,10 @@ Route::middleware("test")->group(function () {
         Route::put("/folders/{company}/job-specific", [FolderController::class, "updateJobSpecific"])->name("folders.job-specific.update");
         Route::get("/folders/{company:slug}", [FolderController::class, "companyIndex"])->name("folders.company");
 
+        // Preview
+        Route::get("/folders/preview-list", [FolderController::class, "previewFolderList"])->name("folders.preview-list");
+        Route::get("/folders/{folder:slug}/preview", [SlideController::class, "previewFolder"])->name("folders.preview");
+
         // Job Specific
         Route::get("/folders/{company:slug}/job-positions", [FolderController::class, "jobPositionPicker"])->name("folders.job-position-picker");
         Route::get("/folders/{company}/job-positions/{jobPosition}/resolve", [FolderController::class, "resolveJobSpecificFolder"])->name("folders.resolve-job-specific");
@@ -72,10 +76,6 @@ Route::middleware("test")->group(function () {
         Route::post("/folders/{folder}/topics/{topic}/slides", [SlideController::class, "store"])->name("folders.topics.slides.store");
         Route::patch("/folders/{folder}/slides/reorder", [SlideController::class, "reorder"])->name("folder.slides.reorder");
         Route::delete("/folders/{folder}/slides/{slide}", [SlideController::class, "destroy"])->name("folder.slides.destroy");
-
-        // Preview
-        Route::get("/folders/preview-list", [FolderController::class, "previewFolderList"])->name("folders.preview-list");
-        Route::get("/folders/{folder:slug}/preview", [SlideController::class, "previewFolder"])->name("folders.preview");
 
         // Users
         Route::get("/users/admins", [UserController::class, "admins"])->name("users.admins");
