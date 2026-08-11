@@ -38,6 +38,11 @@ export default function TopicList({
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
+    useEffect(() => {
+        setTopics(initalTopics)
+    }, [initalTopics])
+
+
     function handleEdit(topic: Topic) {
         setSelectedTopic(topic);
         setOpenEditDialog(true);
