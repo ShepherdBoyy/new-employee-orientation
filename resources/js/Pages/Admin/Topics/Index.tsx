@@ -1,247 +1,147 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Folder, Plus, ChevronLeft, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft } from "lucide-react";
 import { Link } from "@inertiajs/react";
-
+import { motion } from "motion/react";
 import AddTopicDialog from "@/Pages/Admin/Topics/component/Dialogs/AddTopicDialog";
 import TopicCard from "./component/TopicCard";
 import Master from "@/Layout/Master";
+import FolderIcon from "./component/FolderIcon";
+import { Company } from "../Types/company";
+import type { Topic } from "./component/TopicCard";
+import type { Folder } from "../Slides/Index";
+import DeleteTopicDialog from "./component/Dialogs/DeleteTopicDialog";
+import EditTopicDialog from "./component/Dialogs/EditTopicDialog";
+import TopicList from "./component/TopicList";
+interface Props {
+    company: Company;
+    topics: Topic[];
+    activeFolder: Folder;
+}
 
-function Index({ topics, company, activeFolder }) {
+const pageVariants = {
+    hidden: {
+        opacity: 0,
+    },
+    visible: {
+        opacity: 1,
+        transition: {
+            duration: 0.35,
+            staggerChildren: 0.08,
+        },
+    },
+};
+
+const itemVariants = {
+    hidden: {
+        opacity: 0,
+        y: 12,
+    },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.4,
+            ease: "easeOut",
+        },
+    },
+};
+function Index({ topics, company, activeFolder }: Props) {
     const [openAddDialog, setOpenAddDialog] = useState(false);
-    console.log(activeFolder);
+
+    const isJobSpecific = activeFolder.is_job_specific;
+
+    const title = isJobSpecific
+        ? (activeFolder.job_position?.name ?? "Job-Specific Training")
+        : activeFolder.name;
 
     return (
-        <>
-            {/* Header */}
-            {activeFolder.is_job_specific ? (
-                <div className="space-y-8">
+        <motion.div
+            className="space-y-8"
+            variants={pageVariants}
+            initial="hidden"
+            animate="visible"
+        >
+            {isJobSpecific && (
+                <motion.div variants={itemVariants}>
                     <Link
                         href={`/admin/folders/${company.slug}/job-positions`}
-                        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+                        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
-                        <ArrowLeft className="h-4 w-4" />
-                        Back to {activeFolder.name}
-                    </Link>{" "}
-                    <header className="border-b pb-6">
-                        <div className="flex items-center justify-between gap-6">
-                            <div className="flex min-w-0 items-center gap-4">
-                                <div className="flex size-20 shrink-0 items-center justify-center rounded-2xl  p-2.5 text-primary">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="currentColor"
-                                        aria-label="Users"
-                                        viewBox="-0.0 -46.5 285.0 285.0"
-                                    >
-                                        <g transform="translate(0.000000,192.000000) scale(0.100000,-0.100000)">
-                                            <path
-                                                d="M685 1730 c-16 -4 -54 -17 -83 -29 -29 -11 -66 -21 -83 -21 -56 0
-                                            -129 -57 -129 -100 0 -10 -13 -23 -30 -30 -74 -31 -111 -125 -90 -234 6 -34
-                                            15 -68 19 -75 5 -8 -1 -22 -15 -36 -29 -29 -40 -86 -25 -135 13 -46 72 -100
-                                            107 -100 15 0 27 -7 30 -17 16 -49 50 -105 85 -139 25 -25 39 -47 39 -64 0
-                                            -22 -7 -28 -47 -39 -160 -46 -248 -135 -274 -276 -14 -74 -8 -79 107 -109 140
-                                            -37 261 -49 456 -45 167 4 177 3 180 -15 4 -22 77 -47 200 -67 126 -20 468
-                                            -18 592 5 54 9 108 21 120 25 11 5 23 8 26 8 22 -1 51 18 55 36 6 22 8 22 223
-                                            23 202 0 298 9 412 35 105 25 117 38 105 112 -25 147 -112 238 -271 284 -80
-                                            22 -83 40 -18 107 25 26 54 67 64 91 15 35 24 44 53 49 44 8 93 62 103 111 8
-                                            42 -2 99 -19 114 -9 7 -12 28 -9 68 3 32 5 84 6 117 1 56 0 60 -40 95 -26 22
-                                            -45 48 -49 69 -8 39 -59 92 -89 92 -12 0 -36 16 -54 35 -57 60 -132 67 -208
-                                            19 -16 -10 -30 -10 -56 -2 -67 20 -159 -25 -196 -98 -10 -19 -33 -42 -52 -52
-                                            -19 -11 -46 -35 -59 -56 -24 -35 -25 -36 -45 -18 -12 10 -34 24 -51 32 -16 8
-                                            -44 26 -61 41 -116 98 -312 72 -457 -61 l-54 -50 -7 41 c-4 26 -17 52 -36 70
-                                            -28 29 -28 30 -12 58 23 40 6 57 -61 63 -34 3 -80 18 -128 41 -75 37 -112 43
-                                            -174 27z m163 -77 c39 -20 78 -33 101 -33 47 0 54 -7 36 -34 -21 -29 -19 -41
-                                            11 -54 15 -8 33 -31 46 -59 19 -44 20 -53 9 -108 -7 -33 -20 -77 -29 -98 l-16
-                                            -38 -12 70 c-7 42 -21 83 -35 103 -13 18 -23 38 -21 45 5 20 -14 23 -64 9
-                                            -121 -35 -232 -38 -344 -10 -61 15 -74 11 -80 -26 -4 -19 -16 -53 -27 -75 -12
-                                            -22 -24 -61 -28 -87 -6 -39 -10 -45 -26 -41 -31 9 -51 69 -52 156 -1 72 1 79
-                                            28 107 16 17 33 30 39 30 16 0 46 32 46 50 0 31 47 63 104 71 30 4 79 18 108
-                                            32 74 34 127 32 206 -10z m1458 -19 c18 -20 41 -34 55 -34 31 0 79 -47 79 -78
-                                            0 -17 15 -38 45 -65 41 -37 45 -45 45 -87 0 -26 -3 -50 -7 -54 -5 -4 -8 -26
-                                            -8 -49 0 -23 -4 -42 -10 -42 -5 -1 -20 -6 -31 -13 -21 -11 -22 -9 -26 45 -4
-                                            40 -10 60 -25 72 -11 9 -26 26 -32 38 -10 19 -16 21 -70 16 -57 -5 -61 -4 -92
-                                            27 -31 30 -35 32 -64 21 -43 -15 -87 -14 -111 4 -28 22 -42 18 -59 -15 -16
-                                            -32 -52 -60 -81 -64 -19 -3 -30 -31 -42 -106 l-8 -45 -28 85 c-16 47 -33 91
-                                            -39 98 -17 22 10 90 43 107 16 8 35 15 42 15 7 0 24 21 38 47 14 26 37 56 52
-                                            66 32 24 108 27 133 7 13 -11 19 -10 39 9 52 49 115 47 162 -5z m-771 -103
-                                            c22 -10 51 -30 64 -44 13 -15 27 -25 30 -22 4 2 25 -6 46 -18 69 -39 115 -139
-                                            177 -380 27 -105 29 -261 4 -326 -19 -51 -73 -121 -107 -139 -20 -10 -34 -9
-                                            -89 10 -81 29 -86 45 -30 99 23 22 54 68 70 101 20 43 38 64 61 76 52 27 73
-                                            64 73 128 0 49 -3 59 -27 80 -16 13 -39 24 -52 24 -24 0 -28 6 -40 69 -5 23
-                                            -16 38 -37 50 -83 45 -121 75 -150 116 -18 25 -37 45 -42 45 -6 0 -24 -23 -41
-                                            -52 -37 -63 -118 -118 -208 -143 -61 -16 -65 -20 -77 -56 -12 -36 -16 -39 -46
-                                            -37 -67 4 -103 -68 -78 -153 15 -51 56 -89 97 -89 9 0 17 -7 17 -15 0 -26 39
-                                            -95 79 -138 54 -60 46 -81 -44 -112 -78 -26 -86 -24 -133 29 -74 85 -89 208
-                                            -48 399 64 292 155 431 326 498 60 24 154 24 205 0z m-609 -152 c28 -40 28
-                                            -45 31 -194 4 -183 -14 -259 -75 -327 -144 -160 -410 -85 -456 129 -7 30 -10
-                                            32 -47 30 -50 -2 -79 25 -86 80 -10 75 35 108 84 62 34 -33 53 -12 53 58 0 36
-                                            8 72 24 106 13 29 26 60 30 70 4 12 12 17 23 13 105 -30 233 -31 338 -2 28 7
-                                            51 14 51 15 1 0 14 -18 30 -40z m1184 1 c23 0 50 5 61 10 15 8 21 7 25 -4 3
-                                            -9 22 -25 41 -37 27 -17 44 -20 77 -16 38 5 46 3 69 -21 21 -21 27 -41 33 -95
-                                            8 -77 23 -93 55 -58 14 15 30 21 47 19 25 -3 27 -7 30 -55 3 -46 -1 -56 -23
-                                            -79 -20 -20 -34 -25 -62 -22 -35 3 -36 2 -53 -46 -34 -101 -145 -186 -243
-                                            -186 -95 0 -182 51 -221 128 -31 62 -45 190 -33 310 9 80 12 91 31 96 12 3 37
-                                            21 55 40 27 28 38 33 52 26 10 -6 36 -10 59 -10z m-580 -89 c21 -21 61 -51 91
-                                            -67 52 -28 53 -31 67 -92 l14 -64 33 6 c29 6 37 3 50 -18 33 -50 -11 -140 -66
-                                            -134 -20 3 -26 -4 -39 -42 -43 -128 -131 -199 -245 -200 -102 0 -195 68 -239
-                                            175 -21 52 -28 60 -51 61 -65 3 -103 100 -57 147 20 19 22 19 47 3 33 -22 41
-                                            -16 55 43 11 48 12 48 66 61 74 18 145 61 190 115 21 25 40 45 42 45 3 0 21
-                                            -17 42 -39z m470 -527 c0 -12 -8 -24 -17 -27 -10 -3 -33 -10 -51 -16 -31 -9
-                                            -33 -9 -26 11 9 31 12 50 13 86 l1 33 40 -32 c25 -20 40 -41 40 -55z m-1051
-                                            -48 c9 -23 9 -27 -3 -23 -8 3 -32 11 -55 18 -52 16 -53 37 -3 83 l37 35 7 -42
-                                            c3 -23 11 -55 17 -71z m1169 31 c34 -9 53 -8 101 5 l58 15 11 -34 c13 -44 8
-                                            -58 -33 -83 -24 -15 -50 -20 -99 -20 -62 0 -69 2 -104 34 -30 28 -35 37 -24
-                                            47 6 7 12 24 12 37 0 19 4 23 18 17 9 -3 36 -11 60 -18z m-1403 -23 c22 3 49
-                                            8 60 11 16 4 24 -3 37 -31 16 -35 16 -37 -6 -59 -23 -23 -82 -45 -121 -45 -37
-                                            0 -95 21 -122 44 -26 23 -27 25 -14 63 l13 40 57 -14 c32 -9 73 -12 96 -9z
-                                            m1781 -94 c64 -40 124 -144 120 -210 -1 -27 1 -27 -186 -59 -158 -28 -498 -30
-                                            -507 -3 -23 70 -66 143 -100 172 l-40 34 41 39 c38 37 112 77 140 77 7 0 22
-                                            -13 34 -29 68 -93 263 -88 331 8 l21 30 56 -19 c31 -11 71 -29 90 -40z m-1992
-                                            12 c8 -15 36 -40 63 -54 39 -21 62 -26 119 -26 82 0 135 23 169 74 22 33 17
-                                            33 107 -3 20 -9 51 -31 69 -49 l33 -34 -42 -43 c-24 -25 -53 -69 -67 -103 -19
-                                            -47 -30 -60 -52 -66 -60 -16 -241 -21 -339 -8 -54 7 -112 14 -129 16 -40 4
-                                            -143 29 -179 43 -25 10 -28 15 -23 40 22 109 118 206 232 234 11 2 21 5 22 6
-                                            1 0 9 -12 17 -27z m883 -2 c50 -13 80 -10 147 16 7 3 17 -14 25 -41 11 -38 11
-                                            -48 0 -62 -21 -24 -89 -53 -129 -53 -44 0 -113 31 -133 60 -14 20 -14 26 -2
-                                            44 14 21 15 25 15 47 0 6 6 9 13 6 6 -2 35 -10 64 -17z m398 -142 c50 -44 81
-                                            -105 86 -168 l4 -45 -110 -24 c-97 -21 -137 -24 -340 -25 -144 -1 -249 3 -280
-                                            11 -27 6 -76 17 -107 24 -50 11 -58 15 -58 35 0 36 39 131 68 166 26 30 152
-                                            98 182 98 8 -1 24 -15 35 -33 32 -51 97 -78 178 -74 75 5 129 33 160 86 l17
-                                            29 61 -22 c34 -11 80 -37 104 -58z M530 1272 c-32 -26 -17 -49 17 -27 14 10
-                                            35 14 47 11 28 -7 40 3 25 21 -16 19 -63 16 -89 -5z M792 1278 c-20 -20 -14
-                                            -31 15 -25 15 3 40 -1 55 -9 23 -12 28 -12 28 -1 0 37 -71 62 -98 35z M560
-                                            1171 c-15 -29 -12 -67 7 -86 16 -16 18 -16 35 5 28 35 17 100 -17 100 -8 0
-                                            -19 -9 -25 -19z M800 1171 c-15 -29 -12 -67 7 -86 16 -16 18 -16 35 5 22 27
-                                            23 63 2 84 -20 21 -31 20 -44 -3z M606 961 c-10 -16 42 -53 81 -57 41 -5 79
-                                            10 97 38 15 25 1 33 -26 14 -28 -20 -88 -21 -114 -1 -22 17 -31 18 -38 6z
-                                            M1999 1291 c-28 -23 -20 -38 11 -21 12 6 33 9 46 6 26 -7 31 3 12 22 -17 17
-                                            -42 15 -69 -7z M2256 1295 c-21 -16 -17 -18 26 -15 14 1 29 -3 33 -9 8 -14 35
-                                            -14 35 -1 0 9 -52 40 -67 40 -4 0 -17 -7 -27 -15z M2026 1194 c-23 -23 -21
-                                            -81 4 -94 11 -6 25 -8 30 -5 16 10 23 71 11 94 -14 25 -24 26 -45 5z M2260
-                                            1195 c-31 -37 -5 -114 34 -99 14 5 16 17 14 58 -3 55 -23 71 -48 41z M2070
-                                            967 c0 -19 53 -47 90 -47 39 0 90 26 90 46 0 9 -6 13 -12 10 -64 -26 -86 -28
-                                            -118 -12 -40 19 -50 20 -50 3z M1530 1190 c-19 -12 -7 -23 27 -25 16 -2 38 -6
-                                            51 -10 31 -10 20 18 -14 34 -30 13 -44 14 -64 1z M1300 1081 c-24 -46 -2 -111
-                                            34 -98 23 9 30 64 12 92 -20 30 -32 31 -46 6z M1536 1084 c-34 -34 -7 -121 31
-                                            -98 27 17 30 89 4 103 -15 8 -23 7 -35 -5z M1350 856 c0 -22 46 -46 89 -46 28
-                                            0 48 7 68 24 35 30 23 46 -16 23 -35 -21 -67 -21 -101 -2 -32 18 -40 18 -40 1z"
-                                            ></path>
-                                        </g>
-                                    </svg>
-                                </div>
-
-                                <div className="min-w-0">
-                                    <h1 className="truncate text-2xl font-semibold tracking-tight">
-                                        {activeFolder.job_position.name}
-                                    </h1>
-
-                                    <p className="mt-1 text-sm text-muted-foreground">
-                                        Manage the topics included in this
-                                        module.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <Button
-                                size="lg"
-                                className="shrink-0"
-                                onClick={() => setOpenAddDialog(true)}
-                            >
-                                <Plus className="size-4" />
-                                Add Topic
-                            </Button>
-                        </div>
-                    </header>
-                    <section className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h2 className="text-lg font-semibold">
-                                    Topics
-                                </h2>
-
-                                <p className="text-sm text-muted-foreground">
-                                    Organize the content for this module.
-                                </p>
-                            </div>
-
-                            <span className="text-sm text-muted-foreground">
-                                {topics.length}{" "}
-                                {topics.length === 1 ? "topic" : "topics"}
-                            </span>
-                        </div>
-
-                        <TopicCard topics={topics} company={company} />
-                    </section>
-                    <AddTopicDialog
-                        open={openAddDialog}
-                        onOpenChange={setOpenAddDialog}
-                        folderId={activeFolder.id}
-                    />
-                </div>
-            ) : (
-                <div className="space-y-8">
-                    <header className="border-b pb-6">
-                        <div className="flex items-center justify-between gap-6">
-                            <div className="flex min-w-0 items-center gap-4">
-                                <div className="flex size-18 shrink-0 items-center justify-center rounded-2xl  p-2.5 text-primary">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 192 168"
-                                    >
-                                        <path d="M116.5 11 84 21.5a307 307 0 0 1-27.5 8.1c-6.4.7-35.7 10.3-40 13.1-5.3 3.6-6.5 5.1-6.5 8.6 0 4.4 33.8 102.8 36.2 105.4 1.1 1.2 3.1 2.4 4.4 2.7 3 .8 4.5.3 53.4-16.4l56.4-19.2c9.8-3.3 18.7-6.9 19.7-7.9a8 8 0 0 0 1.9-5.4c0-1.9-3.9-14.6-8.6-28.2l-14.9-42.9c-3.5-10-6.8-19-7.4-20.1-1.7-3.2-6.2-4.6-10.7-3.4-5.6 1.6-5.9 1.5-7.2-2.2-1-2.9-4.7-5.8-7-5.6-.4 0-4.7 1.3-9.7 2.9m13.5 4c.7 1.7 1.1 3.2.9 3.4s-13.7 4.4-29.9 9.5-31.1 9.9-33 10.9c-2.7 1.3-3.7 2.6-4.4 5.5l-1 3.7-16.9 5.5c-16 5.2-17 5.4-18.3 3.8-.7-1-1.4-2.3-1.4-2.9 0-.5-1.3-3.1-3-5.7-1.6-2.5-2.6-4.8-2.2-5.1.7-.4 18.6-6 30-9.3l5.3-1.6 2.7 2.6c1.6 1.5 3.6 2.7 4.5 2.7q3.4.2-.5-3-2.1-1.7-1.8-2.2c1.3-1.1 62.8-20.7 65.1-20.7 2-.1 3 .6 3.9 2.9m17.7 5.2c.6.7 2.6 6 4.6 11.8s8.7 25.6 15.2 44c7 20.4 11.4 34.3 11.1 35.6a5 5 0 0 1-2.3 2.9c-8.6 3.4-122 41.5-123.7 41.5-1.3 0-3-.8-3.8-1.8C46 151 12.7 52.5 13.5 49.9c.8-2.4 3.5-2.5 3.5-.1 0 1 7.5 23.6 16.6 50.3l17.7 51.6c1 3.1 2.7 4.5 2.7 2.3 0-.6-7.9-24.3-17.5-52.7-16.3-47.8-20.4-62-14.2-48.3 4.4 9.8 3.8 9.7 22.7 3.9 17.7-5.4 21-6.9 21-9.7 0-4.4 2.6-5.5 38.6-16.8a621 621 0 0 1 39-11.4c1.7 0 3.6.6 4.1 1.2" />
-                                    </svg>
-                                </div>
-
-                                <div className="min-w-0">
-                                    <h1 className="truncate text-2xl font-semibold tracking-tight">
-                                        {activeFolder.name}
-                                    </h1>
-
-                                    <p className="mt-1 text-sm text-muted-foreground">
-                                        Manage the topics included in this
-                                        module.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <Button
-                                size="lg"
-                                className="shrink-0"
-                                onClick={() => setOpenAddDialog(true)}
-                            >
-                                <Plus className="size-4" />
-                                Add Topic
-                            </Button>
-                        </div>
-                    </header>
-                    <section className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h2 className="text-lg font-semibold">
-                                    Topics
-                                </h2>
-
-                                <p className="text-sm text-muted-foreground">
-                                    Organize the content for this module.
-                                </p>
-                            </div>
-
-                            <span className="text-sm text-muted-foreground">
-                                {topics.length}{" "}
-                                {topics.length === 1 ? "topic" : "topics"}
-                            </span>
-                        </div>
-
-                        <TopicCard topics={topics} company={company} />
-                    </section>
-                    <AddTopicDialog
-                        open={openAddDialog}
-                        onOpenChange={setOpenAddDialog}
-                        folderId={activeFolder.id}
-                    />
-                </div>
+                        <ArrowLeft className="size-4" />
+                        Back to Job Positions
+                    </Link>
+                </motion.div>
             )}
-        </>
+
+            <motion.header variants={itemVariants} className="border-b pb-6">
+                <div className="flex items-center justify-between gap-6">
+                    <div className="flex min-w-0 items-center gap-4">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{
+                                duration: 0.4,
+                                ease: "easeOut",
+                            }}
+                        >
+                            <FolderIcon jobSpecific={isJobSpecific} />
+                        </motion.div>
+
+                        <div className="min-w-0">
+                            <motion.h1
+                                variants={itemVariants}
+                                className="truncate text-2xl font-semibold tracking-tight"
+                            >
+                                {title}
+                            </motion.h1>
+
+                            <motion.p
+                                variants={itemVariants}
+                                className="mt-1 text-sm text-muted-foreground"
+                            >
+                                Manage the topics included in this module.
+                            </motion.p>
+                        </div>
+                    </div>
+
+                    <motion.div variants={itemVariants}>
+                        <Button
+                            size="lg"
+                            className="shrink-0"
+                            onClick={() => setOpenAddDialog(true)}
+                        >
+                            <Plus className="size-4" />
+                            Add Topic
+                        </Button>
+                    </motion.div>
+                </div>
+            </motion.header>
+            <motion.section variants={itemVariants} className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h2 className="text-lg font-semibold">Topics</h2>
+
+                        <p className="text-sm text-muted-foreground">
+                            Manage the content included in this module.
+                        </p>
+                    </div>
+
+                    <span className="text-sm text-muted-foreground">
+                        {topics.length}{" "}
+                        {topics.length === 1 ? "topic" : "topics"}
+                    </span>
+                </div>
+
+                <TopicList topics={topics} company={company} />
+            </motion.section>
+
+            <AddTopicDialog
+                open={openAddDialog}
+                onOpenChange={setOpenAddDialog}
+                folderId={activeFolder.id}
+            />
+        </motion.div>
     );
 }
 
