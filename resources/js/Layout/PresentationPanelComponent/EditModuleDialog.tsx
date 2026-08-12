@@ -98,7 +98,7 @@ export default function EditModuleDialog({
                         </Button>
 
                         <Button type="submit">
-                            {form.processing ? "Editing..." : "Edit Module"}
+                            {form.processing ? "Saving..." : "Save Changes"}
                         </Button>
                     </DialogFooter>
                 </form>

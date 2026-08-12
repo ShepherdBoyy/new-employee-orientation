@@ -12,12 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-    CheckCircle2,
-    Circle,
-    ShieldCheck,
-    Download,
-} from "lucide-react";
+import { CheckCircle2, Circle, ShieldCheck, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FolderProgress {
@@ -56,17 +51,10 @@ interface Props {
 export default function EmployeeDetailDialog({ employee, onClose }: Props) {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<ProgressResponse | null>(null);
-
-    const [signatureUrl, setSignatureUrl] = useState<string | null>(null);
-    const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-    const [loadingSignature, setLoadingSignature] = useState(false);
-    const [loadingPhoto, setLoadingPhoto] = useState(false);
-
     useEffect(() => {
         if (!employee) {
             setData(null);
-            setSignatureUrl(null);
-            setPhotoUrl(null);
+
             return;
         }
 
@@ -76,24 +64,6 @@ export default function EmployeeDetailDialog({ employee, onClose }: Props) {
             .then((res) => setData(res.data))
             .finally(() => setLoading(false));
     }, [employee]);
-
-    function handleViewSignature() {
-        if (!employee) return;
-        setLoadingSignature(true);
-        axios
-            .get(`/admin/users/employees/${employee.id}/signature`)
-            .then((res) => setSignatureUrl(res.data.url))
-            .finally(() => setLoadingSignature(false));
-    }
-
-    function handleViewPhoto() {
-        if (!employee) return;
-        setLoadingPhoto(true);
-        axios
-            .get(`/admin/users/employees/${employee.id}/photo`)
-            .then((res) => setPhotoUrl(res.data.url))
-            .finally(() => setLoadingPhoto(false));
-    }
 
     const statusMap = {
         not_started: {
@@ -118,8 +88,13 @@ export default function EmployeeDetailDialog({ employee, onClose }: Props) {
                 {employee && (
                     <>
                         <DialogHeader>
-                            <div className="flex items-center gap-3">
-                                <div className="min-w-0 flex-1 text-left">
+                            <DialogTitle>Employee Details</DialogTitle>
+                            <DialogDescription>
+                                Track employee's progress{" "}
+                            </DialogDescription>
+
+                            <div className="flex justify-between gap-2 text-xs text-muted-foreground items-center pt-4">
+                                <div className="flex flex-col text-left">
                                     <DialogTitle className="truncate">
                                         {employee.name}
                                     </DialogTitle>
@@ -127,23 +102,22 @@ export default function EmployeeDetailDialog({ employee, onClose }: Props) {
                                         {employee.email}
                                     </DialogDescription>
                                 </div>
+                                <div className="flex flex-col">
+                                    <span className="flex items-center gap-1">
+                                        <Avatar size="sm">
+                                            <AvatarImage
+                                                src={`/storage/${employee.company?.logo_path}`}
+                                            />
+                                        </Avatar>
+                                        {employee.company?.name ?? "No company"}
+                                    </span>
+                                    <span className="text-right">
+                                        {employee.job_position?.name ??
+                                            "No position"}
+                                    </span>
+                                </div>
                             </div>
                         </DialogHeader>
-
-                        <div className="flex gap-2 text-xs text-muted-foreground items-center">
-                            <span className="flex items-center gap-1">
-                                <Avatar>
-                                    <AvatarImage
-                                        src={`/storage/${employee.company?.logo_path}`}
-                                    />
-                                </Avatar>
-                                {employee.company?.name ?? "No company"}
-                            </span>
-                            <span>·</span>
-                            <span>
-                                {employee.job_position?.name ?? "No position"}
-                            </span>
-                        </div>
 
                         <Separator />
 
@@ -224,7 +198,7 @@ export default function EmployeeDetailDialog({ employee, onClose }: Props) {
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >
-                                                <Button variant="outline" size="sm">
+                                                <Button size="sm">
                                                     <Download className="mr-1.5 h-3.5 w-3.5" />
                                                     Export PDF
                                                 </Button>
@@ -234,13 +208,19 @@ export default function EmployeeDetailDialog({ employee, onClose }: Props) {
 
                                     {!data?.acknowledgement ? (
                                         <p className="text-sm text-muted-foreground">
-                                            This employee has not yet submitted their final acknowledgement.
+                                            This employee has not yet submitted
+                                            their final acknowledgement.
                                         </p>
                                     ) : (
                                         <div className="rounded-xl border bg-muted/20 p-3.5 text-xs">
-                                            <p className="text-muted-foreground">Acknowledged on</p>
+                                            <p className="text-muted-foreground">
+                                                Acknowledged on
+                                            </p>
                                             <p className="mt-0.5 font-medium text-foreground">
-                                                {data.acknowledgement.acknowledged_at}
+                                                {
+                                                    data.acknowledgement
+                                                        .acknowledged_at
+                                                }
                                             </p>
                                         </div>
                                     )}

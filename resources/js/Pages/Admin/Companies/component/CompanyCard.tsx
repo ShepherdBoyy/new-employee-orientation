@@ -1,5 +1,5 @@
 import CompanyCardActions from "./CompanyCardActions";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { CompanyWithJobCount } from "../../Types/company";
 import { COMPANY_THEMES } from "../../Types/company";

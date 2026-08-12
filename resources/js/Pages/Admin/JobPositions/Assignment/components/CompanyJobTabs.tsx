@@ -188,7 +188,7 @@ export default function CompanyJobTabs({ companies }: Props) {
                                                             {job.document ? (
                                                                 <Button
                                                                     size="sm"
-                                                                    variant="outline"
+                                                                    variant="secondary"
                                                                     className="gap-2"
                                                                     onClick={() => {
                                                                         setViewDialog(
@@ -207,7 +207,6 @@ export default function CompanyJobTabs({ companies }: Props) {
                                                             ) : (
                                                                 <Button
                                                                     size="sm"
-                                                                    variant="outline"
                                                                     className="gap-2"
                                                                     onClick={() => {
                                                                         setUploadDialog(

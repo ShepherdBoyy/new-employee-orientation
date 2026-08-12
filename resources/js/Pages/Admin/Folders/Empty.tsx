@@ -1,8 +1,8 @@
-import { FolderOpen, Image, Video, ListTree, CirclePlus } from "lucide-react";
+import { CirclePlus } from "lucide-react";
 import Master from "@/Layout/Master";
 import { Button } from "@/components/ui/button";
 
-function Empty({}) {
+function Empty() {
     return (
         <div className="flex h-full items-center justify-center">
             <div className="max-w-2xl text-center">

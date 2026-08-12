@@ -78,7 +78,7 @@ export default function CompanySelector({
                     <Field orientation="horizontal" className="">
                         <FieldContent className="">
                             <div className="flex items-center gap-3">
-                                <Avatar className="h-8 w-8">
+                                <Avatar className="h-7 w-7">
                                     <AvatarImage
                                         src={`/storage/${company.logo_path}`}
                                     />

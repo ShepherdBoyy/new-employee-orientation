@@ -10,7 +10,7 @@ import {
     AlertDialogMedia,
 } from "@/components/ui/alert-dialog";
 import { Trash2Icon } from "lucide-react";
-import type { Company } from "../Index";
+import type { Company } from "../../Types/company";
 
 type DeleteCompanyDialogProps = {
     company: Company | null;

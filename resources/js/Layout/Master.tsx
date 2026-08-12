@@ -20,7 +20,7 @@ import {
 import PresentationPanel from "./PresentationPanel";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ChevronsUpDown, LogOut } from "lucide-react";
-import { AnimatePresence, motion, LayoutGroup } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import type { PageProps } from "./PresentationPanel";
 type MasterProps = {
     children: React.ReactNode;
@@ -29,7 +29,7 @@ type MasterProps = {
     email: string;
 };
 
-export default function Master({ children }: MasterProps) {
+export default function Master({ children, id, name, email }: MasterProps) {
     const user = usePage().props.auth.user as MasterProps;
 
     const { props } = usePage<PageProps>();

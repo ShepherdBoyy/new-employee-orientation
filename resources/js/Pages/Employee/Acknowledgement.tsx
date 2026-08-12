@@ -10,16 +10,23 @@ import {
     ArrowRight,
     ShieldCheck,
     Check,
+    ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SignaturePad from "./components/acknowledgement/SignaturePad";
 import PhotoCapture from "./components/acknowledgement/PhotoCapture";
-
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import EmployeeLayout from "@/Layout/EmployeeLayout";
 interface ProgressItem {
     folder_id: number;
     folder_name: string;
     slide_count: number;
     completed: boolean;
+    topics: string[];
 }
 
 interface Props {
@@ -30,6 +37,7 @@ interface Props {
 const STEPS = ["Review", "Name & Signature", "Photo & Consent"] as const;
 
 export default function Acknowledgement({ user, progress }: Props) {
+    console.log(progress);
     const [step, setStep] = useState(0);
 
     const { data, setData, post, processing, errors } = useForm({
@@ -61,8 +69,8 @@ export default function Acknowledgement({ user, progress }: Props) {
         data.full_name.trim().toLowerCase() === user.name.trim().toLowerCase();
 
     return (
-        <>
-            <div className="min-h-screen bg-linear-to-b from-muted/40 to-background">
+        <EmployeeLayout>
+            <div>
                 <div className="mx-auto flex w-full max-w-3xl flex-col px-4 py-8 sm:px-6 sm:py-10">
                     {/* Header */}
                     <div className="mb-6 space-y-1.5 text-center sm:mb-8">
@@ -142,25 +150,56 @@ export default function Acknowledgement({ user, progress }: Props) {
                                 </div>
                                 <div className="space-y-2">
                                     {progress.map((item) => (
-                                        <div
+                                        <Collapsible
                                             key={item.folder_id}
-                                            className="flex items-center gap-3 rounded-xl border bg-muted/20 px-3 py-2.5 transition-colors"
+                                            className="overflow-hidden rounded-xl border bg-background"
                                         >
-                                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900 dark:text-emerald-400">
-                                                <CheckCircle2 className="h-4 w-4" />
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <p className="truncate text-sm font-medium">
-                                                    {item.folder_name}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {item.slide_count}{" "}
-                                                    {item.slide_count === 1
-                                                        ? "slide"
-                                                        : "slides"}
-                                                </p>
-                                            </div>
-                                        </div>
+                                            <CollapsibleTrigger asChild>
+                                                <button
+                                                    type="button"
+                                                    className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40"
+                                                >
+                                                    <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400">
+                                                        <CheckCircle2 className="size-4" />
+                                                    </div>
+
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="truncate text-sm font-medium">
+                                                            {item.folder_name}
+                                                        </p>
+
+                                                        <p className="mt-0.5 text-xs text-muted-foreground">
+                                                            {item.slide_count}{" "}
+                                                            slides ·{" "}
+                                                            {item.topics.length}{" "}
+                                                            topics
+                                                        </p>
+                                                    </div>
+                                                    <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                                                </button>
+                                            </CollapsibleTrigger>
+
+                                            <CollapsibleContent>
+                                                <div className="border-t bg-muted/10 px-4 py-3">
+                                                    <div className="space-y-2">
+                                                        {item.topics.map(
+                                                            (topic, index) => (
+                                                                <div
+                                                                    key={`${item.folder_id}-${index}`}
+                                                                    className="flex items-start gap-2.5 text-sm text-muted-foreground"
+                                                                >
+                                                                    <span className="mt-2 size-1.5 shrink-0 rounded-full bg-muted-foreground/40" />
+
+                                                                    <span>
+                                                                        {topic}
+                                                                    </span>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </CollapsibleContent>
+                                        </Collapsible>
                                     ))}
                                 </div>
                             </div>
@@ -244,7 +283,7 @@ export default function Acknowledgement({ user, progress }: Props) {
                             <div className="animate-in fade-in slide-in-from-right-2 space-y-5 duration-300">
                                 <div>
                                     <h2 className="text-sm font-semibold">
-                                        Take or Upload a Photo
+                                        Take a photo
                                     </h2>
                                     <p className="mt-0.5 text-xs text-muted-foreground">
                                         This confirms your identity for this
@@ -336,6 +375,6 @@ export default function Acknowledgement({ user, progress }: Props) {
                     </div>
                 </div>
             </div>
-        </>
+        </EmployeeLayout>
     );
 }

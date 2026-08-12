@@ -77,7 +77,7 @@ export default function EditTopicDialog({ topic, open, onOpenChange }: Props) {
                         </Button>
 
                         <Button type="submit">
-                            {processing ? "Editing..." : "Edit Topic"}
+                            {processing ? "Saving..." : "Save Changes"}
                         </Button>
                     </DialogFooter>
                 </form>

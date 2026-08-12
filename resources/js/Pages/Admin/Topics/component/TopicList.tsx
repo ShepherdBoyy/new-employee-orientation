@@ -39,9 +39,8 @@ export default function TopicList({
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     useEffect(() => {
-        setTopics(initalTopics)
-    }, [initalTopics])
-
+        setTopics(initalTopics);
+    }, [initalTopics]);
 
     function handleEdit(topic: Topic) {
         setSelectedTopic(topic);

@@ -60,27 +60,11 @@ function Index({ activeFolder, slides, topic }: Props) {
                     )}
                 </Link>
 
-                <div className="flex flex-col gap-4 border-b pb-5 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="space-y-2">
+                <div className="flex flex-col  border-b pb-5 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="">
                         <h1 className="text-xl font-semibold tracking-tight">
                             {topic.label}
                         </h1>
-                        <div className="flex flex-wrap gap-1.5">
-                            {activeFolder.job_position && (
-                                <Badge
-                                    variant="secondary"
-                                    className="text-xs font-normal"
-                                >
-                                    {activeFolder.job_position.name}
-                                </Badge>
-                            )}
-                            <Badge
-                                variant="outline"
-                                className="text-xs font-normal"
-                            >
-                                {activeFolder.name}
-                            </Badge>
-                        </div>
                     </div>
                     <div className="flex items-center gap-2">
                         <Button

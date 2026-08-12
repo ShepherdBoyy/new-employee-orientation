@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { Rotate3d, MessageCircle, X } from "lucide-react";
-import FloatingFAQ from "./FloatingFAQ";
+import { Rotate3d } from "lucide-react";
 import { OnboardingUser } from "@/Pages/Employee/Types";
 import { usePage } from "@inertiajs/react";
 import {

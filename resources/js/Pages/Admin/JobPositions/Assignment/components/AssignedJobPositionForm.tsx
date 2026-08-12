@@ -15,8 +15,9 @@ import {
     FieldLabel,
     FieldError,
     FieldGroup,
+    FieldSeparator,
 } from "@/components/ui/field";
-
+import { BriefcaseBusiness } from "lucide-react";
 import {
     Combobox,
     ComboboxChip,
@@ -32,9 +33,11 @@ import {
 
 import CompanySelector from "./CompanySelector";
 import type { Company } from "../../../Types/company";
+import { JobPosition } from "@/Pages/Admin/Types/job-position";
 
 interface Props {
     companies: Company[];
+    jobs: JobPosition[];
 }
 
 export default function AssignedJobPositionForm({ companies, jobs }: Props) {
@@ -62,36 +65,48 @@ export default function AssignedJobPositionForm({ companies, jobs }: Props) {
     }
 
     return (
-        <Card className="w-full  flex flex-col overflow-hidden">
+        <Card className="w-full overflow-hidden">
             <CardHeader className="border-b bg-muted/20">
-                <CardTitle>Assign Job Position</CardTitle>
+                <div className="flex items-start gap-3">
+                    <div>
+                        <CardTitle className="text-base">
+                            Assign Job Positions
+                        </CardTitle>
+
+                        <CardDescription className="mt-1">
+                            Add one or more positions to selected companies.
+                        </CardDescription>
+                    </div>
+                </div>
             </CardHeader>
-            <CardContent>
-                <form onSubmit={handleSubmit} className="max-w-full ">
+
+            <CardContent className="">
+                <form onSubmit={handleSubmit}>
                     <FieldGroup>
+                        {/* Step 1 */}
                         <Field>
-                            <FieldLabel>Position Name</FieldLabel>
+                            <FieldLabel>Job positions</FieldLabel>
+
                             <FieldDescription>
-                                Select 1 or more job positions
+                                Select one or more positions to assign.
                             </FieldDescription>
+
                             <Combobox
                                 multiple
                                 autoHighlight
                                 items={jobs}
                                 itemToStringValue={(item) => String(item.id)}
-                                onValueChange={(val) => handleJob(val)}
-                                // val will now be an array of IDs: [1, 2, 3]
+                                onValueChange={handleJob}
                             >
-                                <ComboboxChips ref={anchor}>
+                                <ComboboxChips ref={anchor} className="">
                                     <ComboboxValue>
-                                        {(
-                                            values: number[], // 2. values is now an array of job IDs
-                                        ) => (
+                                        {(values: number[]) => (
                                             <>
                                                 {values.map((id) => {
                                                     const job = jobs.find(
                                                         (j) => j.id === id,
                                                     );
+
                                                     if (!job) return null;
 
                                                     return (
@@ -102,7 +117,14 @@ export default function AssignedJobPositionForm({ companies, jobs }: Props) {
                                                         </ComboboxChip>
                                                     );
                                                 })}
-                                                <ComboboxChipsInput />
+
+                                                <ComboboxChipsInput
+                                                    placeholder={
+                                                        values.length
+                                                            ? "Add another..."
+                                                            : "Search positions..."
+                                                    }
+                                                />
                                             </>
                                         )}
                                     </ComboboxValue>
@@ -110,11 +132,11 @@ export default function AssignedJobPositionForm({ companies, jobs }: Props) {
 
                                 <ComboboxContent anchor={anchor}>
                                     <ComboboxEmpty>
-                                        No items found.
+                                        No positions found.
                                     </ComboboxEmpty>
+
                                     <ComboboxList>
                                         {(item) => (
-                                            /* 4. Pass the item's id as the primary value instead of the whole object */
                                             <ComboboxItem
                                                 key={item.id}
                                                 value={item.id}
@@ -126,24 +148,79 @@ export default function AssignedJobPositionForm({ companies, jobs }: Props) {
                                 </ComboboxContent>
                             </Combobox>
 
-                            <FieldError>{form.errors.name}</FieldError>
+                            {form.errors.job_ids && (
+                                <FieldError>{form.errors.job_ids}</FieldError>
+                            )}
                         </Field>
-                        <CompanySelector
-                            companies={companies}
-                            selected={form.data.company_ids}
-                            onChange={(ids) => form.setData("company_ids", ids)}
-                        />
+
+                        {/* Divider */}
+                        <FieldSeparator />
+
+                        {/* Step 2 */}
                         <Field>
-                            <Button
-                                type="submit"
-                                disabled={
-                                    form.processing ||
-                                    form.data.company_ids.length === 0
+                            <CompanySelector
+                                companies={companies}
+                                selected={form.data.company_ids}
+                                onChange={(ids) =>
+                                    form.setData("company_ids", ids)
                                 }
-                            >
-                                {form.processing ? "Adding..." : "Add Position"}
-                            </Button>
+                            />
+
+                            {form.errors.company_ids && (
+                                <FieldError>
+                                    {form.errors.company_ids}
+                                </FieldError>
+                            )}
                         </Field>
+                        {/* Summary */}
+                        {(form.data.job_ids.length > 0 ||
+                            form.data.company_ids.length > 0) && (
+                            <div className="rounded-lg border bg-muted/30 p-3">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div>
+                                        <p className="text-sm font-medium">
+                                            Assignment summary
+                                        </p>
+
+                                        <p className="mt-0.5 text-xs text-muted-foreground">
+                                            {form.data.job_ids.length}{" "}
+                                            {form.data.job_ids.length === 1
+                                                ? "position"
+                                                : "positions"}{" "}
+                                            → {form.data.company_ids.length}{" "}
+                                            {form.data.company_ids.length === 1
+                                                ? "company"
+                                                : "companies"}
+                                        </p>
+                                    </div>
+
+                                    <span className="text-sm font-semibold">
+                                        {form.data.job_ids.length *
+                                            form.data.company_ids.length}
+                                    </span>
+                                </div>
+
+                                <p className="mt-2 text-[11px] text-muted-foreground">
+                                    Total assignments if all selected positions
+                                    are assigned to all selected companies.
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Submit */}
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={
+                                form.processing ||
+                                form.data.company_ids.length === 0 ||
+                                form.data.job_ids.length === 0
+                            }
+                        >
+                            {form.processing
+                                ? "Assigning..."
+                                : "Assign Positions"}
+                        </Button>
                     </FieldGroup>
                 </form>
             </CardContent>

@@ -77,7 +77,7 @@ export default function ModuleItem({
         <div
             ref={setNodeRef}
             style={style}
-            className={cn("relative", isDragging && "z-50 opacity-50")}
+            className={cn("relative", isDragging && "z-50 ")}
         >
             <Item
                 ref={setNodeRef}

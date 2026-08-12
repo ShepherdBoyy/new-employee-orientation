@@ -1,23 +1,25 @@
-import { Link } from '@inertiajs/react'
-import { ArrowLeft } from 'lucide-react'
-import PreviewFolderCard, { type PreviewFolder } from "./components/PreviewFolderCard"
+import { Link } from "@inertiajs/react";
+import { ArrowLeft } from "lucide-react";
+import PreviewFolderCard, {
+    type PreviewFolder,
+} from "./components/PreviewFolderCard";
 
 interface Company {
-    id: number
-    name: string
-    slug: string
+    id: number;
+    name: string;
+    slug: string;
 }
 
 interface JobPosition {
-    id: number
-    name: string
-    slug: string
+    id: number;
+    name: string;
+    slug: string;
 }
 
 interface Props {
-    folders: PreviewFolder[]
-    company: Company
-    jobPosition: JobPosition | null
+    folders: PreviewFolder[];
+    company: Company;
+    jobPosition: JobPosition | null;
 }
 
 export default function PreviewList({ folders, company, jobPosition }: Props) {
@@ -45,18 +47,24 @@ export default function PreviewList({ folders, company, jobPosition }: Props) {
 
                 <div className="mx-auto w-full max-w-5xl flex-1 space-y-8 px-6 py-12">
                     <div className="space-y-1">
-                        <h1 className="text-2xl font-semibold text-white">Orientation Modules</h1>
+                        <h1 className="text-2xl font-semibold text-white">
+                            Orientation Modules
+                        </h1>
                         <p className="text-sm text-zinc-400">
                             {folders.length === 0
-                                ? 'No folders are assigned to this audience yet.'
-                                : `${folders.length} ${folders.length === 1 ? 'module' : 'modules'} in this orientation.`}
+                                ? "No folders are assigned to this audience yet."
+                                : `${folders.length} ${folders.length === 1 ? "module" : "modules"} in this orientation.`}
                         </p>
                     </div>
 
                     {folders.length > 0 ? (
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             {folders.map((folder, index) => (
-                                <PreviewFolderCard key={folder.id} folder={folder} index={index} />
+                                <PreviewFolderCard
+                                    key={folder.id}
+                                    folder={folder}
+                                    index={index}
+                                />
                             ))}
                         </div>
                     ) : (
@@ -83,5 +91,5 @@ export default function PreviewList({ folders, company, jobPosition }: Props) {
                 </div>
             </div>
         </>
-    )
+    );
 }
