@@ -1,7 +1,5 @@
-import { router, Link } from "@inertiajs/react";
-import { ChevronRight, CheckCircle2, Circle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
+import { Link } from "@inertiajs/react";
+import { ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
 
 export interface PickerPosition {
