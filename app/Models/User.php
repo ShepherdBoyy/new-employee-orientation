@@ -97,7 +97,7 @@ class User extends Authenticatable
             $this->load("company");
         }
 
-        $folders = $this->company->foldersForEmployee($this);
+        $folders = $this->company->foldersForEmployee($this)->load("keyTopics");
 
         $completedIds = $this->folderCompletions()
             ->pluck("folder_id")
@@ -108,7 +108,12 @@ class User extends Authenticatable
                 "folder_id" => $folder->id,
                 "folder_name" => $folder->name,
                 "slide_count" => $folder->slideCount(),
-                "completed" => in_array($folder->id, $completedIds)
+                "completed" => in_array($folder->id, $completedIds),
+                "topics" => $folder->keyTopics
+                    ->sortBy("order")
+                    ->pluck("label")
+                    ->values()
+                    ->toArray()
             ];
         })->toArray();
     }

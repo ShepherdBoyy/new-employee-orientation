@@ -176,11 +176,15 @@ class UserController extends Controller
             "timestamp" => now()->toDateTimeString()
         ]);
 
-        $folders = $user->company->foldersForEmployee($user);
+        $folders = $user->company->foldersForEmployee($user)->load("keyTopics");
 
         $modules = $folders->map(fn($folder) => [
             "name" => $folder->name,
-            "key_topics" => $folder->keyTopicsList()
+            "key_topics" => $folder->keyTopics
+                ->sortBy("order")
+                ->pluck("label")
+                ->values()
+                ->toArray()
         ]);
 
         $signaturePath = Storage::disk("private")->path($acknowledgement->getRawOriginal("signature_path"));
