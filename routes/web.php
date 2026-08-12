@@ -49,6 +49,7 @@ Route::middleware("test")->group(function () {
         Route::post('/upload-jd', [JobPositionController::class, 'uploadJd']);
 
         // Folders
+        Route::get("/folders/preview-list", [FolderController::class, "previewFolderList"])->name("folders.preview-list");
         Route::post("/folders", [FolderController::class, "store"])->name("folders.store");
         Route::put("/folders/{folder}", [FolderController::class, "update"])->name("folders.update");
         Route::patch("/folders/reorder", [FolderController::class, "reorder"])->name("folders.reorder");
@@ -57,7 +58,6 @@ Route::middleware("test")->group(function () {
         Route::get("/folders/{company:slug}", [FolderController::class, "companyIndex"])->name("folders.company");
 
         // Preview
-        Route::get("/folders/preview-list", [FolderController::class, "previewFolderList"])->name("folders.preview-list");
         Route::get("/folders/{folder:slug}/preview", [SlideController::class, "previewFolder"])->name("folders.preview");
 
         // Job Specific

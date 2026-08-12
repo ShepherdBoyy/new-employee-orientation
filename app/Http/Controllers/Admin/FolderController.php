@@ -170,21 +170,49 @@ class FolderController extends Controller
             'job_position_id' => $request->job_position_id,
         ]);
 
-        $folders = $company->foldersForEmployee($simulatedUser);
+        $folders = $company->foldersForEmployee($simulatedUser)->map(fn($folder) => [
+            "id" => $folder->id,
+            "slug" => $folder->slug,
+            "name" => $folder->name,
+            "slide_count" => $folder->slideCount(),
+            "is_job_specific" => false,
+            "locked" => false,
+            "order" => $folder->order
+        ])->values();
+
+        if (!$request->job_position_id) {
+            $jobSpecificFolder = Folder::forCompany($company->id)
+                ->whereNotNull("job_position_id")
+                ->first();
+
+            if ($jobSpecificFolder) {
+                $placeholder = [
+                    'id' => 0,
+                    'slug' => null,
+                    'name' => 'Job-Specific Training',
+                    'slide_count' => 0,
+                    'is_job_specific' => true,
+                    'locked' => true,
+                    'order' => $jobSpecificFolder->order,
+                ];
+
+                $insertAt = $folders->filter(
+                    fn($f) => $f["order"] < $placeholder["order"]
+                )->count();
+
+                $folders->splice($insertAt, 0, [$placeholder]);
+            }
+        }
 
         $jobPosition = $request->job_position_id
             ? JobPosition::find($request->job_position_id)
             : null;
 
         return Inertia::render("Admin/Folders/PreviewList", [
-            "folders" => $folders->map(fn($folder) => [
-                "id" => $folder->id,
-                "name" => $folder->name,
-                "slug" => $folder->slug,
-                "slide_count" => $folder->slideCount(),
-            ]),
+            "folders" => $folders->values(),
             "company" => $company,
-            "jobPosition" => $jobPosition
+            "jobPosition" => $jobPosition,
+            "jobPositions" => $company->jobs()->get(["job_positions.id", "name", "slug"])
         ]);
     }
 }

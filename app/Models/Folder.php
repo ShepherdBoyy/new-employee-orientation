@@ -97,8 +97,13 @@ class Folder extends Model
         $query->whereNull("job_position_id");
     }
 
-    public function scopeForJobPosition($query, int $jobPositionId): void
+    public function scopeForJobPosition($query, ?int $jobPositionId): void
     {
+        if ($jobPositionId === null) {
+            $query->whereRaw("1 = 0");
+            return;
+        }
+
         $query->where("job_position_id", $jobPositionId);
     }
 

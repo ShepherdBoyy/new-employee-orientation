@@ -47,10 +47,7 @@ export default function PresentationPanel() {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-    const [activeItem, setActiveItem] = useState<GridItem | null>(null);
-
     const [isDragging, setIsDragging] = useState(false);
-
     const [module, setModule] = useState<SelectedModule | null>(null);
 
     const companyWideFolders = props.companyWideFolders;
@@ -102,12 +99,10 @@ export default function PresentationPanel() {
     function handleDragStart(event: DragStartEvent) {
         setIsDragging(true);
         const item = items.find((i) => i.id === event.active.id);
-        setActiveItem(item ?? null);
     }
 
     function handleDragEnd(event: DragEndEvent) {
         setIsDragging(false);
-        setActiveItem(null);
         const { active, over } = event;
 
         if (!over || active.id === over.id) {
@@ -148,11 +143,7 @@ export default function PresentationPanel() {
     const isJobSpecificActive =
         url === jobPositionsPath ||
         props.activeFolder?.is_job_specific === true;
-
-    function handlePreview() {
-        router.visit("/admin/folders/preview-list");
-    }
-
+    
     return (
         <>
             <aside className="flex h-full w-125  shrink-0 flex-col rounded-xl text-white">
@@ -170,7 +161,7 @@ export default function PresentationPanel() {
                     <Button
                         variant="secondary"
                         className="px-3"
-                        onClick={() => handlePreview()}
+                        onClick={() => router.visit(`/admin/folders/preview-list?company_id=${company.id}`)}
                     >
                         Preview Modules
                         <svg
