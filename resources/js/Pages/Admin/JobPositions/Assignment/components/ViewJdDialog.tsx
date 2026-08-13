@@ -14,6 +14,7 @@ interface Props {
     companyJobIds: CompanyJobIds | null;
     isOpen: boolean;
     onClose: () => void;
+    document:React.ReactNode
 }
 
 export default function ViewJdDialog({ isOpen, onClose, document }: Props) {

@@ -118,16 +118,14 @@ class JobPositionController extends Controller
     {
         $request->validate([
             'company_ids' => 'required|array',
-            'company_ids.*' => 'exists:companies,id',
             'job_ids' => 'present|array',
-            'job_ids.*' => 'exists:job_positions,id',
         ]);
 
         $companies = Company::whereIn('id', $request->company_ids)->get();
 
         foreach ($companies as $company) {
             $company->jobs()->syncWithoutDetaching($request->job_ids);
-
+                
             foreach ($request->job_ids as $jobId) {
                 Folder::ensureJobSpecificFolder($company->id, $jobId);
             }
@@ -151,6 +149,8 @@ class JobPositionController extends Controller
         $request->validate([
             'pdf_file' => 'required|file|mimes:pdf|max:10240'
         ]);
+
+        $document = null;
         
         if ($request->hasFile('pdf_file')) {
             $file = $request->file('pdf_file');
@@ -159,14 +159,35 @@ class JobPositionController extends Controller
             $path = Storage::disk('public')->putFile('', $file);
 
             // 2. Save records to the database
-            Document::create([
-                'company_id' => $request->company_id,
-                'job_position_id' => $request->job_position_id,
-                'file_path' => $path,
-                'orig_name' => $file->getClientOriginalName(),
-            ]);
+            $document = Document::updateOrCreate(
+                // 1. Search Criteria (What makes it unique?)
+                [
+                    'company_id' => $request->company_id,
+                    'job_position_id' => $request->job_position_id,
+                ],
+                // 2. Data to insert or update with
+                [
+                    'file_path' => $path,
+                    'orig_name' => $file->getClientOriginalName(),
+                ]
 
-            return back()->with('success', 'PDF uploaded and saved to database successfully!');
+            );
+
+            // return back()->with('success', 'PDF uploaded and saved to database successfully!');
+            // Check if it was newly created or updated
+            if ($document->wasRecentlyCreated) {
+                // It was a brand new record
+                return back()->with([
+                    'success' => 'Document created successfully!',
+                    'document' => $document
+                ]);
+            } else {
+                // It already existed and was updated
+                return back()->with([
+                    'success' => 'Document updated successfully!',
+                    'document' => $document
+                ]);
+            }
         }
     }
 

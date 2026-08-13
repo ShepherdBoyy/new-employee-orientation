@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Form } from "@inertiajs/react";
+import { toast } from "sonner";
 
 interface CompanyJobIds {
     company_id: number;
@@ -55,6 +56,12 @@ export default function UploadJdDialog({
                             company_id: companyJobIds?.company_id,
                             job_position_id: companyJobIds?.job_position_id,
                         })}
+                        onSuccess={(success) => {
+                            toast.success(success?.props.success,{
+                                position: "top-center",
+                            });
+                            onClose();
+                        }}  
                         className="space-y-5"
                     >
                         {({ errors }) => (
