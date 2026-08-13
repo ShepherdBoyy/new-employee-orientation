@@ -102,9 +102,9 @@ export default function EmployeeDetailDialog({ employee, onClose }: Props) {
                                         {employee.email}
                                     </DialogDescription>
                                 </div>
-                                <div className="flex flex-col">
-                                    <span className="flex items-center gap-1">
-                                        <Avatar size="sm">
+                                <div className="flex flex-col gap-2">
+                                    <span className="flex items-center justify-end gap-1">
+                                        <Avatar className="size-6">
                                             <AvatarImage
                                                 src={`/storage/${employee.company?.logo_path}`}
                                             />

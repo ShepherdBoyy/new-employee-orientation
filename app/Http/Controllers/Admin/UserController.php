@@ -37,12 +37,14 @@ class UserController extends Controller
         $employees = User::where("role", "employee")
             ->with("company", "jobPosition")
             ->latest()
-            ->get()
-            ->map(function (User $employee) {
+            ->paginate(10)
+            ->through(function (User $employee) {
                 $totalFolders = $employee->company
                     ? $employee->company->foldersForEmployee($employee)->count()
                     : 0;
+                    
                 $completedFolders = $employee->folderCompletions()->count();
+                
                 $status = match (true) {
                     $employee->hasAcknowledgedOrientation() => "acknowledged",
                     $completedFolders > 0 => "in_progress",
@@ -61,7 +63,7 @@ class UserController extends Controller
                     "status" => $status
                 ];
             });
-
+            
         $companies = Company::with("jobs:id,name")
             ->get(["id", "name"]);
 

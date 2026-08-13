@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useForm, router } from "@inertiajs/react";
-import { Plus, Pencil, Trash2, Users2, CalendarClock } from "lucide-react";
+import EmployeeTable from "./components/EmployeeTable";
+import { Plus, Trash2, Users2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import {
     Select,
     SelectContent,
@@ -32,24 +31,23 @@ import {
     AlertDialogMedia,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
 import EmployeeDetailDialog, {
     type Employee as EmployeeDetail,
 } from "./components/EmployeeDetailDialog";
 import Master from "@/Layout/Master";
 import type { JobPosition } from "../Types/job-position";
 import type { CompanyWithJobs } from "../Types/company";
-
-interface Employee {
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+    CardContent,
+} from "@/components/ui/card";
+import AppPagination from "@/Layout/Pagination";
+import EmployeeFilters from "./components/EmployeeFilters";
+import type { Paginated } from "../Types/job-position";
+export interface Employee {
     id: number;
     name: string;
     email: string;
@@ -62,28 +60,14 @@ interface Employee {
 }
 
 interface Props {
-    employees: Employee[];
+    employees: Paginated<Employee>;
     companies: CompanyWithJobs[];
 }
 
-const statusMap = {
-    not_started: {
-        label: "Not Started",
-        className: "bg-muted text-muted-foreground",
-    },
-    in_progress: {
-        label: "Ongoing",
-        className:
-            "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
-    },
-    acknowledged: {
-        label: "Acknowledged",
-        className:
-            "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
-    },
-};
-
 function Employees({ employees: initialEmployees, companies }: Props) {
+    const [search, setSearch] = useState("");
+    const [companyFilter, setCompanyFilter] = useState("all");
+    const [statusFilter, setStatusFilter] = useState("all");
     const [employees, setEmployees] = useState(initialEmployees);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<Employee | null>(
@@ -97,6 +81,72 @@ function Employees({ employees: initialEmployees, companies }: Props) {
 
     useEffect(() => setEmployees(initialEmployees), [initialEmployees]);
 
+    const employeeStats = useMemo(() => {
+        return {
+            total: employees.data.length,
+            ongoing: employees.data.filter(
+                (employee) => employee.status === "in_progress",
+            ).length,
+            acknowledged: employees.data.filter(
+                (employee) => employee.status === "acknowledged",
+            ).length,
+
+            not_started: employees.data.filter(
+                (employee) => employee.status === "not_started",
+            ).length,
+        };
+    }, [employees]);
+
+    function StatCard({
+        label,
+        value,
+        description,
+    }: {
+        label: string;
+        value: number;
+        description: string;
+    }) {
+        return (
+            <>
+                <Card className="">
+                    <CardHeader className="flex items-center justify-between gap-3">
+                        <CardTitle>{label}</CardTitle>
+
+                        <CardDescription>{value}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="mt-1 text-[11px] text-muted-foreground">
+                            {description}
+                        </p>
+                    </CardContent>
+                </Card>
+            </>
+        );
+    }
+
+    const filteredEmployee = useMemo(() => {
+        const query = search.trim().toLowerCase();
+
+        return employees.data.filter((employee) => {
+            const matchesSearch =
+                !query ||
+                employee.name.toLowerCase().includes(query) ||
+                employee.email.toLowerCase().includes(query);
+            const matchesCompany =
+                companyFilter === "all" ||
+                String(employee.company?.id) === companyFilter;
+
+            const matchesStatus =
+                statusFilter === "all" || employee.status === statusFilter;
+            return matchesSearch && matchesCompany && matchesStatus;
+        });
+    }, [employees, search, companyFilter, statusFilter]);
+
+    function clearFilters() {
+        setSearch("");
+        setCompanyFilter("all");
+        setStatusFilter("all");
+    }
     const { data, setData, post, put, processing, errors, reset } = useForm({
         name: "",
         email: "",
@@ -117,8 +167,7 @@ function Employees({ employees: initialEmployees, companies }: Props) {
         setDialogOpen(true);
     }
 
-    function openEdit(employee: Employee, e: React.MouseEvent) {
-        e.stopPropagation();
+    function openEdit(employee: Employee) {
         setEditingEmployee(employee);
         setData({
             name: employee.name,
@@ -159,35 +208,83 @@ function Employees({ employees: initialEmployees, companies }: Props) {
             setDeletingEmployee(null);
         }
     }
-
-    function handleDeleteClick(employee: Employee, e: React.MouseEvent) {
-        e.stopPropagation();
-        setDeletingEmployee(employee);
-    }
-
-    function isExpired(expiresAt: string | null) {
-        return expiresAt ? new Date(expiresAt) < new Date() : false;
-    }
+    const hasActiveFilters =
+        search.trim() !== "" ||
+        companyFilter !== "all" ||
+        statusFilter !== "all";
     return (
         <>
             <div className="w-full space-y-6">
-                <div className="flex items-center justify-between border-b pb-5">
-                    <div>
+                <div className="flex items-start justify-between gap-4 border-b pb-5">
+                    <div className="min-w-0">
                         <h1 className="text-xl font-semibold tracking-tight">
                             Employees
                         </h1>
+
                         <p className="mt-1 text-sm text-muted-foreground">
-                            Manage employee accounts and their orientation
-                            access.
+                            Manage employee accounts, assignments, and
+                            orientation progress.
                         </p>
                     </div>
-                    <Button size="lg" onClick={openCreate}>
-                        <Plus className="mr-2 h-4 w-4" />
+
+                    <Button onClick={openCreate} className="shrink-0" size="lg">
+                        <Plus className="mr-2 size-4" />
                         New Employee
                     </Button>
                 </div>
 
-                {employees.length === 0 ? (
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <StatCard
+                        label="Total Employees"
+                        value={employeeStats.total}
+                        description="All registered employees"
+                    />
+
+                    <StatCard
+                        label="In Progress"
+                        value={employeeStats.ongoing}
+                        description="Currently completing orientation"
+                    />
+
+                    <StatCard
+                        label="Acknowledged"
+                        value={employeeStats.acknowledged}
+                        description="Orientation completed"
+                    />
+
+                    <StatCard
+                        label="Not Started"
+                        value={employeeStats.not_started}
+                        description="Awaiting orientation"
+                    />
+                </div>
+                <EmployeeFilters
+                    search={search}
+                    onSearchChange={setSearch}
+                    companyFilter={companyFilter}
+                    onCompanyChange={setCompanyFilter}
+                    companies={companies}
+                    statusFilter={statusFilter}
+                    onStatusChange={setStatusFilter}
+                    onClear={clearFilters}
+                    hasActiveFilters={hasActiveFilters}
+                />
+
+                <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                        Showing{" "}
+                        <span className="font-medium text-foreground">
+                            {filteredEmployee.length}
+                        </span>{" "}
+                        of{" "}
+                        <span className="font-medium text-foreground">
+                            {employees.data.length}
+                        </span>{" "}
+                        employees
+                    </p>
+                </div>
+
+                {employees.data.length === 0 ? (
                     <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-20 text-center">
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                             <Users2 className="h-5 w-5 text-muted-foreground" />
@@ -202,160 +299,13 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                         </div>
                     </div>
                 ) : (
-                    <div className="rounded-xl border">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Employee</TableHead>
-                                    <TableHead>Company</TableHead>
-                                    <TableHead>Progress</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Access Expires</TableHead>
-                                    <TableHead className="text-right">
-                                        Actions
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {employees.map((employee) => {
-                                    const expired = isExpired(
-                                        employee.expires_at,
-                                    );
-                                    const progressPct = employee.total_folders
-                                        ? (employee.completed_folders /
-                                              employee.total_folders) *
-                                          100
-                                        : 0;
-
-                                    return (
-                                        <TableRow
-                                            key={employee.id}
-                                            className="cursor-pointer"
-                                            onClick={() =>
-                                                setViewingEmployee(employee)
-                                            }
-                                        >
-                                            <TableCell className="">
-                                                <div className="flex items-center gap-3">
-                                                    <div>
-                                                        <p className="font-medium leading-none">
-                                                            {employee.name}
-                                                        </p>
-                                                        <p className="mt-1 text-xs text-muted-foreground">
-                                                            {employee.email}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground flex items-center gap-2">
-                                                <Avatar className="h-8 w-8">
-                                                    <AvatarImage
-                                                        src={
-                                                            employee.company
-                                                                ?.logo_path
-                                                                ? `/storage/${employee.company.logo_path}`
-                                                                : undefined
-                                                        }
-                                                    />
-                                                    <AvatarFallback>
-                                                        {employee.company?.name?.charAt(
-                                                            0,
-                                                        ) ?? "—"}
-                                                    </AvatarFallback>
-                                                </Avatar>
-
-                                                <span>
-                                                    {employee.company?.name ??
-                                                        "—"}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex items-center gap-2">
-                                                    <Progress
-                                                        value={progressPct}
-                                                        className="h-1.5 w-16"
-                                                    />
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {
-                                                            employee.completed_folders
-                                                        }
-                                                        /
-                                                        {employee.total_folders}
-                                                    </span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge
-                                                    className={cn(
-                                                        "font-normal",
-                                                        statusMap[
-                                                            employee.status
-                                                        ].className,
-                                                    )}
-                                                >
-                                                    {
-                                                        statusMap[
-                                                            employee.status
-                                                        ].label
-                                                    }
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell>
-                                                {employee.expires_at ? (
-                                                    <Badge
-                                                        variant={
-                                                            expired
-                                                                ? "destructive"
-                                                                : "secondary"
-                                                        }
-                                                        className="gap-1 font-normal"
-                                                    >
-                                                        <CalendarClock className="h-3 w-3" />
-                                                        {expired
-                                                            ? "Expired"
-                                                            : new Date(
-                                                                  employee.expires_at,
-                                                              ).toLocaleDateString()}
-                                                    </Badge>
-                                                ) : (
-                                                    "—"
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex justify-end gap-1">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8 cursor-pointer"
-                                                        onClick={(e) =>
-                                                            openEdit(
-                                                                employee,
-                                                                e,
-                                                            )
-                                                        }
-                                                    >
-                                                        <Pencil className="h-3.5 w-3.5" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer"
-                                                        onClick={(e) =>
-                                                            handleDeleteClick(
-                                                                employee,
-                                                                e,
-                                                            )
-                                                        }
-                                                    >
-                                                        <Trash2 className="h-3.5 w-3.5" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })}
-                            </TableBody>
-                        </Table>
+                    <div className="rounded-xl  ">
+                        <EmployeeTable
+                            employees={filteredEmployee}
+                            onView={setViewingEmployee}
+                            onEdit={openEdit}
+                            onDelete={setDeletingEmployee}
+                        />
                     </div>
                 )}
             </div>
@@ -530,6 +480,7 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                 </AlertDialogContent>
             </AlertDialog>
 
+            <AppPagination />
             <EmployeeDetailDialog
                 employee={viewingEmployee}
                 onClose={() => setViewingEmployee(null)}
