@@ -71,6 +71,14 @@ class Folder extends Model
 
     public static function ensureJobSpecificFolder(int $companyId, int $jobPositionId): self
     {
+        $existing = static::where('company_id', $companyId)
+            ->where('job_position_id', $jobPositionId)
+            ->first();
+
+        if ($existing) {
+            return $existing;
+        }
+
         $lastOrder = static::forCompany($companyId)->companyWide()->max("order") ?? 0;
 
         return static::create([
