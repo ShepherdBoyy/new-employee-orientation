@@ -38,28 +38,17 @@ export default function ToolbarJob({
     return (
         <>
             <div className="flex items-center justify-between gap-4 py-4">
-                <div className="flex items-center gap-3 flex-1">
-                    <Button size="lg" onClick={onCreate}>
-                        <Plus className="size-4" />
-                        New Job
-                    </Button>
+                <InputGroup className="max-w-2xl h-9">
+                    <InputGroupInput
+                        value={search}
+                        onChange={(e) => onSearchChange(e.target.value)}
+                        placeholder="Search job positions..."
+                    />
+                    <InputGroupAddon>
+                        <SearchIcon />
+                    </InputGroupAddon>
+                </InputGroup>
 
-                    <div className="flex gap-3 items-center">
-                        <JobSort sort={sort} onSortChange={onSortChange} />
-                        <Separator orientation="vertical" />
-
-                        <div className="flex items-center gap-2 shrink-0">
-                            <Checkbox
-                                checked={allSelected}
-                                onCheckedChange={onToggleAll}
-                            />
-
-                            <span className="text-sm text-muted-foreground">
-                                Select all
-                            </span>
-                        </div>
-                    </div>
-                </div>
                 <div className="flex items-center gap-2">
                     {selectedCount > 0 && (
                         <span className="text-sm text-muted-foreground">
@@ -75,17 +64,27 @@ export default function ToolbarJob({
                             Delete {selectedCount} jobs
                         </Button>
                     )}
+                    <div className="flex items-center gap-3 flex-1">
+                        <div className="flex gap-3 items-center">
+                            {/*   <JobSort sort={sort} onSortChange={onSortChange} /> */}
+
+                            <div className="flex items-center gap-2 shrink-0">
+                                <Checkbox
+                                    checked={allSelected}
+                                    onCheckedChange={onToggleAll}
+                                />
+
+                                <span className="text-sm text-muted-foreground">
+                                    Select all
+                                </span>
+                            </div>
+                            <Button size="lg" onClick={onCreate}>
+                                <Plus className="size-4" />
+                                New Job
+                            </Button>
+                        </div>
+                    </div>
                 </div>
-                <InputGroup className="max-w-sm h-9">
-                    <InputGroupInput
-                        value={search}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                        placeholder="Search job positions..."
-                    />
-                    <InputGroupAddon>
-                        <SearchIcon />
-                    </InputGroupAddon>
-                </InputGroup>
             </div>
         </>
     );

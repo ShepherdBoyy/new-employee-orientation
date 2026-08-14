@@ -6,7 +6,7 @@ function Empty() {
     return (
         <div className="flex h-full items-center justify-center">
             <div className="max-w-2xl text-center">
-                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl">
+                <div className="mx-auto flex h-26 w-26 items-center justify-center rounded-3xl">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="currentColor"
@@ -26,11 +26,6 @@ function Empty() {
                     slides, and learning materials, or create a new one to get
                     started.
                 </p>
-
-                <Button className="mt-8 gap-2" size="lg">
-                    <CirclePlus className="size-4" />
-                    Create Module
-                </Button>
             </div>
         </div>
     );

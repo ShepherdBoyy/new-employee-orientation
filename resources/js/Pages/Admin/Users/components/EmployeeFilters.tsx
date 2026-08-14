@@ -1,4 +1,4 @@
-import { Search, X } from "lucide-react";
+import { Search, SearchIcon, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-
+import {
+    InputGroup,
+    InputGroupAddon,
+    InputGroupInput,
+} from "@/components/ui/input-group";
 interface Company {
     id: number;
     name: string;
@@ -38,28 +42,28 @@ export default function EmployeeFilters({
     hasActiveFilters,
 }: EmployeeFiltersProps) {
     return (
-        <div className="flex flex-col gap-3 rounded-xl border bg-card p-3 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3  bg-card  ">
             {/* Search */}
-            <div className="relative flex-1">
-                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-
-                <Input
+            <InputGroup className="max-w-2xl h-9">
+                <InputGroupInput
                     value={search}
                     onChange={(e) => onSearchChange(e.target.value)}
                     placeholder="Search employees..."
-                    className="h-9 border-0 bg-muted/40 pl-9 shadow-none focus-visible:ring-1"
                 />
-            </div>
+                <InputGroupAddon>
+                    <SearchIcon />
+                </InputGroupAddon>
+            </InputGroup>
 
             {/* Filters */}
             <div className="flex flex-wrap items-center gap-2">
                 <Select value={companyFilter} onValueChange={onCompanyChange}>
-                    <SelectTrigger className="h-9 w-full sm:w-40">
+                    <SelectTrigger className="h-9  w-65">
                         <SelectValue placeholder="Company" />
                     </SelectTrigger>
 
                     <SelectContent position="popper">
-                        <SelectItem value="">All companies</SelectItem>
+                        <SelectItem value="all">All companies</SelectItem>
 
                         {companies.map((company) => (
                             <SelectItem

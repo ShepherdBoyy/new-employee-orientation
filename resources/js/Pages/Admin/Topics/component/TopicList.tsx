@@ -81,6 +81,7 @@ export default function TopicList({
             { preserveScroll: true },
         );
     }
+
     return (
         <>
             <DndContext
@@ -92,18 +93,46 @@ export default function TopicList({
                     items={topics.map((topic) => topic.id)}
                     strategy={rectSortingStrategy}
                 >
-                    <div className="grid grid-cols-2 gap-2">
-                        {topics.map((item, index) => (
-                            <TopicCard
-                                index={index}
-                                key={item.id}
-                                topic={item}
-                                company={company}
-                                onEdit={handleEdit}
-                                onDelete={handleDelete}
-                            />
-                        ))}
-                    </div>
+                    {topics.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center p-12 text-center border border-dashed rounded-lg border-gray-300 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
+                            <div className="w-12 h-12 mb-4 flex items-center justify-center rounded-full bg-primary/10 text-primary">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="w-6 h-6"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                    />
+                                </svg>
+                            </div>
+                            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                                No topics found
+                            </h3>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 max-w-sm">
+                                Get started by creating your first topic for
+                                this folder.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 gap-2">
+                            {topics.map((item, index) => (
+                                <TopicCard
+                                    index={index}
+                                    key={item.id}
+                                    topic={item}
+                                    company={company}
+                                    onEdit={handleEdit}
+                                    onDelete={handleDelete}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </SortableContext>
             </DndContext>
 
