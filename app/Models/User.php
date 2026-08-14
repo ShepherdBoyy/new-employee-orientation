@@ -20,7 +20,8 @@ class User extends Authenticatable
         "password",
         "role",
         "job_position_id",
-        "expires_at"
+        "expires_at",
+        "welcome_viewed_at"
     ];
 
     protected $hidden = [
@@ -34,6 +35,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             "expires_at" => "datetime",
             "role" => "string",
+            "welcome_viewed_at" => "datetime"
         ];
     }
 

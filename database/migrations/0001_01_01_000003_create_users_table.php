@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId("company_id")->nullable()->constrained()->nullOnDelete();
             $table->string("name");
             $table->string("email")->unique();
+            $table->timestamp("welcome_viewed_at")->nullable();
             $table->string("password");
             $table->enum("role", ["admin", "employee"]);
             $table->foreignId("job_position_id")->nullable()->constrained()->nullOnDelete();

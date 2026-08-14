@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import OnboardingHeader from "./OnboardingHeader";
 import { motion } from "motion/react";
 
@@ -215,14 +215,15 @@ export default function GuidelinesStep({}) {
                     </div>
                 </div>
 
-                <Link href="/orientation/folders" className="py-8">
+                <div className="py-8">
                     <button
                         disabled={!agreed}
                         className="rounded-2xl border px-6 py-3 disabled:cursor-not-allowed disabled:opacity-50"
+                        onClick={() => router.post("/orientation/begin")}
                     >
                         Begin Orientation
                     </button>
-                </Link>
+                </div>
             </div>
         </div>
     );

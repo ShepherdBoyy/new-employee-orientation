@@ -27,6 +27,10 @@ class OrientationController extends Controller
             return redirect()->route("employee.completed");
         }
 
+        if ($user->welcome_viewed_at !== null) {
+            return redirect()->route("employee.folders.index");
+        }
+
         return Inertia::render("Employee/Welcome", [
             "user" => [
                 "name" => $user->name,
@@ -34,6 +38,17 @@ class OrientationController extends Controller
                 "jobPosition" => $user->jobPosition?->name
             ],
         ]);
+    }
+
+    public function beginOrientation()
+    {
+        $user = Auth::user();
+
+        if ($user->welcome_viewed_at === null) {
+            $user->update(["welcome_viewed_at" => now()]);
+        }
+
+        return redirect()->route("employee.folders.index");
     }
 
     public function index(): Response|RedirectResponse
