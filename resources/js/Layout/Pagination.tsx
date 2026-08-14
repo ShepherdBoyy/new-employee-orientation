@@ -37,7 +37,7 @@ export default function AppPagination({
             <span className="text-sm text-muted-foreground">
                 Showing <span className="font-medium">{from}</span>–
                 <span className="font-medium">{to}</span> of{" "}
-                <span className="font-medium">{total}</span> jobs
+                <span className="font-medium">{total}</span>
             </span>
 
             <div className="shrink-0">
