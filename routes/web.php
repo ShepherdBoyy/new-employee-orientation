@@ -97,27 +97,8 @@ Route::middleware("test")->group(function () {
         Route::get("/completed", [OrientationController::class, "completed"])->name("completed");
         Route::get("/locked", [OrientationController::class, "locked"])->name("account-locked");
     });
-});
 
-Route::get('/preview-welcome-email', function () {
-    return view('emails.employee-welcome', [
-        'employeeName'  => 'Juan Dela Cruz',
-        'companyName'   => 'Acme Corp',
-        'jobPosition'   => 'Software Engineer',
-        'email'         => 'juan@acme.com',
-        'password'      => 'delacruz-neo@2026',
-        'loginUrl'      => url('/login'),
-        'expiresInDays' => 2,
-    ]);
-});
-
-Route::get('/preview-completed-email', function () {
-    return view('emails.orientation-completed', [
-        'employeeName'   => 'Juan Dela Cruz',
-        'employeeEmail'  => 'juan@acme.com',
-        'companyName'    => 'Acme Corp',
-        'jobPosition'    => 'Software Engineer',
-        'acknowledgedAt' => now()->format('F j, Y g:i A'),
-        'viewUrl'        => url('/admin/users/employees'),
-    ]);
+    Route::prefix("orientation")->name("employee.")->group(function () {
+        Route::get("/locked", [OrientationController::class, "locked"])->name("account-locked");
+    });
 });
