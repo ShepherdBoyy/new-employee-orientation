@@ -18,9 +18,20 @@ use Illuminate\Support\Facades\Storage;
 class JobPositionController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $jobs = JobPosition::with('companies')->paginate(12);
+        $jobs = JobPosition::with('companies')
+        ->when($request->filled('search'), function ($query) use ($request) {
+            $search = $request->input('search');
+            
+            $query->where(function ($q) use ($search) {
+                // Search in job position attributes (e.g., title, description)
+                $q->where('name', 'like', '%' . $search . '%');
+            });
+        })
+        ->paginate(12)
+        ->withQueryString();
+
         return Inertia::render("Admin/JobPositions/AllJobs/Index")->with(['jobs' => $jobs]);
     }
 

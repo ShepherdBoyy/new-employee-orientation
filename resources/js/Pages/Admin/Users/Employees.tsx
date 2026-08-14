@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useDebouncedCallback } from 'use-debounce';
 import { useForm, router } from "@inertiajs/react";
 import EmployeeTable from "./components/EmployeeTable";
 import { Plus, Trash2, Users2 } from "lucide-react";
@@ -66,7 +67,7 @@ interface Props {
 
 function Employees({ employees: initialEmployees, companies }: Props) {
     const [search, setSearch] = useState("");
-    const [companyFilter, setCompanyFilter] = useState("all");
+    const [companyFilter, setCompanyFilter] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [employees, setEmployees] = useState(initialEmployees);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -128,23 +129,15 @@ function Employees({ employees: initialEmployees, companies }: Props) {
         const query = search.trim().toLowerCase();
 
         return employees.data.filter((employee) => {
-            const matchesSearch =
-                !query ||
-                employee.name.toLowerCase().includes(query) ||
-                employee.email.toLowerCase().includes(query);
-            const matchesCompany =
-                companyFilter === "all" ||
-                String(employee.company?.id) === companyFilter;
-
             const matchesStatus =
                 statusFilter === "all" || employee.status === statusFilter;
-            return matchesSearch && matchesCompany && matchesStatus;
+            return matchesStatus;
         });
     }, [employees, search, companyFilter, statusFilter]);
 
     function clearFilters() {
         setSearch("");
-        setCompanyFilter("all");
+        setCompanyFilter("");
         setStatusFilter("all");
     }
     const { data, setData, post, put, processing, errors, reset } = useForm({
@@ -210,8 +203,47 @@ function Employees({ employees: initialEmployees, companies }: Props) {
     }
     const hasActiveFilters =
         search.trim() !== "" ||
-        companyFilter !== "all" ||
+        companyFilter !== "" ||
         statusFilter !== "all";
+
+    const handleSearch = useDebouncedCallback((searchValue, companyValue) => {
+        router.get('/admin/users/employees', 
+            { 
+                search: searchValue,
+                company_id: companyValue, // Include company filter here
+                page: 1
+            }, 
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            }
+        );
+    }, 300);
+
+    const handleSearchChange = (e) => {
+        setSearch(e);
+        handleSearch(e, companyFilter); // Pass current company state
+    };
+
+    const handleCompanyChange = (e) => {
+        const value = e;
+        setCompanyFilter(value);
+        
+        // Trigger immediate request or debounced search with the new company value
+        router.get('/admin/users/employees', 
+            { 
+                search: search,
+                company_id: value,
+                page: 1
+            }, 
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            }
+        );
+    };
     return (
         <>
             <div className="w-full space-y-6">
@@ -260,9 +292,9 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                 </div>
                 <EmployeeFilters
                     search={search}
-                    onSearchChange={setSearch}
+                    onSearchChange={handleSearchChange}
                     companyFilter={companyFilter}
-                    onCompanyChange={setCompanyFilter}
+                    onCompanyChange={handleCompanyChange}
                     companies={companies}
                     statusFilter={statusFilter}
                     onStatusChange={setStatusFilter}
@@ -480,7 +512,31 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                 </AlertDialogContent>
             </AlertDialog>
 
-            <AppPagination />
+            <AppPagination
+                from={employees.from}
+                to={employees.to}
+                total={employees.total}
+                currentPage={employees.current_page}
+                lastPage={employees.last_page}
+                onPrevious={employees?.prev_page_url}
+                onNext={employees?.next_page_url}
+                onPageChange={(page) => {
+                    // 1. Get existing query parameters from the current URL
+                    const params = new URLSearchParams(window.location.search);
+                    
+                    // 2. Set or update the page parameter
+                    params.set('page', page);
+                    
+                    // 3. Convert params back to a plain object for Inertia's data option
+                    const queryData = Object.fromEntries(params.entries());
+
+                    router.visit(window.location.pathname, {
+                        data: queryData,
+                        preserveState: true, // Optional: keeps component state if desired
+                        preserveScroll: true, // Optional: keeps scroll position
+                    });
+                }}
+            />
             <EmployeeDetailDialog
                 employee={viewingEmployee}
                 onClose={() => setViewingEmployee(null)}

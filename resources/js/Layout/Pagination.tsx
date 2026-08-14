@@ -46,7 +46,10 @@ export default function AppPagination({
                         <PaginationItem>
                             <PaginationPrevious
                                 href="#"
-                                onClick={() => router.visit(onPrevious)}
+                                onClick={() => router.visit(onPrevious,{
+                                    preserveState: true,
+                                    preserveScroll: true,
+                                })}
                                 className={
                                     !onPrevious
                                         ? "pointer-events-none opacity-50"
@@ -70,7 +73,10 @@ export default function AppPagination({
                         <PaginationItem>
                             <PaginationNext
                                 href="#"
-                                onClick={() => router.visit(onNext)}
+                                onClick={() => router.visit(onNext,{
+                                    preserveState: true,
+                                    preserveScroll: true,
+                                })}
                                 className={
                                     !onNext
                                         ? "pointer-events-none opacity-50"

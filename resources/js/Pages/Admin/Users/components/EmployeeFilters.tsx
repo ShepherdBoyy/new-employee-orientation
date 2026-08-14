@@ -59,7 +59,7 @@ export default function EmployeeFilters({
                     </SelectTrigger>
 
                     <SelectContent position="popper">
-                        <SelectItem value="all">All companies</SelectItem>
+                        <SelectItem value="">All companies</SelectItem>
 
                         {companies.map((company) => (
                             <SelectItem

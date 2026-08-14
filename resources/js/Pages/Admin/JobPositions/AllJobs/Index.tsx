@@ -11,6 +11,8 @@ import ToolbarJob from "./components/ToolbarJob";
 import DeleteSelectedJobs from "./components/forms/DeleteSelectedJobs";
 import AppPagination from "../../../../Layout/Pagination";
 import type { Paginated } from "../../Types/job-position";
+import { useDebouncedCallback } from 'use-debounce';
+
 type Props = {
     jobs: Paginated<JobPosition>;
 };
@@ -28,13 +30,11 @@ function Index({ jobs }: Props) {
     const [editingJob, setEditingJob] = useState<JobPosition | null>(null);
     const [deletingJob, setDeletingJob] = useState<JobPosition | null>(null);
     const [createOpen, setCreateOpen] = useState(false);
-    const [search, setSearch] = useState("");
     const [selectedJobIds, setSelectedJobIds] = useState<number[]>([]);
-
+    const [search, setSearch] = useState("");
     const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
     const [sort, setSort] = useState<JobSortOption>("assigned");
     const filteredJobs = jobs.data
-        .filter((job) => job.name.toLowerCase().includes(search.toLowerCase()))
         .sort((a, b) => {
             const aCompanies = a.companies?.length ?? 0;
             const bCompanies = b.companies?.length ?? 0;
@@ -67,6 +67,26 @@ function Index({ jobs }: Props) {
             setSelectedJobIds(filteredJobs.map((job) => job.id));
         }
     }
+
+    const handleSearch = useDebouncedCallback((value) => {
+        router.get('/admin/job-positions', // Update with your actual route name
+            { 
+                search: value,
+                page: 1
+            }, 
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            }
+        );
+    }, 300);
+
+    const handleSearchChange = (e) => {
+        setSearch(e);
+        handleSearch(e);
+    };
+    
     return (
         <>
             <div className="space-y-6">
@@ -86,7 +106,7 @@ function Index({ jobs }: Props) {
 
                 <ToolbarJob
                     search={search}
-                    onSearchChange={setSearch}
+                    onSearchChange={handleSearchChange} // Pass the wrapper function here
                     allSelected={allSelected}
                     onToggleAll={handleToggleAll}
                     selectedCount={selectedJobIds.length}
@@ -116,8 +136,19 @@ function Index({ jobs }: Props) {
                     onPrevious={jobs?.prev_page_url}
                     onNext={jobs?.next_page_url}
                     onPageChange={(page) => {
+                        // 1. Get existing query parameters from the current URL
+                        const params = new URLSearchParams(window.location.search);
+                        
+                        // 2. Set or update the page parameter
+                        params.set('page', page);
+                        
+                        // 3. Convert params back to a plain object for Inertia's data option
+                        const queryData = Object.fromEntries(params.entries());
+
                         router.visit(window.location.pathname, {
-                            data: { page: page },
+                            data: queryData,
+                            preserveState: true, // Optional: keeps component state if desired
+                            preserveScroll: true, // Optional: keeps scroll position
                         });
                     }}
                 />

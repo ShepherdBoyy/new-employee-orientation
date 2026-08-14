@@ -32,12 +32,27 @@ class UserController extends Controller
         ]);
     }
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
+
         $employees = User::where("role", "employee")
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->input('search');
+                
+                $query->where(function ($q) use ($search) {
+                    // Search in job position attributes (e.g., title, description)
+                    $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
+                });
+            })
+            ->when($request->filled('company_id'), function ($query) use ($request) {
+                $query->where('company_id', $request->input('company_id'));
+            })
             ->with("company", "jobPosition")
             ->latest()
             ->paginate(10)
+            // Optional: appends search query parameters to pagination links automatically
+            ->withQueryString() 
             ->through(function (User $employee) {
                 $totalFolders = $employee->company
                     ? $employee->company->foldersForEmployee($employee)->count()
