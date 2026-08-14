@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -54,10 +55,14 @@ class CompanyController extends Controller
             "header_theme" => ["required", "string"]
         ]);
 
-        $logoPath = $company->logoPath;
+        $logoPath = $company->logo_path;
+
         if ($request->hasFile("logo_path")) {
-            $logoPath = $request->file("logo_path")
-                ->store("logos", "public");
+            if ($logoPath) {
+                Storage::disk("public")->delete($logoPath);
+            }
+
+            $logoPath = $request->file("logo_path")->store("logos", "public");
         }
 
         $company->update([
@@ -71,6 +76,10 @@ class CompanyController extends Controller
 
     public function destroy(Company $company): RedirectResponse
     {
+        if ($company->logo_path) {
+            Storage::disk('public')->delete($company->logo_path);
+        }
+
         $company->delete();
 
         return back()->with("success", "Company deleted successfully");

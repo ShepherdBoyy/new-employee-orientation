@@ -18,6 +18,7 @@ import {
     FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useEffect } from "react";
 
 type CompanyForm = {
     name: string;
@@ -36,6 +37,16 @@ export default function EditCompanyDialog({
     onSubmit,
     onClose,
 }: EditCompanyDialogProps) {
+    useEffect(() => {
+        if (company) {
+            form.setData({
+                name: company.name,
+                logo_path: null,
+                header_theme: company.header_theme ?? ""
+            })
+        }
+    }, [company])
+
     const logoPreview = form.data.logo_path
         ? URL.createObjectURL(form.data.logo_path)
         : company?.logo_path

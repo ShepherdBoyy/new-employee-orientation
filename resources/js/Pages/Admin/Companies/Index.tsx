@@ -67,10 +67,6 @@ function CompaniesIndex({ companies }: Props) {
         });
     }
 
-    function handleToggleStatus(company: CompanyWithJobCount) {
-        router.patch(`/admin/companies/${company.id}/toggle-status`);
-    }
-
     function confirmDelete() {
         if (!companyToDelete) return;
         router.delete(`/admin/companies/${companyToDelete.id}`, {
