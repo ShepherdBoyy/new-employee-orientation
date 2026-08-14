@@ -16,6 +16,7 @@ import ModuleJobItem from "./PresentationPanelComponent/ModuleJobItem";
 import { useCallback, useEffect, useState } from "react";
 import {
     DndContext,
+    DragOverlay,
     closestCenter,
     PointerSensor,
     useSensor,
@@ -47,7 +48,7 @@ export default function PresentationPanel() {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-    const [isDragging, setIsDragging] = useState(false);
+    const [activeItem, setActiveItem] = useState<GridItem | null>(null);
     const [module, setModule] = useState<SelectedModule | null>(null);
 
     const companyWideFolders = props.companyWideFolders;
@@ -97,12 +98,12 @@ export default function PresentationPanel() {
     );
 
     function handleDragStart(event: DragStartEvent) {
-        setIsDragging(true);
         const item = items.find((i) => i.id === event.active.id);
+        setActiveItem(item ?? null);
     }
 
     function handleDragEnd(event: DragEndEvent) {
-        setIsDragging(false);
+        setActiveItem(null);
         const { active, over } = event;
 
         if (!over || active.id === over.id) {
@@ -130,7 +131,7 @@ export default function PresentationPanel() {
     }
 
     function handleDragCancel() {
-        setIsDragging(false);
+        setActiveItem(null);
     }
 
     function openCreate() {
@@ -143,10 +144,10 @@ export default function PresentationPanel() {
     const isJobSpecificActive =
         url === jobPositionsPath ||
         props.activeFolder?.is_job_specific === true;
-    
+
     return (
         <>
-            <aside className="flex h-full w-125  shrink-0 flex-col rounded-xl text-white">
+            <aside className="flex h-full w-125 shrink-0 flex-col rounded-xl text-white">
                 <div className="px-3 pt-4 pb-1 shrink-0 flex justify-between items-center">
                     <div>
                         <h2 className="font-medium text-lg tracking-tight">
@@ -161,7 +162,11 @@ export default function PresentationPanel() {
                     <Button
                         variant="secondary"
                         className="px-3"
-                        onClick={() => router.visit(`/admin/folders/preview-list?company_id=${company.id}`)}
+                        onClick={() =>
+                            router.visit(
+                                `/admin/folders/preview-list?company_id=${company.id}`,
+                            )
+                        }
                     >
                         Preview Modules
                         <svg
@@ -212,7 +217,7 @@ export default function PresentationPanel() {
                 </div>
 
                 {/* Action */}
-                <div className="px-1  flex shrink-0 pt-4 items-center justify-between w-full">
+                <div className="px-1 flex shrink-0 pt-4 items-center justify-between w-full">
                     <Button
                         variant="ghost"
                         size="lg"
@@ -223,6 +228,7 @@ export default function PresentationPanel() {
                         Create Module
                     </Button>
                 </div>
+
                 <ScrollArea className="mt-2 min-h-0 flex-1 pr-2">
                     <DndContext
                         sensors={sensors}
@@ -238,8 +244,6 @@ export default function PresentationPanel() {
                             <div className="space-y-1 pb-4 pr-2">
                                 {items.map((item) => {
                                     if (item.type === "job-specific") {
-                                        const active = url === jobPositionsPath;
-
                                         if (!jobSpecificSummary) {
                                             return null;
                                         }
@@ -263,7 +267,6 @@ export default function PresentationPanel() {
                                             company={company}
                                             module={item.folder}
                                             active={active}
-                                            isDragging={isDragging}
                                             onEdit={(module) => {
                                                 setModule(module);
                                                 setOpenEditDialog(true);
@@ -277,6 +280,34 @@ export default function PresentationPanel() {
                                 })}
                             </div>
                         </SortableContext>
+
+                        <DragOverlay
+                            dropAnimation={{ duration: 180, easing: "ease" }}
+                        >
+                            {activeItem ? (
+                                activeItem.type === "job-specific" ? (
+                                    jobSpecificSummary && (
+                                        <div className="shadow-2xl rounded-lg">
+                                            <ModuleJobItem
+                                                company={company}
+                                                summary={jobSpecificSummary}
+                                                active={false}
+                                            />
+                                        </div>
+                                    )
+                                ) : (
+                                    <div className="shadow-2xl rounded-lg">
+                                        <ModuleItem
+                                            company={company}
+                                            module={activeItem.folder}
+                                            active={false}
+                                            onEdit={() => {}}
+                                            onDelete={() => {}}
+                                        />
+                                    </div>
+                                )
+                            ) : null}
+                        </DragOverlay>
                     </DndContext>
                 </ScrollArea>
             </aside>

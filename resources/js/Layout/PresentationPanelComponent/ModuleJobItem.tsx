@@ -35,66 +35,67 @@ export default function ModuleJobItem({ company, summary, active }: Props) {
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
+        opacity: isDragging ? 0 : 1,
+        visibility: isDragging ? ("hidden" as const) : ("visible" as const),
     };
 
     const href = `/admin/folders/${company.slug}/job-positions`;
 
     return (
-        <Item
-            ref={setNodeRef}
-            style={style}
-            className={cn(
-                "relative flex items-center justify-between rounded-xl px-3 py-2.5 transition-all duration-150",
-                active
-                    ? "bg-white text-slate-900 shadow-sm"
-                    : "text-white/80 hover:bg-white/5 hover:text-white",
-                isDragging && "z-50 opacity-50",
-            )}
-        >
-            <ItemMedia>
-                <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className={cn(
-                        "h-7 w-7 rounded-md cursor-grabbing",
-                        active
-                            ? "text-slate-600 hover:bg-slate-100"
-                            : "text-white/70 hover:bg-white/10 hover:text-white",
-                    )}
-                    {...attributes}
-                    {...listeners}
-                >
-                    <GripVertical className="h-4 w-4" />
-                </Button>
-            </ItemMedia>
-            <Link
-                href={href}
-                className="group flex min-w-0 flex-1 items-center"
+        <div ref={setNodeRef} style={style}>
+            <Item
+                className={cn(
+                    "relative flex items-center justify-between rounded-xl px-3 py-2.5 transition-all duration-150",
+                    active
+                        ? "bg-white text-slate-900 shadow-sm"
+                        : "text-white/80 hover:bg-white/5 hover:text-white",
+                )}
             >
-                <ItemContent className="ml-3 min-w-0 flex-1">
-                    <ItemTitle
+                <ItemMedia>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
                         className={cn(
+                            "h-7 w-7 rounded-md cursor-grab active:cursor-grabbing",
                             active
-                                ? "font-semibold text-slate-900"
-                                : "font-medium text-white",
+                                ? "text-slate-600 hover:bg-slate-100"
+                                : "text-white/70 hover:bg-white/10 hover:text-white",
                         )}
+                        {...attributes}
+                        {...listeners}
                     >
-                        {summary.name}
-                    </ItemTitle>
+                        <GripVertical className="h-4 w-4" />
+                    </Button>
+                </ItemMedia>
+                <Link
+                    href={href}
+                    className="group flex min-w-0 flex-1 items-center"
+                >
+                    <ItemContent className="ml-3 min-w-0 flex-1">
+                        <ItemTitle
+                            className={cn(
+                                active
+                                    ? "font-semibold text-slate-900"
+                                    : "font-medium text-white",
+                            )}
+                        >
+                            {summary.name}
+                        </ItemTitle>
 
-                    <ItemDescription
-                        className={cn(
-                            "mt-0.5 truncate text-[12px]",
-                            active ? "text-slate-500" : "text-white/50",
-                        )}
-                    >
-                        {summary.total_positions} positions
-                    </ItemDescription>
-                </ItemContent>
-            </Link>
+                        <ItemDescription
+                            className={cn(
+                                "mt-0.5 truncate text-[12px]",
+                                active ? "text-slate-500" : "text-white/50",
+                            )}
+                        >
+                            {summary.total_positions} positions
+                        </ItemDescription>
+                    </ItemContent>
+                </Link>
 
-            <ItemActions></ItemActions>
-        </Item>
+                <ItemActions></ItemActions>
+            </Item>
+        </div>
     );
 }

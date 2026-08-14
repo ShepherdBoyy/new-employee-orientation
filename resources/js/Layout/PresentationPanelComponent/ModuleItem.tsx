@@ -40,7 +40,6 @@ interface Props {
     onEdit: (module: SelectedModule) => void;
     onDelete: (module: SelectedModule) => void;
     active: boolean;
-    isDragging: boolean;
 }
 
 export default function ModuleItem({
@@ -68,26 +67,23 @@ export default function ModuleItem({
         companySlug: company.slug,
     };
 
+    // While actively dragging, this becomes an invisible placeholder —
+    // the DragOverlay clone is what visually follows the pointer instead.
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
+        opacity: isDragging ? 0 : 1,
+        visibility: isDragging ? ("hidden" as const) : ("visible" as const),
     };
 
     return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            className={cn("relative", isDragging && "z-50 ")}
-        >
+        <div ref={setNodeRef} style={style}>
             <Item
-                ref={setNodeRef}
-                style={style}
                 className={cn(
                     "relative flex items-center justify-between rounded-xl px-3 py-2.5 transition-all duration-150",
                     active
                         ? "bg-white text-slate-900 shadow-sm"
                         : "text-white/80 hover:bg-white/5 hover:text-white",
-                    isDragging && "z-50 opacity-50",
                 )}
             >
                 <ItemMedia>
@@ -96,7 +92,7 @@ export default function ModuleItem({
                         variant="ghost"
                         size="icon"
                         className={cn(
-                            "h-7 w-7 rounded-md cursor-grabbing",
+                            "h-7 w-7 rounded-md cursor-grab active:cursor-grabbing",
                             active
                                 ? "text-slate-600 hover:bg-slate-100"
                                 : "text-white/70 hover:bg-white/10 hover:text-white",
