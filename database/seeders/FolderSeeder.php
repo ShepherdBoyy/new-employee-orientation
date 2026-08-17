@@ -17,7 +17,7 @@ class FolderSeeder extends Seeder
                 'key_topics' => [
                     'Company history, mission, vision, values',
                     'Organizational structure',
-                    'Code of conduct overview',
+                    'Code of discipline overview',
                 ],
             ],
             [
@@ -35,7 +35,6 @@ class FolderSeeder extends Seeder
                 'name' => 'Module 3 — Workplace Safety & OSH Compliance (RA 11058)',
                 'key_topics' => [
                     'Emergency procedures and evacuation routes',
-                    'Incident reporting',
                     'Drug-free workplace policy',
                 ],
             ],
