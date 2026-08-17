@@ -3,7 +3,7 @@ import JobPositionListItem, {
     type PickerPosition,
 } from "./components/JobPositionListItem";
 import Master from "@/Layout/Master";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 interface CompanyType {
     id: number;
     name: string;
@@ -42,6 +42,13 @@ const itemVariants = {
     },
 };
 function JobPositionPicker({ company, positions }: Props) {
+    const fieldBasedPositions = positions.filter(
+        (position) => position.type === "field_based",
+    );
+
+    const nonFieldPositions = positions.filter(
+        (position) => position.type === "non_field",
+    );
     return (
         <>
             <motion.div
@@ -109,16 +116,45 @@ function JobPositionPicker({ company, positions }: Props) {
                     </div>
                 </motion.section>
 
-                <div className="space-y-2">
-                    {positions.map((position, index) => (
-                        <JobPositionListItem
-                            key={position.id}
-                            companyId={company.id}
-                            position={position}
-                            index={index}
-                        />
-                    ))}
-                </div>
+                <Tabs defaultValue="field_base" className="w-full">
+                    <TabsList className="h-10 w-full">
+                        <TabsTrigger value="field_base" className="gap-2">
+                            Field-Based
+                            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px]">
+                                {fieldBasedPositions.length}
+                            </span>
+                        </TabsTrigger>
+
+                        <TabsTrigger value="non_field" className="gap-2">
+                            Non-Field
+                            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px]">
+                                {nonFieldPositions.length}
+                            </span>
+                        </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="field_base" className="mt-4 space-y-2">
+                        {fieldBasedPositions.map((position, index) => (
+                            <JobPositionListItem
+                                key={position.id}
+                                companyId={company.id}
+                                position={position}
+                                index={index}
+                            />
+                        ))}
+                    </TabsContent>
+
+                    <TabsContent value="non_field" className="mt-4 space-y-2">
+                        {nonFieldPositions.map((position, index) => (
+                            <JobPositionListItem
+                                key={position.id}
+                                companyId={company.id}
+                                position={position}
+                                index={index}
+                            />
+                        ))}
+                    </TabsContent>
+                </Tabs>
             </motion.div>
         </>
     );
