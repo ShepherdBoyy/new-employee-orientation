@@ -27,7 +27,7 @@ class FolderController extends Controller
 
     public function jobPositionPicker(Company $company): Response
     {
-        $company->load("jobs:id,name,slug");
+        $company->load("jobs:id,name,slug,type");
 
         $folders = Folder::forCompany($company->id)
             ->whereNotNull("job_position_id")
@@ -36,6 +36,7 @@ class FolderController extends Controller
         $positions = $company->jobs->map(fn(JobPosition $position) => [
             "id" => $position->id,
             "name" => $position->name,
+            "type" => $position->type,
             "has_folder" => $folders->contains("job_position_id", $position->id),
             "folder_slug" => $folders->firstWhere("job_position_id", $position->id)?->slug,
         ]);
