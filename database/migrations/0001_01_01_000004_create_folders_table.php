@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('folders', function (Blueprint $table) {
             $table->id();
             $table->foreignId("company_id")->constrained()->cascadeOnDelete();
-            $table->foreignId("job_position_id")->nullable()->constrained()->cascadeOnDelete();
+            $table->enum("employee_type", ["field", "non_field"])->nullable();
             $table->string("name");
             $table->string("slug")->unique();
             $table->unsignedInteger("order")->default(1);

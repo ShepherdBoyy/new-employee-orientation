@@ -11,7 +11,7 @@ class Folder extends Model
 {
     protected $fillable = [
         "company_id",
-        "job_position_id",
+        "employee_type",
         "name",
         "slug",
         "order"
@@ -21,6 +21,7 @@ class Folder extends Model
     {
         return [
             "order" => "integer",
+            "employee_type" => "string"
         ];
     }
     
@@ -57,39 +58,6 @@ class Folder extends Model
         return $slug;
     }
 
-    public function hasKeyTopics(): bool
-    {
-        return $this->keyTopics()->exists();
-    }
-
-    public const DEFAULT_JOB_SPECIFIC_KEY_TOPICS = [
-        'Job description and KPIs',
-        'Tools, Systems, and Equipments (Tarkie Policy and EzLife Roadshow)',
-        'Department Workflow and SOPs',
-        'Performance evaluation process',
-    ];
-
-    public static function ensureJobSpecificFolder(int $companyId, int $jobPositionId): self
-    {
-        $existing = static::where('company_id', $companyId)
-            ->where('job_position_id', $jobPositionId)
-            ->first();
-
-        if ($existing) {
-            return $existing;
-        }
-
-        $lastOrder = static::forCompany($companyId)->companyWide()->max("order") ?? 0;
-
-        return static::create([
-            "company_id" => $companyId,
-            "job_position_id" => $jobPositionId,
-            "name" => "Job-Specific Training",
-            "key_topics" => static::DEFAULT_JOB_SPECIFIC_KEY_TOPICS,
-            "order" => $lastOrder + 1
-        ]);
-    }
-
     public function scopeOrdered($query): void
     {
         $query->orderBy("order");
@@ -102,23 +70,29 @@ class Folder extends Model
 
     public function scopeCompanyWide($query): void
     {
-        $query->whereNull("job_position_id");
+        $query->whereNull("employee_type");
     }
 
-    public function scopeForJobPosition($query, ?int $jobPositionId): void
+    public function scopeForEmployeeType($query, ?string $employeeType): void
     {
-        if ($jobPositionId === null) {
-            $query->whereRaw("1 = 0");
-            return;
-        }
-
-        $query->where("job_position_id", $jobPositionId);
+        $query->where("employee_type", $employeeType);
     }
 
-    public function isJobSpecific(): bool
+    public function isTypeSpecific(): bool
     {
-        return $this->job_position_id !== null;
+        return $this->employee_type !== null;
     }
+
+    public function isFieldTraining(): bool
+    {
+        return $this->employee_type === "field";
+    }
+
+    public function isNonFieldTraining(): bool
+    {
+        return $this->employee_type === "non_field";
+    }
+
 
     public function isCompletedBy(User $user): bool
     {
@@ -137,19 +111,9 @@ class Folder extends Model
         return $this->belongsTo(Company::class);
     }
 
-    public function jobPosition(): BelongsTo
-    {
-        return $this->belongsTo(JobPosition::class);
-    }
-
     public function keyTopics(): HasMany
     {
         return $this->hasMany(FolderKeyTopic::class)->orderBy("order");
-    }
-
-    public function slides(): HasMany
-    {
-        return $this->hasMany(Slide::class)->orderBy("order");
     }
 
     public function completions(): HasMany

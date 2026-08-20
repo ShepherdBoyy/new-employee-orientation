@@ -55,12 +55,16 @@ class Company extends Model
             ->companyWide()
             ->get();
 
-        $jobSpecific = Folder::forCompany($user->company_id)
-            ->forJobPosition($user->job_position_id)
-            ->get();
+        $typeSpecific = collect();
+
+        if ($user->jobPosition) {
+            $typeSpecific = Folder::forCompany($user->company_id)
+                ->forEmployeeType($user->jobPosition->employee_type)
+                ->get();
+        }
 
         return $companyWide
-            ->concat($jobSpecific)
+            ->concat($typeSpecific)
             ->sortBy("order")
             ->values();
     }
@@ -78,10 +82,5 @@ class Company extends Model
     public function document(): HasMany
     {
         return $this->hasMany(Document::class);
-    }
-
-    public function folders(): HasMany
-    {
-        return $this->hasMany(Folder::class);
     }
 } 
