@@ -59,10 +59,6 @@ Route::middleware("test")->group(function () {
 
         // Preview
         Route::get("/folders/{folder:slug}/preview", [SlideController::class, "previewFolder"])->name("folders.preview");
-
-        // Job Specific
-        Route::get("/folders/{company:slug}/job-positions", [FolderController::class, "jobPositionPicker"])->name("folders.job-position-picker");
-        Route::get("/folders/{company}/job-positions/{jobPosition}/resolve", [FolderController::class, "resolveJobSpecificFolder"])->name("folders.resolve-job-specific");
         
         // Topics
         Route::get("/folders/{company:slug}/{folder:slug}", [FolderKeyTopicController::class, "index"])->name("folders.topics.index");

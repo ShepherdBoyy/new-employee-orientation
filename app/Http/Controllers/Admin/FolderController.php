@@ -25,42 +25,28 @@ class FolderController extends Controller
         ]);
     }
 
-    public function jobPositionPicker(Company $company): Response
-    {
-        $company->load("jobs:id,name,slug,type");
+    // public function jobPositionPicker(Company $company): Response
+    // {
+    //     $company->load("jobs:id,name,slug,type");
 
-        $folders = Folder::forCompany($company->id)
-            ->whereNotNull("job_position_id")
-            ->get(["id", "job_position_id", "slug"]);
+    //     $folders = Folder::forCompany($company->id)
+    //         ->whereNotNull("job_position_id")
+    //         ->get(["id", "job_position_id", "slug"]);
 
-        $positions = $company->jobs->map(fn(JobPosition $position) => [
-            "id" => $position->id,
-            "name" => $position->name,
-            "type" => $position->type,
-            "has_folder" => $folders->contains("job_position_id", $position->id),
-            "folder_slug" => $folders->firstWhere("job_position_id", $position->id)?->slug,
-        ]);
+    //     $positions = $company->jobs->map(fn(JobPosition $position) => [
+    //         "id" => $position->id,
+    //         "name" => $position->name,
+    //         "type" => $position->type,
+    //         "has_folder" => $folders->contains("job_position_id", $position->id),
+    //         "folder_slug" => $folders->firstWhere("job_position_id", $position->id)?->slug,
+    //     ]);
 
-        return Inertia::render("Admin/Folders/JobPositionPicker", [
-            "company" => $company,
-            "positions" => $positions,
-            ...PresentationPanelData::build($company)
-        ]);
-    }
-
-    public function resolveJobSpecificFolder(Company $company, JobPosition $jobPosition): RedirectResponse
-    {
-        // $folder = Folder::ensureJobSpecificFolder($company->id, $jobPosition->id);
-
-        $folder = Folder::where("company_id", $company->id)
-            ->where("job_position_id", $jobPosition->id)
-            ->first();
-
-        return redirect()->route("admin.folders.topics.index", [
-            "company" => $company->slug,
-            "folder" => $folder->slug
-        ]);
-    }
+    //     return Inertia::render("Admin/Folders/JobPositionPicker", [
+    //         "company" => $company,
+    //         "positions" => $positions,
+    //         ...PresentationPanelData::build($company)
+    //     ]);
+    // }
 
     public function store(Request $request): RedirectResponse
     {

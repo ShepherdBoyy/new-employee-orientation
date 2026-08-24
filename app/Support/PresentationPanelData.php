@@ -15,23 +15,22 @@ class PresentationPanelData
             ->withCount("keyTopics")
             ->get();
 
-        $company->loadMissing("jobs:id,name,slug");
+        $moduleFivePair = Folder::forCompany($company->id)
+            ->whereNotNull("employee_type")
+            ->get(["id", "employee_type", "name", "slug", "order"]);
+        
+        $firstVariant = $moduleFivePair->first();
 
-        $jobSpecificFolders = Folder::forCompany($company->id)
-            ->whereNotNull("job_position_id")
-            ->get(["id", "job_position_id", "name", "order"]);
-
-        $firstJobSpecific = $jobSpecificFolders->first();
-
-        $jobSpecificSummary = $company->jobs->isNotEmpty() ? [
-            "total_positions" => $company->jobs->count(),
-            "order" => $firstJobSpecific?->order ?? ($companyWideFolders->max("order") + 1 ?? 1),
-            "name" => $firstJobSpecific?->name ?? "Job-Specific Training"
+        $moduleFiveSummary = $firstVariant ? [
+            "name" => $firstVariant->name,
+            "order" => $firstVariant->order,
+            "field_folder_slug" => $moduleFivePair->firstWhere("employee_type", "field")?->slug,
+            "non_field_folder_slug" => $moduleFivePair->firstWhere("employee_type", "non_field")?->slug,
         ] : null;
 
         return [
             "companyWideFolders" => $companyWideFolders,
-            "jobSpecificSummary" => $jobSpecificSummary
+            "jobSpecificSummary" => $moduleFiveSummary
         ];
     }
 }

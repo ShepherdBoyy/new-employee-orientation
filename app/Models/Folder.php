@@ -24,7 +24,7 @@ class Folder extends Model
             "employee_type" => "string"
         ];
     }
-    
+
 
     protected static function booted(): void
     {
@@ -56,6 +56,52 @@ class Folder extends Model
         }
 
         return $slug;
+    }
+
+    public static function defaultCompanyModules(): array
+    {
+        return [
+            'Module 1 — Welcome & Company Overview',
+            'Module 2 — Employment Terms & HR Policies (DOLE-Aligned)',
+            'Module 3 — Workplace Safety & OSH Compliance (RA 11058)',
+            'Module 4 — Data Privacy & Confidentiality (RA 10173)',
+            'Module 6 — Product, Service, and Compliance Training',
+            'Module 7 — Anti-Harassment, Anti-Bullying, and Ethics',
+            'Module 8 — IT, Cybersecurity & Acceptable Use',
+        ];
+    }
+
+    public static function seedDefaultsForCompany(Company $company): void
+    {
+        $order = 0;
+
+        foreach (static::defaultCompanyModules() as $index => $name) {
+            $order++;
+
+            if ($index === 4) {
+                static::create([
+                    "company_id" => $company->id,
+                    "employee_type" => "field",
+                    "name" => "Module 5 - Job-Specific Training",
+                    "order" => $order
+                ]);
+
+                static::create([
+                    "company_id" => $company->id,
+                    "employee_type" => "non_field",
+                    "name" => "Module 5 - Job-Specific Training",
+                    "order" => $order
+                ]);
+
+                $order++;
+            }
+
+            static::create([
+                "company_id" => $company->id,
+                "name" => $name,
+                "order" => $order
+            ]);
+        }
     }
 
     public function scopeOrdered($query): void
@@ -97,8 +143,8 @@ class Folder extends Model
     public function isCompletedBy(User $user): bool
     {
         return $this->completions()
-                    ->where("user_id", $user->id)
-                    ->exists();
+            ->where("user_id", $user->id)
+            ->exists();
     }
 
     public function slideCount(): int
