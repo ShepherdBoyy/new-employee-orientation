@@ -23,7 +23,7 @@ class SlideController extends Controller
             ->orderBy('order')
             ->get();
 
-        $folder->load('company:id,name,slug', 'jobPosition:id,name,slug');
+        $folder->load('company:id,name,slug');
 
         return Inertia::render('Admin/Slides/Index', [
             "company" => $company,
@@ -32,8 +32,8 @@ class SlideController extends Controller
                 'name' => $folder->name,
                 'slug' => $folder->slug,
                 'company' => $folder->company,
-                'job_position' => $folder->jobPosition,
-                "is_job_specific" => $folder->job_position_id !== null
+                'employee_type' => $folder->employee_type,
+                'is_type_specific'  => $folder->isTypeSpecific(),
             ],
             'topic' => $keyTopic,
             'slides' => $slides->map(fn($slide) => [
@@ -148,8 +148,8 @@ class SlideController extends Controller
 
     private function storagePath(Folder $folder, FolderKeyTopic $topic): string
     {
-        $base = $folder->jobPosition_id
-            ? "folders/" . $folder->company->slug . "/job-positions/" . $folder->jobPosition->slug . "/" . $folder->slug
+        $base = $folder->isTypeSpecific()
+            ? "folders/" . $folder->company->slug . "/job-type/" . $folder->employee_type . "/" . $folder->slug
             : "folders/" . $folder->company->slug . "/" . $folder->slug;
 
         return $base . "/" . str($topic->label)->slug();
