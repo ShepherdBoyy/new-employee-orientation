@@ -98,7 +98,7 @@ class CompanyJobPositionSeeder extends Seeder
                 }
 
                 if (!$jobPosition->exists || $type === 'field_based') {
-                    $jobPosition->type = $type;
+                    $jobPosition->employee_type = $type;
                 }
 
                 $jobPosition->save();

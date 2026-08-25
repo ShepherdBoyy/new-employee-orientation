@@ -38,7 +38,7 @@ export interface PageProps {
     company: CompanyNav;
     companyWideFolders?: ModuleNav[];
     jobSpecificSummary: JobSpecificSummary | null;
-    activeFolder?: { slug: string; is_job_specific?: boolean };
+    activeFolder?: { slug: string; is_type_specific ?: boolean };
     [key: string]: unknown;
 }
 
@@ -143,7 +143,7 @@ export default function PresentationPanel() {
     const jobPositionsPath = `/admin/folders/${company.slug}/job-positions`;
     const isJobSpecificActive =
         url === jobPositionsPath ||
-        props.activeFolder?.is_job_specific === true;
+        props.activeFolder?.is_type_specific === true;
 
     return (
         <>

@@ -136,10 +136,6 @@ class JobPositionController extends Controller
 
         foreach ($companies as $company) {
             $company->jobs()->syncWithoutDetaching($request->job_ids);
-                
-            foreach ($request->job_ids as $jobId) {
-                Folder::ensureJobSpecificFolder($company->id, $jobId);
-            }
         }
 
         return back()->with("success", "Job assigned successfully");

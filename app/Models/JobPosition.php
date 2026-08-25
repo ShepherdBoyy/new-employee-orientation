@@ -13,7 +13,7 @@ class JobPosition extends Model
 
     protected $fillable = [
         "name",
-        'type',
+        'employee_type',
         "slug"
     ];
 
