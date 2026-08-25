@@ -25,28 +25,28 @@ class FolderController extends Controller
         ]);
     }
 
-    // public function jobPositionPicker(Company $company): Response
-    // {
-    //     $company->load("jobs:id,name,slug,type");
+    public function jobPositionPicker(Company $company): Response
+    {
+        $company->load("jobs:id,name,slug,employee_type");
 
-    //     $folders = Folder::forCompany($company->id)
-    //         ->whereNotNull("job_position_id")
-    //         ->get(["id", "job_position_id", "slug"]);
+        $folders = Folder::forCompany($company->id)
+            ->whereNotNull("employee_type")
+            ->get(["id", "slug", "employee_type"]);
 
-    //     $positions = $company->jobs->map(fn(JobPosition $position) => [
-    //         "id" => $position->id,
-    //         "name" => $position->name,
-    //         "type" => $position->type,
-    //         "has_folder" => $folders->contains("job_position_id", $position->id),
-    //         "folder_slug" => $folders->firstWhere("job_position_id", $position->id)?->slug,
-    //     ]);
+        $positions = $company->jobs->map(fn(JobPosition $position) => [
+            "id" => $position->id,
+            "name" => $position->name,
+            "type" => $position->employee_type,
+            "has_folder" => $folders->contains("job_position_id", $position->id),
+            "folder_slug" => $folders->firstWhere("job_position_id", $position->id)?->slug,
+        ]);
 
-    //     return Inertia::render("Admin/Folders/JobPositionPicker", [
-    //         "company" => $company,
-    //         "positions" => $positions,
-    //         ...PresentationPanelData::build($company)
-    //     ]);
-    // }
+        return Inertia::render("Admin/Folders/JobPositionPicker", [
+            "company" => $company,
+            "positions" => $positions,
+            ...PresentationPanelData::build($company)
+        ]);
+    }
 
     public function store(Request $request): RedirectResponse
     {
@@ -95,10 +95,10 @@ class FolderController extends Controller
         ]);
 
         Folder::where("company_id", $company->id)
-            ->whereNotNull("job_position_id")
+            ->whereNotNull("employee_type")
             ->update(["name" => $validated["name"]]);
 
-        return back()->with("success", "Job-specific training name updated successfully");
+        return back()->with("success", "Module updated successfully");
     }
 
     public function reorder(Request $request): RedirectResponse
@@ -157,49 +157,29 @@ class FolderController extends Controller
             'job_position_id' => $request->job_position_id,
         ]);
 
-        $folders = $company->foldersForEmployee($simulatedUser)->map(fn($folder) => [
-            "id" => $folder->id,
-            "slug" => $folder->slug,
-            "name" => $folder->name,
-            "slide_count" => $folder->slideCount(),
-            "is_job_specific" => false,
-            "locked" => false,
-            "order" => $folder->order
-        ])->values();
-
-        if (!$request->job_position_id) {
-            $jobSpecificFolder = Folder::forCompany($company->id)
-                ->whereNotNull("job_position_id")
-                ->first();
-
-            if ($jobSpecificFolder) {
-                $placeholder = [
-                    'id' => 0,
-                    'slug' => null,
-                    'name' => 'Job-Specific Training',
-                    'slide_count' => 0,
-                    'is_job_specific' => true,
-                    'locked' => true,
-                    'order' => $jobSpecificFolder->order,
-                ];
-
-                $insertAt = $folders->filter(
-                    fn($f) => $f["order"] < $placeholder["order"]
-                )->count();
-
-                $folders->splice($insertAt, 0, [$placeholder]);
-            }
+        if ($request->job_position_id) {
+            $simulatedUser->setRelation(
+                "jobPosition",
+                JobPosition::find($request->job_position_id)
+            );
         }
+
+        $folders = $company->foldersForEmployee($simulatedUser);
 
         $jobPosition = $request->job_position_id
             ? JobPosition::find($request->job_position_id)
             : null;
 
         return Inertia::render("Admin/Folders/PreviewList", [
-            "folders" => $folders->values(),
+            "folders" => $folders->map(fn($folder ) => [
+                "id" => $folder->id,
+                "slug" => $folder->slug,
+                "name" => $folder->name,
+                "slide_count" => $folder->slideCount(),
+            ]),
             "company" => $company,
             "jobPosition" => $jobPosition,
-            "jobPositions" => $company->jobs()->get(["job_positions.id", "name", "slug"])
+            "jobPositions" => $company->jobs()->get(["job_positions.id", "name", "slug", "employee_type"])
         ]);
     }
 }

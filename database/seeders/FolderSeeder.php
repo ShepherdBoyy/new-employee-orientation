@@ -5,124 +5,110 @@ namespace Database\Seeders;
 use App\Models\Company;
 use App\Models\Folder;
 use Illuminate\Database\Seeder;
-use Str;
+use Illuminate\Support\Str;
 
 class FolderSeeder extends Seeder
 {
+    private array $companyWideTopics = [
+        'Module 1 — Welcome & Company Overview' => [
+            'Company history, mission, vision, values',
+            'Organizational structure',
+            'Code of discipline overview',
+        ],
+        'Module 2 — Employment Terms & HR Policies (DOLE-Aligned)' => [
+            'Employment classification (probationary, regular)',
+            'Working hours, breaks, overtime rules (Labor Code)',
+            'Leave benefits (SL/VL, maternity/paternity, solo parent, etc.)',
+            'Pay periods, deductions, government contributions',
+            'Company rules on attendance, tardiness, and timekeeping',
+            'Disciplinary policy and due process',
+        ],
+        'Module 3 — Workplace Safety & OSH Compliance (RA 11058)' => [
+            'Emergency procedures and evacuation routes',
+            'Drug-free workplace policy',
+        ],
+        'Module 4 — Data Privacy & Confidentiality (RA 10173)' => [
+            'How data is stored, used, and protected',
+            'Prohibited acts (sharing passwords, exposing client data, etc.)',
+        ],
+        'Module 6 — Product, Service, and Compliance Training' => [
+            'Field Etiquette',
+            'Product portfolio overview',
+            'Sales Expectations (Quota and Incentive Scheme)',
+            'Client Marketing',
+        ],
+        'Module 7 — Anti-Harassment, Anti-Bullying, and Ethics' => [
+            'RA 7877 (Anti-Sexual Harassment Act)',
+            'Anti-bullying and anti-discrimination',
+            'Ethics hotline and reporting channels',
+        ],
+        'Module 8 — IT, Cybersecurity & Acceptable Use' => [
+            'Email and system access rules',
+            'Password policy',
+            'Prohibited online behavior',
+            'Reporting IT incidents',
+        ],
+    ];
+
+    private array $jobSpecificTopics = [
+        'Job description and KPIs',
+        'Tools, Systems, and Equipments (Tarkie Policy and EzLife Roadshow)',
+        'Department Workflow and SOPs',
+        'Performance evaluation process',
+    ];
+
     public function run(): void
     {
-        $companyWideModules = [
-            [
-                'name' => 'Module 1 — Welcome & Company Overview',
-                'key_topics' => [
-                    'Company history, mission, vision, values',
-                    'Organizational structure',
-                    'Code of discipline overview',
-                ],
-            ],
-            [
-                'name' => 'Module 2 — Employment Terms & HR Policies (DOLE-Aligned)',
-                'key_topics' => [
-                    'Employment classification (probationary, regular)',
-                    'Working hours, breaks, overtime rules (Labor Code)',
-                    'Leave benefits (SL/VL, maternity/paternity, solo parent, etc.)',
-                    'Pay periods, deductions, government contributions',
-                    'Company rules on attendance, tardiness, and timekeeping',
-                    'Disciplinary policy and due process',
-                ],
-            ],
-            [
-                'name' => 'Module 3 — Workplace Safety & OSH Compliance (RA 11058)',
-                'key_topics' => [
-                    'Emergency procedures and evacuation routes',
-                    'Drug-free workplace policy',
-                ],
-            ],
-            [
-                'name' => 'Module 4 — Data Privacy & Confidentiality (RA 10173)',
-                'key_topics' => [
-                    'How data is stored, used, and protected',
-                    'Prohibited acts (sharing passwords, exposing client data, etc.)',
-                ],
-            ],
-            [
-                'name' => 'Module 6 — Product, Service, and Compliance Training',
-                'key_topics' => [
-                    'Field Etiquette',
-                    'Product portfolio overview',
-                    'Sales Expectations (Quota and Incentive Scheme)',
-                    'Client Marketing'
-                ],
-            ],
-            [
-                'name' => 'Module 7 — Anti-Harassment, Anti-Bullying, and Ethics',
-                'key_topics' => [
-                    'RA 7877 (Anti-Sexual Harassment Act)',
-                    'Anti-bullying and anti-discrimination',
-                    'Ethics hotline and reporting channels',
-                ],
-            ],
-            [
-                'name' => 'Module 8 - IT, Cybersecurity & Acceptable Use',
-                'key_topics' => [
-                    'Email and system access rules',
-                    'Password policy',
-                    'Prohibited online behavior',
-                    'Reporting IT incidents',
-                ],
-            ],
-        ];
-
-        $companies = Company::with('jobs')->get();
+        $companies = Company::all();
 
         if ($companies->isEmpty()) {
-            $this->command->warn('No companies found. Run CompanyJobPositionSeeder first.');
+            $this->command->warn("No companies found. Run CompanyJobPositionSeeder first.");
             return;
         }
 
         foreach ($companies as $company) {
-            $order = 0;
+            if (!Folder::forCompany($company->id)->exists()) {
+                Folder::seedDefaultsForCompany($company);
+            }
 
-            foreach ($companyWideModules as $index => $module) {
-                $order++;
+            foreach ($this->companyWideTopics as $moduleName => $topics) {
+                $folder = Folder::forCompany($company->id)
+                    ->companyWide()
+                    ->where("name", $moduleName)
+                    ->first();
 
-                if ($index === 4) {
-                    if ($company->jobs->isEmpty()) {
-                        $this->command->warn(
-                            "Skipping Module 5 for {$company->name} — no job positions assigned."
-                        );
-                    } else {
-                        foreach ($company->jobs as $position) {
-                            $folder = Folder::create([
-                                'company_id' => $company->id,
-                                'job_position_id' => $position->id,
-                                'name' => 'Module 5 — Job-Specific Training',
-                                'order' => $order,
-                            ]);
-
-                            foreach (Folder::DEFAULT_JOB_SPECIFIC_KEY_TOPICS as $topicOrder => $topic) {
-                                $folder->keyTopics()->create([
-                                    "label" => $topic,
-                                    "slug" => Str::slug($topic),
-                                    "order" => $topicOrder + 1
-                                ]);
-                            }
-                        }
-                        $order++;
-                    }
+                if (!$folder) {
+                    $this->command->warn("Folder \"{$moduleName}\" not found {$company->name}, skipping.");
+                    continue;
                 }
 
-                $folder = Folder::create([
-                    'company_id' => $company->id,
-                    'name' => $module["name"],
-                    'order' => $order,
-                ]);
+                if ($folder->keyTopics()->exists()) {
+                    continue;
+                }
 
-                foreach ($module["key_topics"] as $topicOrder => $topic) {
+                foreach ($topics as $order => $label) {
                     $folder->keyTopics()->create([
-                        "label" => $topic,
-                        "slug" => Str::slug($topic),
-                        "order" => $topicOrder + 1
+                        "label" => $label,
+                        "slug" => Str::slug($label),
+                        "order" => $order + 1
+                    ]);
+                }
+            }
+
+            $moduleFiveFolders = Folder::forCompany($company->id)
+                ->whereNotNull("employee_type")
+                ->get();
+
+            foreach ($moduleFiveFolders as $folder) {
+                if ($folder->keyTopics()->exists()) {
+                    continue;
+                }
+
+                foreach ($this->jobSpecificTopics as $order => $label) {
+                    $folder->keyTopics()->create([
+                        "label" => $label,
+                        "slug" => Str::slug($label),
+                        "order" => $order + 1
                     ]);
                 }
             }
