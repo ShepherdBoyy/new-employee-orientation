@@ -89,7 +89,7 @@ export default function ModuleJobItem({ company, summary, active }: Props) {
                                 active ? "text-slate-500" : "text-white/50",
                             )}
                         >
-                            {summary.total_positions} positions
+                            types
                         </ItemDescription>
                     </ItemContent>
                 </Link>

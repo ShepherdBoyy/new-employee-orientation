@@ -76,7 +76,7 @@ export default function CompanyJobTabs({ companies }: Props) {
     const missingCount = totalJobs - uploadedCount;
     return (
         <>
-            <Card className="w-full  flex flex-col ">
+            <Card className="w-full h-full flex flex-col ">
                 <CardHeader className="border-b bg-muted/20">
                     <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0">

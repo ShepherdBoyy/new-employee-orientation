@@ -3,62 +3,190 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Rotate3d } from "lucide-react";
+import { motion } from "motion/react";
 import { Form } from "@inertiajs/react";
-import { usePage } from "@inertiajs/react";
- 
+const pageVariants = {
+    hidden: {
+        opacity: 0,
+    },
+    visible: {
+        opacity: 1,
+        transition: {
+            duration: 0.35,
+        },
+    },
+};
+
+const leftPanelVariants = {
+    hidden: {
+        opacity: 0,
+        x: -24,
+    },
+    visible: {
+        opacity: 1,
+        x: 0,
+        transition: {
+            duration: 0.55,
+            ease: "easeOut",
+        },
+    },
+};
+
+const rightPanelVariants = {
+    hidden: {
+        opacity: 0,
+        x: 24,
+    },
+    visible: {
+        opacity: 1,
+        x: 0,
+        transition: {
+            duration: 0.5,
+            ease: "easeOut",
+            delay: 0.1,
+        },
+    },
+};
+
+const contentVariants = {
+    hidden: {},
+    visible: {
+        transition: {
+            delayChildren: 0.2,
+            staggerChildren: 0.08,
+        },
+    },
+};
+
+const itemVariants = {
+    hidden: {
+        opacity: 0,
+        y: 12,
+    },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.35,
+            ease: "easeOut",
+        },
+    },
+};
+
+const logoVariants = {
+    hidden: {
+        opacity: 0,
+        scale: 0.9,
+    },
+    visible: {
+        opacity: 1,
+        scale: 1,
+        transition: {
+            duration: 0.4,
+            ease: "easeOut",
+        },
+    },
+};
 export default function Login() {
-    const page = usePage();
     return (
-        <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-linear-to-br from-slate-50 via-white to-slate-100 p-6 lg:p-12 ">
-            {/* CONTAINER  */}
-            <div className="absolute left-1/2 top-1/2 -z-10 h-175 w-175 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-200/20 blur-[10px]" />
-
-            <div className="grid lg:grid-cols-[0.95fr_1.05fr] w-full max-w-7xl rounded-3xl border-slate-200 lg:shadow-2xl  p-3 lg:min-h-180">
+        <motion.div
+            className="min-h-screen bg-background overflow-hidden"
+            variants={pageVariants}
+            initial="hidden"
+            animate="visible"
+        >
+            <div className="grid min-h-screen lg:grid-cols-2">
                 {/* LEFT SIDE */}
-                <div className="relative hidden lg:flex h-full flex-col rounded-2xl bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 text-white shadow-2xl">
-                    <div className="absolute inset-0">
-                        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-white/5 blur-3xl" />
-                        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-sky-400/10 blur-3xl" />
-                    </div>
-                    <div className="flex items-center gap-2 p-6">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/10 backdrop-blur">
-                            <Rotate3d
-                                size={24}
-                                absoluteStrokeWidth
-                                strokeWidth={1.3}
-                            />
-                        </div>
-
-                        <span className="font-medium">NEO</span>
-                    </div>
-                    <div className="mt-auto p-12">
-                        <p className="text-sm font-medium uppercase tracking-[0.25em] text-white/50">
-                            New Employee Orientation
-                        </p>
-
-                        <h1 className="mt-6 text-5xl font-medium tracking-tight leading-[1.4]">
-                            Everything you need to get started.
-                        </h1>
-
-                        <p className="mt-4 text-white/80 leading-relaxed text-md">
-                            Access onboarding materials, orientation modules,
-                            and company resources— all in one place.
-                        </p>
-                    </div>
-                </div>
-                {/* Right Side */}
-                <Form
-                    action="/login"
-                    method="post"
-                    className="flex items-center justify-center p-6 bg-slate-50/40"
+                <motion.div
+                    variants={leftPanelVariants}
+                    className="relative hidden overflow-hidden bg-linear-to-br from-slate-950 via-slate-900 to-slate-800 text-white lg:flex rounded-lg -ml-2"
                 >
-                    {({ errors, processing }) => (
-                        <>
-                            <div className="w-full max-w-md lg:px-0">
-                                <div className="mb-10 flex flex-col items-center lg:hidden">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white">
+                    {/* Background decoration */}
+                    <div className="absolute inset-0 overflow-hidden">
+                        <div className="absolute -top-32 -right-32 size-96 rounded-full bg-white/5 blur-3xl" />
+
+                        <div className="absolute -bottom-32 -left-32 size-96 rounded-full bg-sky-400/10 blur-3xl" />
+
+                        <div className="absolute top-1/2 left-1/2 size-125 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-300/5 blur-[120px]" />
+                    </div>
+
+                    {/* Brand */}
+                    <div className="relative flex w-full flex-col">
+                        <motion.div
+                            variants={logoVariants}
+                            className="flex items-center gap-3 p-10"
+                        >
+                            <div className="flex size-11 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/10 backdrop-blur">
+                                <Rotate3d
+                                    size={24}
+                                    absoluteStrokeWidth
+                                    strokeWidth={1.3}
+                                />
+                            </div>
+
+                            <div>
+                                <span className="block font-medium tracking-wide">
+                                    NEO
+                                </span>
+
+                                <span className="text-xs text-white/40">
+                                    New Employee Orientation
+                                </span>
+                            </div>
+                        </motion.div>
+
+                        {/* Hero */}
+                        <motion.div
+                            variants={contentVariants}
+                            className="relative mt-auto max-w-2xl p-10 pb-16 xl:p-16 xl:pb-20"
+                        >
+                            <motion.p
+                                variants={itemVariants}
+                                className="text-xs font-medium uppercase tracking-[0.3em] text-white/40"
+                            >
+                                New Employee Orientation
+                            </motion.p>
+
+                            <motion.h1
+                                variants={itemVariants}
+                                className="mt-6 max-w-xl text-5xl font-medium leading-[1.15] tracking-tight xl:text-6xl"
+                            >
+                                Everything you need to get started.
+                            </motion.h1>
+
+                            <motion.p
+                                variants={itemVariants}
+                                className="mt-6 max-w-lg text-base leading-relaxed text-white/60"
+                            >
+                                Access onboarding materials, orientation
+                                modules, and company resources — all in one
+                                place.
+                            </motion.p>
+                        </motion.div>
+                    </div>
+                </motion.div>
+
+                {/* RIGHT SIDE */}
+                <motion.div
+                    variants={rightPanelVariants}
+                    className="flex min-h-screen items-center justify-center bg-slate-50/60 px-6 py-12 sm:px-10 lg:bg-background lg:px-16"
+                >
+                    <Form
+                        action="/login"
+                        method="post"
+                        className="w-full max-w-md"
+                    >
+                        {({ errors, processing }) => (
+                            <motion.div
+                                variants={contentVariants}
+                                initial="hidden"
+                                animate="visible"
+                            >
+                                {/* Mobile brand */}
+                                <div className="mb-12 flex flex-col items-center lg:hidden">
+                                    <div className="flex size-11 items-center justify-center rounded-xl bg-slate-900 text-white">
                                         <Rotate3d
-                                            size={22}
+                                            size={23}
                                             absoluteStrokeWidth
                                             strokeWidth={1.3}
                                         />
@@ -68,70 +196,97 @@ export default function Login() {
                                         NEO
                                     </span>
                                 </div>
-                                <h1 className="text-2xl lg:text-3xl tracking-tight lg:text-left text-center">
-                                    Welcome Back
-                                </h1>
-                                <p className="mt-2 text-sm lg:text-base text-muted-foreground lg:text-left text-center lg:max-w-2xl ">
-                                    Sign in with your company account to
-                                    continue.
-                                </p>
 
-                                <div className="mt-12 space-y-6">
-                                    <div className="flex flex-col gap-6">
-                                        <div className="space-y-5">
-                                            <Label htmlFor="email">Email</Label>
-                                            <Input
-                                                className="h-10 lg:h-11"
-                                                id="email"
-                                                name="email"
-                                                type="email"
-                                                placeholder="Enter your work email"
-                                                required
-                                            />
-                                            {errors["email"] && (
-                                                <div className="text-red-700">
-                                                    {errors["email"]}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="grid gap-2 ">
-                                            <div className="flex items-center">
-                                                <Label htmlFor="password">
-                                                    Password
-                                                </Label>
-                                            </div>
-                                            <Input
-                                                className="h-10 lg:h-11"
-                                                id="password"
-                                                name="password"
-                                                type="password"
-                                                placeholder="Enter your password"
-                                                required
-                                            />
-                                            {errors["password"] && (
-                                                <div className="text-red-700">
-                                                    {errors["password"]}
-                                                </div>
-                                            )}
-                                        </div>
+                                {/* Header */}
+                                <motion.div variants={itemVariants}>
+                                    <h1 className="text-center text-3xl font-medium tracking-tight lg:text-left">
+                                        Welcome back
+                                    </h1>
+
+                                    <p className="mt-2 text-center text-sm text-muted-foreground lg:text-left">
+                                        Sign in with your company account to
+                                        continue.
+                                    </p>
+                                </motion.div>
+
+                                {/* Form */}
+                                <motion.div
+                                    variants={itemVariants}
+                                    className="mt-10 space-y-6"
+                                >
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email">Email</Label>
+
+                                        <Input
+                                            className="h-11"
+                                            id="email"
+                                            name="email"
+                                            type="email"
+                                            placeholder="Enter your work email"
+                                            required
+                                        />
+
+                                        {errors.email && (
+                                            <p className="text-sm text-destructive">
+                                                {errors.email}
+                                            </p>
+                                        )}
                                     </div>
-                                </div>
-                                <div className="pt-8 ">
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="password">
+                                            Password
+                                        </Label>
+
+                                        <Input
+                                            className="h-11"
+                                            id="password"
+                                            name="password"
+                                            type="password"
+                                            placeholder="Enter your password"
+                                            required
+                                        />
+
+                                        {errors.password && (
+                                            <p className="text-sm text-destructive">
+                                                {errors.password}
+                                            </p>
+                                        )}
+                                    </div>
+                                </motion.div>
+
+                                {/* Submit */}
+                                <motion.div
+                                    variants={itemVariants}
+                                    className="mt-8"
+                                >
                                     <Button
                                         type="submit"
-                                        className="w-full h-10 lg:h-12 rounded-xl font-semibold shadow-2xl"
+                                        className="h-11 w-full rounded-xl font-semibold"
+                                        disabled={processing}
                                     >
                                         {processing && (
                                             <Spinner data-icon="inline-start" />
                                         )}
-                                        Sign in
+
+                                        {processing
+                                            ? "Signing in..."
+                                            : "Sign in"}
                                     </Button>
-                                </div>
-                            </div>
-                        </>
-                    )}
-                </Form>
+                                </motion.div>
+
+                                {/* Footer */}
+                                <motion.p
+                                    variants={itemVariants}
+                                    className="mt-8 text-center text-xs text-muted-foreground"
+                                >
+                                    Access is provided through your email.
+                                </motion.p>
+                            </motion.div>
+                        )}
+                    </Form>
+                </motion.div>
             </div>
-        </div>
+        </motion.div>
     );
 }

@@ -26,7 +26,7 @@ function Index({ companies, jobs }: Props) {
                     </div>
                 </div>
                 <Separator />
-                <div className="grid lg:grid-cols-[380px_minmax(0,1fr)] gap-6 items-start">
+                <div className="grid lg:grid-cols-[400px_minmax(0,1fr)] gap-6 items-start">
                     <AssignedJobPositionForm
                         companies={companies}
                         jobs={jobs}
