@@ -21,11 +21,11 @@ class CompanyJobPositionSeeder extends Seeder
                     'Assistant Supply Chain Specialist' => 'non_field',
                     'Online Support Executive/Receptionist' => 'non_field',
                     // field-based
-                    'Product Manager' => 'field_based',
-                    'Division Manager' => 'field_based',
-                    'Product Specialist' => 'field_based',
-                    'Division Specialist' => 'field_based',
-                    'Collector' => 'field_based',
+                    'Product Manager' => 'field',
+                    'Division Manager' => 'field',
+                    'Product Specialist' => 'field',
+                    'Division Specialist' => 'field',
+                    'Collector' => 'field',
                 ],
             ],
             'Progressive Medical Corporation' => [
@@ -49,11 +49,11 @@ class CompanyJobPositionSeeder extends Seeder
                 'positions' => [
                     'Clinical Application Specialist' => 'non_field',
                     'Maintenance Helper' => 'non_field',
-                    'Area Sales Manager' => 'field_based',
-                    'Healthcare Product Specialist' => 'field_based',
-                    'Business Development Manager' => 'field_based',
-                    'Product Specialist' => 'field_based',
-                    'Collector' => 'field_based',
+                    'Area Sales Manager' => 'field',
+                    'Healthcare Product Specialist' => 'field',
+                    'Business Development Manager' => 'field',
+                    'Product Specialist' => 'field',
+                    'Collector' => 'field',
                 ],
             ],
             'Inmed Corporation' => [
@@ -64,8 +64,8 @@ class CompanyJobPositionSeeder extends Seeder
                     'Driver' => 'non_field',
                     'Regulatory Assistant' => 'non_field',
                     'Warehouse Operations Manager' => 'non_field',
-                    'Professional Reseller Specialist' => 'field_based',
-                    'Collector/Liaison Officer' => 'field_based',
+                    'Professional Reseller Specialist' => 'field',
+                    'Collector/Liaison Officer' => 'field',
                 ],
             ],
             'Medbanc Inc.' => [
@@ -73,9 +73,9 @@ class CompanyJobPositionSeeder extends Seeder
                 'positions' => [
                     'Accounting Staff' => 'non_field',
                     'Sales and Marketing Assistant' => 'non_field',
-                    'Professional Sales Representative' => 'field_based',
-                    'Sales Manager' => 'field_based',
-                    'Biomedical Engineer' => 'field_based',
+                    'Professional Sales Representative' => 'field',
+                    'Sales Manager' => 'field',
+                    'Biomedical Engineer' => 'field',
                 ],
             ],
         ];
@@ -97,7 +97,7 @@ class CompanyJobPositionSeeder extends Seeder
                     $jobPosition->slug = Str::slug($positionName);
                 }
 
-                if (!$jobPosition->exists || $type === 'field_based') {
+                if (!$jobPosition->exists || $type === 'field') {
                     $jobPosition->employee_type = $type;
                 }
 

@@ -39,7 +39,7 @@ class JobPositionController extends Controller
     {
         $validated = $request->validate([
             "name" => ["required", "string", "max:255", 'unique:job_positions'],
-            'type' => ['required']
+            'employee_type' => ['required']
         ]);
 
         $jobPosition = JobPosition::create($validated);
@@ -52,10 +52,10 @@ class JobPositionController extends Controller
     {
         $validated = $request->validate([
             "name" => ["required", "string", "max:255"],
-            'type' => ['required']
+            'employee_type' => ['required']
         ]);
 
-        $jobPosition->update(["name" => $validated["name"], 'type' => $validated["type"]]);
+        $jobPosition->update(["name" => $validated["name"], 'employee_type' => $validated["employee_type"]]);
 
         return back()->with("success", "Job position updated successfully");
     }

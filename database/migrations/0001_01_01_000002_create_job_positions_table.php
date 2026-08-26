@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('job_positions', function (Blueprint $table) {
             $table->id();
             $table->string("name");
-            $table->enum("employee_type", ["field_based", "non_field"])->default("non_field");
+            $table->enum("employee_type", ["field", "non_field"])->default("non_field");
             $table->string("slug")->unique();
         });
     }

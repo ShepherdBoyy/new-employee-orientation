@@ -32,7 +32,7 @@ export default function CreateJobDialog({ open, onOpenChange }: Props) {
     
     const form = useForm({
         name: "",
-        type: null,
+        employee_type: "",
     });
 
     function handleSubmit(e: React.FormEvent) {
@@ -84,8 +84,8 @@ export default function CreateJobDialog({ open, onOpenChange }: Props) {
                             </FieldDescription>
 
                             <RadioGroup 
-                                value={form.data.type} 
-                                onValueChange={(value) => form.setData('type', value)}
+                                value={form.data.employee_type} 
+                                onValueChange={(value) => form.setData('employee_type', value)}
                                 >
                                 {/* Field-Based Option */}
                                 <FieldLabel>
@@ -99,7 +99,7 @@ export default function CreateJobDialog({ open, onOpenChange }: Props) {
                                                 locations outdoors.
                                             </FieldDescription>
                                         </FieldContent>
-                                        <RadioGroupItem value="field_based" />
+                                        <RadioGroupItem value="field" />
                                     </Field>
                                 </FieldLabel>
 

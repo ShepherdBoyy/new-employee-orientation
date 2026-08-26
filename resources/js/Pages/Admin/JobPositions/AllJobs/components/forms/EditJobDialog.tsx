@@ -105,7 +105,7 @@ export default function EditJobDialog({ onClose, job }: Props) {
                                                 locations outdoors.
                                             </FieldDescription>
                                         </FieldContent>
-                                        <RadioGroupItem value="field_based" />
+                                        <RadioGroupItem value="field" />
                                     </Field>
                                 </FieldLabel>
 

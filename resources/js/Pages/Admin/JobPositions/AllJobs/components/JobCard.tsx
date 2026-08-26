@@ -31,6 +31,8 @@ export default function JobCard({
     selected,
     onToggle,
 }: Props) {
+
+    console.log(job);
     return (
         <>
             <TableRow
@@ -56,7 +58,7 @@ export default function JobCard({
                             variant="secondary"
                             className="rounded-md text-[12px]"
                         >
-                            {job.type === "field_based" ? (
+                            {job.employee_type === "field" ? (
                                 <>
                                     <MapPin
                                         data-icon="inline-start"

@@ -22,7 +22,7 @@ type Props = {
 export default function JobSort({ sort, onSortChange }: Props) {
     const filterLabel = {
         all: "All",
-        field_based: "Field Based",
+        field: "Field Based",
         non_field: "Non-Field Based",
     }[sort];
 
@@ -58,7 +58,7 @@ export default function JobSort({ sort, onSortChange }: Props) {
                             All Job Positions
                         </DropdownMenuRadioItem>
 
-                        <DropdownMenuRadioItem value="field_based">
+                        <DropdownMenuRadioItem value="field">
                             Field Based
                         </DropdownMenuRadioItem>
 

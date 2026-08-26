@@ -1,146 +1,135 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Plus, ArrowLeft } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import { motion } from "motion/react";
-import { Company } from "../Types/company";
-import type { Topic } from "./component/TopicCard";
-import type { Folder } from "../Slides/Index";
-import TopicList from "./component/TopicList";
-import AddTopicDialog from "@/Pages/Admin/Topics/component/Dialogs/AddTopicDialog";
+import { ArrowLeft, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Master from "@/Layout/Master";
 import FolderIcon from "./component/FolderIcon";
+import TopicList from "./component/TopicList";
+import AddTopicDialog from "./component/Dialogs/AddTopicDialog";
+
 interface Props {
     company: Company;
     topics: Topic[];
-    activeFolder: Folder;
+    activeFolder: {
+        id: number;
+        slug: string;
+        name: string;
+        is_type_specific: boolean;
+        employee_type: "field" | "non_field" | null;
+    };
+    sibling: {
+        id: number;
+        slug: string;
+        name: string;
+        employee_type: "field" | "non_field";
+        topics: Topic[];
+    } | null;
 }
 
-const pageVariants = {
-    hidden: {
-        opacity: 0,
-    },
-    visible: {
-        opacity: 1,
-        transition: {
-            duration: 0.35,
-            staggerChildren: 0.08,
-        },
-    },
-};
-
-const itemVariants = {
-    hidden: {
-        opacity: 0,
-        y: 12,
-    },
-    visible: {
-        opacity: 1,
-        y: 0,
-        transition: {
-            duration: 0.4,
-            ease: "easeOut",
-        },
-    },
-};
-function Index({ topics, company, activeFolder }: Props) {
+function Index({ topics, company, activeFolder, sibling }: Props) {
     const [openAddDialog, setOpenAddDialog] = useState(false);
+    const [activeType, setActiveType] = useState<"field" | "non_field">(
+        activeFolder.employee_type ?? "field",
+    );
 
-    const isJobSpecific = activeFolder.is_job_specific;
+    const isTypeSpecific = activeFolder.is_type_specific;
 
-    const title = isJobSpecific
-        ? (activeFolder.job_position?.name ?? "Job-Specific Training")
-        : activeFolder.name;
+    const currentFolder =
+        activeType === activeFolder.employee_type
+            ? { id: activeFolder.id, topics }
+            : sibling
+              ? { id: sibling.id, topics: sibling.topics }
+              : { id: activeFolder.id, topics };
+
+    const title = isTypeSpecific ? "Module 5 — Job-Specific Training" : activeFolder.name;
 
     return (
-        <motion.div
-            className="space-y-8"
-            variants={pageVariants}
-            initial="hidden"
-            animate="visible"
-        >
-            {isJobSpecific && (
-                <motion.div variants={itemVariants}>
-                    <Link
-                        href={`/admin/folders/${company.slug}/job-positions`}
-                        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                        <ArrowLeft className="size-4" />
-                        Back to Job Positions
-                    </Link>
-                </motion.div>
-            )}
-
-            <motion.header variants={itemVariants} className="border-b pb-6">
+        <motion.div className="space-y-8" initial="hidden" animate="visible">
+            <motion.header className="border-b pb-6">
                 <div className="flex items-center justify-between gap-6">
                     <div className="flex min-w-0 items-center gap-4">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{
-                                duration: 0.4,
-                                ease: "easeOut",
-                            }}
-                        >
-                            <FolderIcon jobSpecific={isJobSpecific} />
-                        </motion.div>
+                        <FolderIcon jobSpecific={isTypeSpecific} />
 
                         <div className="min-w-0">
-                            <motion.h1
-                                variants={itemVariants}
-                                className="truncate text-2xl font-semibold tracking-tight"
-                            >
+                            <h1 className="truncate text-2xl font-semibold tracking-tight">
                                 {title}
-                            </motion.h1>
-
-                            <motion.p
-                                variants={itemVariants}
-                                className="mt-1 text-sm text-muted-foreground"
-                            >
+                            </h1>
+                            <p className="mt-1 text-sm text-muted-foreground">
                                 Manage the topics included in this module.
-                            </motion.p>
+                            </p>
                         </div>
                     </div>
 
-                    <motion.div variants={itemVariants}>
-                        <Button
-                            size="lg"
-                            className="shrink-0"
-                            onClick={() => setOpenAddDialog(true)}
-                        >
-                            <Plus className="size-4" />
-                            Add Topic
-                        </Button>
-                    </motion.div>
+                    <Button size="lg" className="shrink-0" onClick={() => setOpenAddDialog(true)}>
+                        <Plus className="size-4" />
+                        Add Topic
+                    </Button>
                 </div>
             </motion.header>
-            <motion.section variants={itemVariants} className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className="text-lg font-semibold">Topics</h2>
 
-                        <p className="text-sm text-muted-foreground">
-                            Manage the content included in this module.
-                        </p>
-                    </div>
+            {isTypeSpecific ? (
+                <Tabs
+                    value={activeType}
+                    onValueChange={(value) => setActiveType(value as "field" | "non_field")}
+                    className="w-full"
+                >
+                    <TabsList className="h-10 w-full">
+                        <TabsTrigger value="field" className="gap-2">
+                            Field-Based
+                        </TabsTrigger>
+                        <TabsTrigger value="non_field" className="gap-2">
+                            Non-Field
+                        </TabsTrigger>
+                    </TabsList>
 
-                    <span className="text-sm text-muted-foreground">
-                        {topics.length}{" "}
-                        {topics.length === 1 ? "topic" : "topics"}
-                    </span>
-                </div>
-            </motion.section>
-            <TopicList
-                topics={topics}
-                company={company}
-                folderId={activeFolder.id}
-            />
+                    <TabsContent value="field" className="mt-4 space-y-4">
+                        <TopicSection
+                            topics={activeType === "field" ? currentFolder.topics : []}
+                            company={company}
+                            folderId={currentFolder.id}
+                        />
+                    </TabsContent>
+
+                    <TabsContent value="non_field" className="mt-4 space-y-4">
+                        <TopicSection
+                            topics={activeType === "non_field" ? currentFolder.topics : []}
+                            company={company}
+                            folderId={currentFolder.id}
+                        />
+                    </TabsContent>
+                </Tabs>
+            ) : (
+                <TopicSection topics={topics} company={company} folderId={activeFolder.id} />
+            )}
+
             <AddTopicDialog
                 open={openAddDialog}
                 onOpenChange={setOpenAddDialog}
-                folderId={activeFolder.id}
+                folderId={currentFolder.id}
             />
         </motion.div>
+    );
+}
+
+function TopicSection({ topics, company, folderId }: { topics: Topic[]; company: Company; folderId: number }) {
+    return (
+        <section className="space-y-4">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-lg font-semibold">Topics</h2>
+                    <p className="text-sm text-muted-foreground">
+                        Manage the content included in this module.
+                    </p>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                    {topics.length} {topics.length === 1 ? "topic" : "topics"}
+                </span>
+            </div>
+
+            <TopicList topics={topics} company={company} folderId={folderId} />
+        </section>
     );
 }
 

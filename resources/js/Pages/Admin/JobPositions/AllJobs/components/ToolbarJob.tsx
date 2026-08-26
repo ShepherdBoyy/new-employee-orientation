@@ -33,7 +33,7 @@ export default function ToolbarJob({
     const hasFilter = filter !== "all";
 
     const filterLabel =
-        filter === "field_based"
+        filter === "field"
             ? "Field Based"
             : filter === "non_field"
               ? "Non-Field Based"

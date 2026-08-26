@@ -3,12 +3,11 @@ import type { Company } from "./company";
 export type JobPosition = {
     id: number;
     name: string;
-    type: string;
+    employee_type: string;
     companies?: Company[];
     companies_count?: number;
-    employee_type: string;
 };
-export type JobSortOption = "all" | "field_based" | "non_field";
+export type JobSortOption = "all" | "field" | "non_field";
 export interface Paginated<T> {
     data: T[];
     links: {

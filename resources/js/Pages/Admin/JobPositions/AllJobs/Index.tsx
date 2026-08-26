@@ -38,8 +38,8 @@ function Index({ jobs }: Props) {
 
     const filteredJobs = jobs.data.filter((job) => {
         switch (filter) {
-            case "field_based":
-                return job.employee_type === "field_based";
+            case "field":
+                return job.employee_type === "field";
 
             case "non_field":
                 return job.employee_type === "non_field";
