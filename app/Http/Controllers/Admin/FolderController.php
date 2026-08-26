@@ -25,29 +25,6 @@ class FolderController extends Controller
         ]);
     }
 
-    public function jobPositionPicker(Company $company): Response
-    {
-        $company->load("jobs:id,name,slug,employee_type");
-
-        $folders = Folder::forCompany($company->id)
-            ->whereNotNull("employee_type")
-            ->get(["id", "slug", "employee_type"]);
-
-        $positions = $company->jobs->map(fn(JobPosition $position) => [
-            "id" => $position->id,
-            "name" => $position->name,
-            "type" => $position->employee_type,
-            "has_folder" => $folders->contains("job_position_id", $position->id),
-            "folder_slug" => $folders->firstWhere("job_position_id", $position->id)?->slug,
-        ]);
-
-        return Inertia::render("Admin/Folders/JobPositionPicker", [
-            "company" => $company,
-            "positions" => $positions,
-            ...PresentationPanelData::build($company)
-        ]);
-    }
-
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -80,7 +57,7 @@ class FolderController extends Controller
 
         if ($request->isLinkActive) {
             return redirect()->route('admin.folders.topics.index', [
-                'company' => $company->slug, // or pass the $company model instance directly
+                'company' => $company->slug,
                 'folder' => $folder->slug,
             ])->with('success', 'Folder deleted successfully.');
         }
@@ -114,7 +91,7 @@ class FolderController extends Controller
         foreach ($validated["items"] as $item) {
             if ($item["type"] === "job-specific") {
                 Folder::where("company_id", $validated["company_id"])
-                    ->whereNotNull("job_position_id")
+                    ->whereNotNull("employee_type")
                     ->update(["order" => $item["order"]]);
             } else {
                 Folder::where("id", $item["id"])
@@ -131,12 +108,13 @@ class FolderController extends Controller
         Slide::where("folder_id", $folder->id)->get()->each(function (Slide $slide) {
             Storage::disk(config("filesystems.default"))->delete($slide->file_path);
         });
-        $folder->delete();
 
         $company = Company::findOrFail($folder->company_id);
 
+        $folder->delete();
+
         if ($request->isLinkActive) {
-            return redirect()->route('admin.folders.company', $company->slug) // Adjust to your index route name
+            return redirect()->route('admin.folders.company', $company->slug)
                 ->with('success', 'Folder deleted successfully.');
         }
 
@@ -147,39 +125,31 @@ class FolderController extends Controller
     {
         $request->validate([
             'company_id' => ['required', 'exists:companies,id'],
-            'job_position_id' => ['nullable', 'exists:job_positions,id'],
+            'employee_type' => ['nullable', 'in:field,non_field'],
         ]);
 
         $company = Company::findOrFail($request->company_id);
 
-        $simulatedUser = new User([
-            'company_id' => $request->company_id,
-            'job_position_id' => $request->job_position_id,
-        ]);
+        $employeeType = $request->employee_type ?? 'field';
 
-        if ($request->job_position_id) {
-            $simulatedUser->setRelation(
-                "jobPosition",
-                JobPosition::find($request->job_position_id)
-            );
-        }
+        $simulatedUser = new User(['company_id' => $request->company_id]);
+
+        $simulatedUser->setRelation(
+            'jobPosition',
+            new JobPosition(['employee_type' => $employeeType])
+        );
 
         $folders = $company->foldersForEmployee($simulatedUser);
 
-        $jobPosition = $request->job_position_id
-            ? JobPosition::find($request->job_position_id)
-            : null;
-
-        return Inertia::render("Admin/Folders/PreviewList", [
-            "folders" => $folders->map(fn($folder ) => [
-                "id" => $folder->id,
-                "slug" => $folder->slug,
-                "name" => $folder->name,
-                "slide_count" => $folder->slideCount(),
+        return Inertia::render('Admin/Folders/PreviewList', [
+            'folders' => $folders->map(fn($folder) => [
+                'id' => $folder->id,
+                'slug' => $folder->slug,
+                'name' => $folder->name,
+                'slide_count' => $folder->slideCount(),
             ]),
-            "company" => $company,
-            "jobPosition" => $jobPosition,
-            "jobPositions" => $company->jobs()->get(["job_positions.id", "name", "slug", "employee_type"])
+            'company' => $company,
+            'employeeType' => $employeeType,
         ]);
     }
 }

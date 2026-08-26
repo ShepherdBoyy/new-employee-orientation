@@ -16,30 +16,27 @@ interface Company {
     slug: string;
 }
 
-interface JobPosition {
-    id: number;
-    name: string;
-    slug: string;
-}
-
 interface Props {
     folders: PreviewFolder[]
     company: Company
-    jobPosition: JobPosition | null
-    jobPositions: JobPosition[]
+    employeeType: "field" | "non_field"
 }
 
-export default function PreviewList({ folders, company, jobPosition, jobPositions }: Props) {
-    const [selectedId, setSelectedId] = useState(jobPosition ? String(jobPosition.id) : '')
+export default function PreviewList({ folders, company, employeeType }: Props) {
+    const [selectedType, setSelectedType] = useState<"field" | "non_field">(employeeType)
 
-    function handleSelectPosition(value: string) {
-        setSelectedId(value)
+    function handleSelectType(value: string) {
+        const type = value as "field" | "non_field"
+        setSelectedType(type)
+
         const params = new URLSearchParams({
             company_id: String(company.id),
-            job_position_id: value,
+            employee_type: type,
         })
         router.visit(`/admin/folders/preview-list?${params.toString()}`)
     }
+
+    const typeLabel = selectedType === "field" ? "Field-Based" : "Non-Field"
 
     return (
         <div className="flex min-h-screen w-full flex-col bg-zinc-950">
@@ -48,8 +45,7 @@ export default function PreviewList({ folders, company, jobPosition, jobPosition
                     <span className="font-medium">Admin Preview</span>
                     <span className="text-indigo-300">—</span>
                     <span className="text-indigo-200">
-                        {company.name}
-                        {jobPosition && <span> · {jobPosition.name}</span>}
+                        {company.name} · {typeLabel}
                     </span>
                 </div>
                 <Link
@@ -74,20 +70,15 @@ export default function PreviewList({ folders, company, jobPosition, jobPosition
                         </p>
                     </div>
 
-                    {jobPositions.length > 0 && (
-                        <Select value={selectedId} onValueChange={handleSelectPosition}>
-                            <SelectTrigger className=" border-zinc-700 bg-zinc-900 text-white w-80">
-                                <SelectValue placeholder="View as job position" />
-                            </SelectTrigger>
-                            <SelectContent position='popper'>
-                                {jobPositions.map((position) => (
-                                    <SelectItem key={position.id} value={String(position.id)}>
-                                        {position.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    )}
+                    <Select value={selectedType} onValueChange={handleSelectType}>
+                        <SelectTrigger className="w-56 border-zinc-700 bg-zinc-900 text-white">
+                            <SelectValue placeholder="View as employee type" />
+                        </SelectTrigger>
+                        <SelectContent position="popper">
+                            <SelectItem value="field">Field-Based</SelectItem>
+                            <SelectItem value="non_field">Non-Field</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 {folders.length > 0 ? (
