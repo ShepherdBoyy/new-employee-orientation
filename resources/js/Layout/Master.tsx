@@ -19,9 +19,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import PresentationPanel from "./PresentationPanel";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronsUpDown, LogOut } from "lucide-react";
+import { ChevronsUpDown, LogOut, ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type { PageProps } from "./PresentationPanel";
+import getNavLinks from "./SideBarNav/getNavLinks";
+import type { CompanyNav } from "./SideBarNav/navTypes";
+
 type MasterProps = {
     children: React.ReactNode;
     id: number;
@@ -29,12 +32,25 @@ type MasterProps = {
     email: string;
 };
 
-export default function Master({ children, id, name, email }: MasterProps) {
+export default function Master({ children }: MasterProps) {
     const user = usePage().props.auth.user as MasterProps;
-
-    const { props } = usePage<PageProps>();
+    const { props, url } = usePage<PageProps>();
     const company = props.company;
     const showPresentationPanel = company?.slug ?? "none";
+    const companies = usePage().props.sidebarCompanies as CompanyNav[];
+
+    const navLinks = getNavLinks(companies);
+
+    const currentNav = navLinks
+        .flatMap((group) =>
+            group.links.map((link) => ({
+                group: group.group,
+                title: link.title,
+                path: link.path,
+            })),
+        )
+        .find((link) => url === link.path || url.startsWith(`${link.path}/`));
+
     return (
         <>
             <TooltipProvider>
@@ -75,9 +91,22 @@ export default function Master({ children, id, name, email }: MasterProps) {
 
                                         <Separator orientation="vertical" />
 
-                                        <h1 className="text-sm font-medium text-muted-foreground">
-                                            Administration
-                                        </h1>
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <span className="text-muted-foreground">
+                                                {currentNav?.group ??
+                                                    "Administration"}
+                                            </span>
+
+                                            {currentNav && (
+                                                <>
+                                                    <ChevronRight className="size-3.5 text-muted-foreground/40" />
+
+                                                    <span className="font-medium text-foreground">
+                                                        {currentNav.title}
+                                                    </span>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <div className="flex items-center gap-4">
@@ -153,7 +182,7 @@ export default function Master({ children, id, name, email }: MasterProps) {
                                     </div>
                                 </header>
 
-                                <main className="flex-1 overflow-y-auto p-8">
+                                <main className="flex-1 overflow-y-auto px-6 py-6">
                                     {children}
                                 </main>
 

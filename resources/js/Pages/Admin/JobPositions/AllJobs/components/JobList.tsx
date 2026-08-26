@@ -1,12 +1,20 @@
 import JobCard from "./JobCard";
-
+import {
+    Table,
+    TableBody,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
 import type { JobPosition } from "@/Pages/Admin/Types/job-position";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
     Empty,
     EmptyHeader,
     EmptyTitle,
     EmptyDescription,
 } from "@/components/ui/empty";
+import { CheckLine } from "lucide-react";
 
 type Props = {
     jobs: JobPosition[];
@@ -14,6 +22,8 @@ type Props = {
     onDelete: (jobs: JobPosition) => void;
     selected: number[];
     onSelectionChange: (ids: number[]) => void;
+    allSelected: boolean;
+    onToggleAll: () => void;
 };
 
 export default function JobList({
@@ -22,6 +32,8 @@ export default function JobList({
     onDelete,
     selected,
     onSelectionChange,
+    allSelected,
+    onToggleAll,
 }: Props) {
     if (!jobs.length) {
         return (
@@ -36,25 +48,46 @@ export default function JobList({
         );
     }
     return (
-        <div className="grid grid-cols-3 gap-4">
-            {jobs.map((job) => (
-                <JobCard
-                    key={job.id}
-                    job={job}
-                    selected={selected.includes(job.id)}
-                    onToggle={() => {
-                        const exists = selected.includes(job.id);
+        <>
+            <div className="overflow-hidden rounded-xl border">
+                <Table>
+                    <TableHeader className="">
+                        <TableRow>
+                            <TableHead>
+                                <Checkbox
+                                    checked={allSelected}
+                                    onCheckedChange={onToggleAll}
+                                />
+                            </TableHead>
+                            <TableHead>Job Position</TableHead>
+                            <TableHead>Type</TableHead>
+                            <TableHead />
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {jobs.map((job) => (
+                            <JobCard
+                                key={job.id}
+                                job={job}
+                                selected={selected.includes(job.id)}
+                                onToggle={() => {
+                                    const exists = selected.includes(job.id);
 
-                        onSelectionChange(
-                            exists
-                                ? selected.filter((id) => id !== job.id)
-                                : [...selected, job.id],
-                        );
-                    }}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                />
-            ))}
-        </div>
+                                    onSelectionChange(
+                                        exists
+                                            ? selected.filter(
+                                                  (id) => id !== job.id,
+                                              )
+                                            : [...selected, job.id],
+                                    );
+                                }}
+                                onEdit={onEdit}
+                                onDelete={onDelete}
+                            />
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+        </>
     );
 }

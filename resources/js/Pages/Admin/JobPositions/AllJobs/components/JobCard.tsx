@@ -3,6 +3,7 @@ import JobTableActions from "./JobActions";
 import { CircleArrowOutUpRight } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { TableCell, TableRow } from "@/components/ui/table";
 import type { JobPosition } from "@/Pages/Admin/Types/job-position";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -14,7 +15,7 @@ import {
     CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
+import { MapPin, Building2 } from "lucide-react";
 type Props = {
     selected: boolean;
     onToggle: () => void;
@@ -22,7 +23,7 @@ type Props = {
     onEdit: (job: JobPosition) => void;
     onDelete: (job: JobPosition) => void;
 };
-
+import { cn } from "@/lib/utils";
 export default function JobCard({
     job,
     onEdit,
@@ -32,78 +33,59 @@ export default function JobCard({
 }: Props) {
     return (
         <>
-            <Card className="transition-colors hover:bg-muted/30">
-                <CardHeader className="flex justify-between">
-                    <div className="flex gap-3 items-start">
-                        {/* Added pt-1 or mt-0.5 to align the checkbox nicely with the title text baseline/height */}
-                        <Checkbox
-                            checked={selected}
-                            onCheckedChange={onToggle}
-                            className="mt-0.5"
-                        />
-
-                        <div className="space-y-1">
-                            <CardTitle>{job.name}</CardTitle>
-                            <CardDescription>
-                                <Badge variant="secondary">
-                                    {job.type === "field_based"
-                                        ? "Field Based"
-                                        : "Non-Field Based"}
-                                </Badge>
-                            </CardDescription>
-                        </div>
+            <TableRow
+                className={cn(
+                    "group border-b transition-colors",
+                    "hover:bg-muted/50",
+                    selected && "bg-primary/[0.04]",
+                )}
+            >
+                <TableCell>
+                    <Checkbox checked={selected} onCheckedChange={onToggle} />
+                </TableCell>
+                <TableCell>
+                    <div className="">
+                        <p className="truncate text-sm font-medium">
+                            {job.name}
+                        </p>
                     </div>
-
+                </TableCell>
+                <TableCell className="w-60">
+                    <div>
+                        <Badge
+                            variant="secondary"
+                            className="rounded-md text-[12px]"
+                        >
+                            {job.type === "field_based" ? (
+                                <>
+                                    <MapPin
+                                        data-icon="inline-start"
+                                        absoluteStrokeWidth
+                                        strokeWidth={2}
+                                    />
+                                    Field Based
+                                </>
+                            ) : (
+                                <>
+                                    <Building2
+                                        absoluteStrokeWidth
+                                        strokeWidth={2}
+                                        data-icon="inline-start"
+                                    />
+                                    Non-Field Based
+                                </>
+                            )}
+                        </Badge>
+                    </div>
+                </TableCell>
+                <TableCell className="w-13 text-right">
                     <JobTableActions
                         job={job}
                         onEdit={onEdit}
                         onDelete={onDelete}
                     />
-                </CardHeader>
-                <CardFooter className="justify-between items-center">
-                    <span className="text-xs text-muted-foreground">
-                        {job.companies?.length
-                            ? `Assigned to ${job.companies.length} ${
-                                  job.companies.length === 1
-                                      ? "company"
-                                      : "companies"
-                              }`
-                            : "Not assigned yet"}
-                    </span>
-
-                    {job.companies?.length ? (
-                        <div className="flex -space-x-4">
-                            {job.companies.slice(0, 4).map((company) => (
-                                <Avatar
-                                    key={company.id}
-                                    className="border-2 border-background size-8"
-                                >
-                                    <AvatarImage
-                                        src={`/storage/${company.logo_path}`}
-                                    />
-
-                                    <AvatarFallback>
-                                        {company.name[0]}
-                                    </AvatarFallback>
-                                </Avatar>
-                            ))}
-
-                            {job.companies.length > 4 && (
-                                <div className="flex size-8 items-center justify-center rounded-full border-2 border-background bg-muted text-xs font-medium z-10">
-                                    +{job.companies.length - 4}
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <Button asChild variant="secondary" size="sm">
-                            <Link href="/admin/all-job-positions">
-                                <CircleArrowOutUpRight />
-                                Assign Companies
-                            </Link>
-                        </Button>
-                    )}
-                </CardFooter>
-            </Card>
+                </TableCell>
+            </TableRow>
         </>
     );
 }

@@ -10,7 +10,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 
-import { Pin, Building2, Building, ListSortDescending } from "lucide-react";
+import { ListFilter } from "lucide-react";
 
 import type { JobSortOption } from "@/Pages/Admin/Types/job-position";
 
@@ -20,17 +20,33 @@ type Props = {
 };
 
 export default function JobSort({ sort, onSortChange }: Props) {
+    const filterLabel = {
+        all: "All",
+        field_based: "Field Based",
+        non_field: "Non-Field Based",
+    }[sort];
+
+    const isFiltered = sort !== "all";
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon-lg">
-                    <ListSortDescending />
+                <Button
+                    variant={isFiltered ? "secondary" : "outline"}
+                    className="gap-2"
+                >
+                    <ListFilter className="size-4" />
+                    {filterLabel}
                 </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent className="min-w-60" align="start">
+            <DropdownMenuContent
+                className="min-w-55"
+                align="start"
+                sideOffset={10}
+            >
                 <DropdownMenuGroup>
-                    <DropdownMenuLabel>Sort Job Positions</DropdownMenuLabel>
+                    <DropdownMenuLabel>Filter by job type</DropdownMenuLabel>
 
                     <DropdownMenuRadioGroup
                         value={sort}
@@ -38,19 +54,16 @@ export default function JobSort({ sort, onSortChange }: Props) {
                             onSortChange(value as JobSortOption)
                         }
                     >
-                        <DropdownMenuRadioItem value="assigned">
-                            <Pin className="size-4" />
-                            Assigned First
+                        <DropdownMenuRadioItem value="all">
+                            All Job Positions
                         </DropdownMenuRadioItem>
 
-                        <DropdownMenuRadioItem value="most-companies">
-                            <Building2 className="size-4" />
-                            Most Companies
+                        <DropdownMenuRadioItem value="field_based">
+                            Field Based
                         </DropdownMenuRadioItem>
 
-                        <DropdownMenuRadioItem value="least-companies">
-                            <Building className="size-4" />
-                            Least Companies
+                        <DropdownMenuRadioItem value="non_field">
+                            Non-Field Based
                         </DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                 </DropdownMenuGroup>

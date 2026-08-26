@@ -33,7 +33,7 @@ export default function AppPagination({
     onPageChange,
 }: Props) {
     return (
-        <div className="flex items-center justify-between ">
+        <div className="flex items-center justify-between pt-3 ">
             <span className="text-sm text-muted-foreground">
                 Showing <span className="font-medium">{from}</span>–
                 <span className="font-medium">{to}</span> of{" "}
@@ -46,10 +46,12 @@ export default function AppPagination({
                         <PaginationItem>
                             <PaginationPrevious
                                 href="#"
-                                onClick={() => router.visit(onPrevious,{
-                                    preserveState: true,
-                                    preserveScroll: true,
-                                })}
+                                onClick={() =>
+                                    router.visit(onPrevious, {
+                                        preserveState: true,
+                                        preserveScroll: true,
+                                    })
+                                }
                                 className={
                                     !onPrevious
                                         ? "pointer-events-none opacity-50"
@@ -73,10 +75,12 @@ export default function AppPagination({
                         <PaginationItem>
                             <PaginationNext
                                 href="#"
-                                onClick={() => router.visit(onNext,{
-                                    preserveState: true,
-                                    preserveScroll: true,
-                                })}
+                                onClick={() =>
+                                    router.visit(onNext, {
+                                        preserveState: true,
+                                        preserveScroll: true,
+                                    })
+                                }
                                 className={
                                     !onNext
                                         ? "pointer-events-none opacity-50"

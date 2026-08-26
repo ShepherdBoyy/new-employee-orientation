@@ -6,10 +6,9 @@ export type JobPosition = {
     type: string;
     companies?: Company[];
     companies_count?: number;
+    employee_type: string;
 };
-
-export type JobSortOption = "assigned" | "most-companies" | "least-companies";
-
+export type JobSortOption = "all" | "field_based" | "non_field";
 export interface Paginated<T> {
     data: T[];
     links: {

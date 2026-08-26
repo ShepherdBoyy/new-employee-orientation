@@ -6,73 +6,16 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {
-    UsersRound,
-    BriefcaseBusiness,
-    Rotate3d,
-    Building2,
-    GitBranchPlus,
-    ShieldCheck,
-} from "lucide-react";
+import { Rotate3d } from "lucide-react";
 import SidebarNavItem from "./SideBarNav/SidebarNavItem";
 import SidebarNavGroup from "./SideBarNav/SidebarNavGroup";
-import type { CompanyNav, NavItem } from "./SideBarNav/navTypes";
+import type { CompanyNav } from "./SideBarNav/navTypes";
 import { usePage } from "@inertiajs/react";
+import getNavLinks from "./SideBarNav/getNavLinks";
 
 export function AppSidebar({}) {
     const companies = usePage().props.sidebarCompanies as CompanyNav[];
-
-    const navLinks: NavItem[] = [
-        {
-            type: "link",
-            group: "Organization",
-            links: [
-                {
-                    icon: <Building2 />,
-                    title: "Companies",
-                    path: "/admin/companies",
-                },
-                {
-                    icon: <BriefcaseBusiness />,
-                    title: "Jobs",
-                    path: "/admin/job-positions",
-                },
-                {
-                    icon: <GitBranchPlus />,
-                    title: "Job Assignments",
-                    path: "/admin/all-job-positions",
-                },
-            ],
-        },
-
-        {
-            type: "link",
-            group: "Users",
-            links: [
-                {
-                    icon: <ShieldCheck />,
-                    title: "Admin",
-                    path: "/admin/users/admins",
-                },
-                {
-                    icon: <UsersRound />,
-                    title: "Employee",
-                    path: "/admin/users/employees",
-                },
-            ],
-        },
-        {
-            type: "link",
-            group: "Workspace",
-            links: [
-                ...companies.map((company) => ({
-                    logo_path: company.logo_path,
-                    title: company.name,
-                    path: `/admin/folders/${company.slug}`,
-                })),
-            ],
-        },
-    ];
+    const navLinks = getNavLinks(companies);
 
     return (
         <Sidebar variant="floating" collapsible="icon">
@@ -99,22 +42,9 @@ export function AppSidebar({}) {
             </SidebarHeader>
 
             <SidebarContent>
-                {navLinks.map((item) => {
-                    switch (item.type) {
-                        case "link":
-                            return (
-                                <SidebarNavItem key={item.group} item={item} />
-                            );
-
-                        case "group":
-                            return (
-                                <SidebarNavGroup key={item.title} item={item} />
-                            );
-
-                        default:
-                            return null;
-                    }
-                })}
+                {navLinks.map((item) => (
+                    <SidebarNavItem key={item.group} item={item} />
+                ))}
             </SidebarContent>
         </Sidebar>
     );

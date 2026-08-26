@@ -11,7 +11,7 @@ import ToolbarJob from "./components/ToolbarJob";
 import DeleteSelectedJobs from "./components/forms/DeleteSelectedJobs";
 import AppPagination from "../../../../Layout/Pagination";
 import type { Paginated } from "../../Types/job-position";
-import { useDebouncedCallback } from 'use-debounce';
+import { useDebouncedCallback } from "use-debounce";
 
 type Props = {
     jobs: Paginated<JobPosition>;
@@ -33,29 +33,22 @@ function Index({ jobs }: Props) {
     const [selectedJobIds, setSelectedJobIds] = useState<number[]>([]);
     const [search, setSearch] = useState("");
     const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
-    const [sort, setSort] = useState<JobSortOption>("assigned");
-    const filteredJobs = jobs.data
-        .sort((a, b) => {
-            const aCompanies = a.companies?.length ?? 0;
-            const bCompanies = b.companies?.length ?? 0;
 
-            switch (sort) {
-                case "assigned":
-                    if (aCompanies === 0 && bCompanies > 0) return 1;
-                    if (aCompanies > 0 && bCompanies === 0) return -1;
+    const [filter, setFilter] = useState<JobSortOption>("all");
 
-                    return a.name.localeCompare(b.name);
+    const filteredJobs = jobs.data.filter((job) => {
+        switch (filter) {
+            case "field_based":
+                return job.employee_type === "field_based";
 
-                case "most-companies":
-                    return bCompanies - aCompanies;
+            case "non_field":
+                return job.employee_type === "non_field";
 
-                case "least-companies":
-                    return aCompanies - bCompanies;
-
-                default:
-                    return 0;
-            }
-        });
+            case "all":
+            default:
+                return true;
+        }
+    });
     const allSelected =
         filteredJobs.length > 0 &&
         selectedJobIds.length === filteredJobs.length;
@@ -69,16 +62,17 @@ function Index({ jobs }: Props) {
     }
 
     const handleSearch = useDebouncedCallback((value) => {
-        router.get('/admin/job-positions', // Update with your actual route name
-            { 
+        router.get(
+            "/admin/job-positions", // Update with your actual route name
+            {
                 search: value,
-                page: 1
-            }, 
+                page: 1,
+            },
             {
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,
-            }
+            },
         );
     }, 300);
 
@@ -86,7 +80,7 @@ function Index({ jobs }: Props) {
         setSearch(e);
         handleSearch(e);
     };
-    
+
     return (
         <>
             <div className="space-y-6">
@@ -101,77 +95,73 @@ function Index({ jobs }: Props) {
                         </p>
                     </div>
                 </div>
-
                 <Separator />
-
-                <ToolbarJob
-                    search={search}
-                    onSearchChange={handleSearchChange} // Pass the wrapper function here
-                    allSelected={allSelected}
-                    onToggleAll={handleToggleAll}
-                    selectedCount={selectedJobIds.length}
-                    onDeleteSelected={() => setDeleteSelectedOpen(true)}
-                    onCreate={() => setCreateOpen(true)}
-                    sort={sort}
-                    onSortChange={setSort}
-                />
-
-                <CreateJobDialog
-                    open={createOpen}
-                    onOpenChange={setCreateOpen}
-                />
-                <JobList
-                    jobs={filteredJobs}
-                    selected={selectedJobIds}
-                    onSelectionChange={setSelectedJobIds}
-                    onEdit={setEditingJob}
-                    onDelete={setDeletingJob}
-                />
-                <AppPagination
-                    from={jobs.from}
-                    to={jobs.to}
-                    total={jobs.total}
-                    currentPage={jobs.current_page}
-                    lastPage={jobs.last_page}
-                    onPrevious={jobs?.prev_page_url}
-                    onNext={jobs?.next_page_url}
-                    onPageChange={(page) => {
-                        // 1. Get existing query parameters from the current URL
-                        const params = new URLSearchParams(window.location.search);
-                        
-                        // 2. Set or update the page parameter
-                        params.set('page', page);
-                        
-                        // 3. Convert params back to a plain object for Inertia's data option
-                        const queryData = Object.fromEntries(params.entries());
-
-                        router.visit(window.location.pathname, {
-                            data: queryData,
-                            preserveState: true, // Optional: keeps component state if desired
-                            preserveScroll: true, // Optional: keeps scroll position
-                        });
-                    }}
-                />
-
-                {/* Forms */}
-                <EditJobDialog
-                    job={editingJob}
-                    onClose={() => setEditingJob(null)}
-                />
-                {deletingJob && (
-                    <DeleteJobDialog
-                        job={deletingJob}
-                        onClose={() => setDeletingJob(null)}
-                        onConfirm={handleDelete}
-                    />
-                )}
-                <DeleteSelectedJobs
-                    ids={selectedJobIds}
-                    setIds={setSelectedJobIds}
-                    open={deleteSelectedOpen}
-                    onClose={() => setDeleteSelectedOpen(false)}
-                />
             </div>
+
+            <ToolbarJob
+                search={search}
+                onSearchChange={handleSearchChange} // Pass the wrapper function here
+                selectedCount={selectedJobIds.length}
+                onDeleteSelected={() => setDeleteSelectedOpen(true)}
+                onCreate={() => setCreateOpen(true)}
+                filter={filter}
+                onFilterChange={setFilter}
+            />
+
+            <CreateJobDialog open={createOpen} onOpenChange={setCreateOpen} />
+            <JobList
+                allSelected={allSelected}
+                onToggleAll={handleToggleAll}
+                jobs={filteredJobs}
+                selected={selectedJobIds}
+                onSelectionChange={setSelectedJobIds}
+                onEdit={setEditingJob}
+                onDelete={setDeletingJob}
+            />
+            <AppPagination
+                from={jobs.from}
+                to={jobs.to}
+                total={jobs.total}
+                currentPage={jobs.current_page}
+                lastPage={jobs.last_page}
+                onPrevious={jobs?.prev_page_url}
+                onNext={jobs?.next_page_url}
+                onPageChange={(page) => {
+                    // 1. Get existing query parameters from the current URL
+                    const params = new URLSearchParams(window.location.search);
+
+                    // 2. Set or update the page parameter
+                    params.set("page", page);
+
+                    // 3. Convert params back to a plain object for Inertia's data option
+                    const queryData = Object.fromEntries(params.entries());
+
+                    router.visit(window.location.pathname, {
+                        data: queryData,
+                        preserveState: true, // Optional: keeps component state if desired
+                        preserveScroll: true, // Optional: keeps scroll position
+                    });
+                }}
+            />
+
+            {/* Forms */}
+            <EditJobDialog
+                job={editingJob}
+                onClose={() => setEditingJob(null)}
+            />
+            {deletingJob && (
+                <DeleteJobDialog
+                    job={deletingJob}
+                    onClose={() => setDeletingJob(null)}
+                    onConfirm={handleDelete}
+                />
+            )}
+            <DeleteSelectedJobs
+                ids={selectedJobIds}
+                setIds={setSelectedJobIds}
+                open={deleteSelectedOpen}
+                onClose={() => setDeleteSelectedOpen(false)}
+            />
         </>
     );
 }

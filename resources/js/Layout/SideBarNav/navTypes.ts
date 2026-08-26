@@ -1,37 +1,23 @@
 import { ReactNode } from "react";
 
-export interface NavLinkItem {
-    type: "link";
+export type NavItem = {
     group: string;
     links: {
         title: string;
         path: string;
         icon?: ReactNode;
-        logo_path?: string;
+        logo_path?: string | null;
     }[];
-}
-
-export interface NavGroupItem {
-    type: "group";
-    title: string;
-    icon: ReactNode;
-    items: { title: string; path: string }[];
-}
-
-export type NavItem = NavLinkItem | NavGroupItem;
+};
 
 export interface CompanyNav {
+    group: string;
     logo_path: string;
     id: number;
     name: string;
     slug: string;
 }
 
-interface TopicNav {
-    id: number;
-    title: string;
-    slides_count: number;
-}
 export interface ModuleNav {
     id: number;
     name: string;

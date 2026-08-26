@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Plus, SearchIcon, Trash } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
+import { Plus, SearchIcon, Trash, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import {
     InputGroup,
     InputGroupAddon,
@@ -10,52 +8,58 @@ import {
 } from "@/components/ui/input-group";
 import type { JobSortOption } from "@/Pages/Admin/Types/job-position";
 import JobSort from "./JobSort";
+
 type Props = {
     search: string;
     onSearchChange: (value: string) => void;
-
-    allSelected: boolean;
-    onToggleAll: () => void;
 
     selectedCount: number;
     onDeleteSelected: () => void;
 
     onCreate: () => void;
-    sort: JobSortOption;
-    onSortChange: (sort: JobSortOption) => void;
+
+    filter: JobSortOption;
+    onFilterChange: (filter: JobSortOption) => void;
 };
 export default function ToolbarJob({
     onCreate,
     search,
     onSearchChange,
-    allSelected,
-    onToggleAll,
     selectedCount,
     onDeleteSelected,
-    sort,
-    onSortChange,
+    filter,
+    onFilterChange,
 }: Props) {
-    return (
-        <>
-            <div className="flex items-center justify-between gap-4 py-4">
-                <InputGroup className="max-w-2xl h-9">
-                    <InputGroupInput
-                        value={search}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                        placeholder="Search job positions..."
-                    />
-                    <InputGroupAddon>
-                        <SearchIcon />
-                    </InputGroupAddon>
-                </InputGroup>
+    const hasFilter = filter !== "all";
 
-                <div className="flex items-center gap-2">
-                    {selectedCount > 0 && (
+    const filterLabel =
+        filter === "field_based"
+            ? "Field Based"
+            : filter === "non_field"
+              ? "Non-Field Based"
+              : null;
+
+    return (
+        <div className="flex items-center justify-between gap-4 py-4">
+            <InputGroup className="h-9 max-w-2xl">
+                <InputGroupInput
+                    value={search}
+                    onChange={(e) => onSearchChange(e.target.value)}
+                    placeholder="Search job positions..."
+                />
+
+                <InputGroupAddon>
+                    <SearchIcon />
+                </InputGroupAddon>
+            </InputGroup>
+
+            <div className="flex items-center gap-2">
+                {selectedCount > 0 && (
+                    <>
                         <span className="text-sm text-muted-foreground">
-                            ({selectedCount} selected)
+                            {selectedCount} selected
                         </span>
-                    )}
-                    {selectedCount > 0 && (
+
                         <Button
                             variant="destructive"
                             onClick={onDeleteSelected}
@@ -63,29 +67,34 @@ export default function ToolbarJob({
                             <Trash />
                             Delete {selectedCount} jobs
                         </Button>
-                    )}
-                    <div className="flex items-center gap-3 flex-1">
-                        <div className="flex gap-3 items-center">
-                            {/*   <JobSort sort={sort} onSortChange={onSortChange} /> */}
+                    </>
+                )}
 
-                            <div className="flex items-center gap-2 shrink-0">
-                                <Checkbox
-                                    checked={allSelected}
-                                    onCheckedChange={onToggleAll}
-                                />
+                <JobSort sort={filter} onSortChange={onFilterChange} />
 
-                                <span className="text-sm text-muted-foreground">
-                                    Select all
-                                </span>
-                            </div>
-                            <Button size="lg" onClick={onCreate}>
-                                <Plus className="size-4" />
-                                New Job
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+                {hasFilter && filterLabel && (
+                    <Badge
+                        variant="secondary"
+                        className="h-9 gap-1 rounded-md px-3"
+                    >
+                        {filterLabel}
+
+                        <button
+                            type="button"
+                            onClick={() => onFilterChange("all")}
+                            className="ml-1 rounded-sm opacity-60 transition-opacity hover:opacity-100"
+                            aria-label={`Clear ${filterLabel} filter`}
+                        >
+                            <X className="size-3.5" />
+                        </button>
+                    </Badge>
+                )}
+
+                <Button size="lg" onClick={onCreate}>
+                    <Plus className="size-4" />
+                    New Job Position
+                </Button>
             </div>
-        </>
+        </div>
     );
 }

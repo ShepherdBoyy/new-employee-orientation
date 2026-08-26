@@ -50,7 +50,7 @@ class UserController extends Controller
             })
             ->with("company", "jobPosition")
             ->latest()
-            ->paginate(10)
+            ->paginate(6)
             // Optional: appends search query parameters to pagination links automatically
             ->withQueryString() 
             ->through(function (User $employee) {

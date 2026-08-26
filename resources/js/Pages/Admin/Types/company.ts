@@ -19,9 +19,7 @@ export interface Company {
     name: string;
     slug: string;
     logo_path: string | null;
-    status: "active" | "inactive";
-    header_theme: keyof typeof COMPANY_THEMES;
-
+    header_theme?: keyof typeof COMPANY_THEMES;
     users_count?: number;
 }
 export interface CompanyWithJobs extends Company {
