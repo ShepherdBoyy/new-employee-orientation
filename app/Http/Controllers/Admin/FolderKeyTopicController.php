@@ -40,6 +40,7 @@ class FolderKeyTopicController extends Controller
                     "name" => $siblingFolder->name,
                     "employee_type" => $siblingFolder->employee_type,
                     "topics" => $siblingFolder->keyTopics()
+                        ->with("folder:id,name,slug") 
                         ->withCount("slides")
                         ->ordered()
                         ->get()
