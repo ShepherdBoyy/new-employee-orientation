@@ -39,7 +39,7 @@ export default function ModuleJobItem({ company, summary, active }: Props) {
         visibility: isDragging ? ("hidden" as const) : ("visible" as const),
     };
 
-    const href = `/admin/folders/${company.slug}/job-positions`;
+    const href = `/admin/folders/${company.slug}/${summary.field_folder_slug}`;
 
     return (
         <div ref={setNodeRef} style={style}>

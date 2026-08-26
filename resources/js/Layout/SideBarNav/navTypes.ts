@@ -45,4 +45,5 @@ export interface JobSpecificSummary {
     folders_created: number;
     order: number;
     name: string;
+    field_folder_slug: string
 }
