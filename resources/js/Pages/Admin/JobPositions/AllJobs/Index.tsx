@@ -33,31 +33,21 @@ function Index({ jobs }: Props) {
     const [selectedJobIds, setSelectedJobIds] = useState<number[]>([]);
     const [search, setSearch] = useState("");
     const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
+    const [filter, setFilter] = useState<JobSortOption>(
+        () =>
+            (new URLSearchParams(window.location.search).get(
+                "filter",
+            ) as JobSortOption) ?? "all",
+    );
 
-    const [filter, setFilter] = useState<JobSortOption>("all");
-
-    const filteredJobs = jobs.data.filter((job) => {
-        switch (filter) {
-            case "field":
-                return job.employee_type === "field";
-
-            case "non_field":
-                return job.employee_type === "non_field";
-
-            case "all":
-            default:
-                return true;
-        }
-    });
     const allSelected =
-        filteredJobs.length > 0 &&
-        selectedJobIds.length === filteredJobs.length;
+        jobs.data.length > 0 && selectedJobIds.length === jobs.data.length;
 
     function handleToggleAll() {
         if (allSelected) {
             setSelectedJobIds([]);
         } else {
-            setSelectedJobIds(filteredJobs.map((job) => job.id));
+            setSelectedJobIds(jobs.data.map((job) => job.id));
         }
     }
 
@@ -80,6 +70,23 @@ function Index({ jobs }: Props) {
         setSearch(e);
         handleSearch(e);
     };
+
+    const handleFilterChange = (value: JobSortOption) => {
+        setFilter(value);
+
+        router.get("/admin/job-positions",
+            {
+                search: search || undefined,
+                filter: value,
+                page: 1
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true
+            }
+        )
+    }
 
     return (
         <>
@@ -105,14 +112,14 @@ function Index({ jobs }: Props) {
                 onDeleteSelected={() => setDeleteSelectedOpen(true)}
                 onCreate={() => setCreateOpen(true)}
                 filter={filter}
-                onFilterChange={setFilter}
+                onFilterChange={handleFilterChange}
             />
 
             <CreateJobDialog open={createOpen} onOpenChange={setCreateOpen} />
             <JobList
                 allSelected={allSelected}
                 onToggleAll={handleToggleAll}
-                jobs={filteredJobs}
+                jobs={jobs.data}
                 selected={selectedJobIds}
                 onSelectionChange={setSelectedJobIds}
                 onEdit={setEditingJob}

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\Folder;
 use App\Models\JobPosition;
 use App\Models\Document;
 use DB;
@@ -21,18 +20,21 @@ class JobPositionController extends Controller
     public function index(Request $request)
     {
         $jobs = JobPosition::with('companies')
-        ->when($request->filled('search'), function ($query) use ($request) {
-            $search = $request->input('search');
-            
-            $query->where(function ($q) use ($search) {
-                // Search in job position attributes (e.g., title, description)
-                $q->where('name', 'like', '%' . $search . '%');
-            });
-        })
-        ->paginate(12)
-        ->withQueryString();
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->input('search');
 
-        return Inertia::render("Admin/JobPositions/AllJobs/Index")->with(['jobs' => $jobs]);
+                $query->where("name", "like", "%" . $search . "%");
+            })
+            ->when($request->filled("filter") && $request->input("filter") !== "all", function ($query) use ($request) {
+                $query->where("employee_type", $request->input("filter"));
+            })
+            ->orderBy("name")
+            ->paginate(12)
+            ->withQueryString();
+
+        return Inertia::render("Admin/JobPositions/AllJobs/Index", [
+            'jobs' => $jobs,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -43,10 +45,10 @@ class JobPositionController extends Controller
         ]);
 
         $jobPosition = JobPosition::create($validated);
-        
+
         return back()->with("success", "Job position created successfully");
     }
-    
+
 
     public function update(Request $request, JobPosition $jobPosition): RedirectResponse
     {
@@ -67,7 +69,7 @@ class JobPositionController extends Controller
         return back()->with("success", "Job position deleted successfully");
     }
 
-    public function destroyMultipleJobs(Request $request) 
+    public function destroyMultipleJobs(Request $request)
     {
         JobPosition::destroy($request->ids);
 
@@ -83,7 +85,7 @@ class JobPositionController extends Controller
         $positions = JobPosition::forCompany($validated["company_id"])
             ->orderBy("name")
             ->get(["id", "name"]);
-        
+
         return response()->json([
             "positions" => $positions,
         ]);
@@ -95,17 +97,17 @@ class JobPositionController extends Controller
 
         $documents = Document::all();
 
-       $filteredCompanies = $companies->map(function ($company) use ($documents) {
+        $filteredCompanies = $companies->map(function ($company) use ($documents) {
             $company->jobs->transform(function ($job) use ($company, $documents) {
                 // Find matching PDF for this exact Company + Job Position pair
                 $pdf = $documents->firstWhere(function ($item) use ($company, $job) {
-                    return $item->company_id === $company->id 
+                    return $item->company_id === $company->id
                         && $item->job_position_id === $job->id;
                 });
 
                 // Attach jd_pdf object directly to the job object
                 $job->document = $pdf ? [
-                    'id'        => $pdf->id,
+                    'id' => $pdf->id,
                     'file_path' => $pdf->file_path,
                     'orig_name' => $pdf->orig_name,
                 ] : null;
@@ -144,9 +146,9 @@ class JobPositionController extends Controller
     public function deleteAssignedJob($company_id, $job_id)
     {
         DB::table('company_job_position')
-        ->where('company_id', $company_id)
-        ->where('job_position_id', $job_id)
-        ->delete();
+            ->where('company_id', $company_id)
+            ->where('job_position_id', $job_id)
+            ->delete();
 
         return back()->with("success", "Job position unlinked successfully");
     }
@@ -158,7 +160,7 @@ class JobPositionController extends Controller
         ]);
 
         $document = null;
-        
+
         if ($request->hasFile('pdf_file')) {
             $file = $request->file('pdf_file');
 
