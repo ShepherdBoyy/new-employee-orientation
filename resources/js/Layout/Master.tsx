@@ -40,7 +40,7 @@ export default function Master({ children }: MasterProps) {
     const companies = usePage().props.sidebarCompanies as CompanyNav[];
 
     const navLinks = getNavLinks(companies);
-
+    const currentPath = new URL(url, window.location.origin).pathname;
     const currentNav = navLinks
         .flatMap((group) =>
             group.links.map((link) => ({
@@ -49,7 +49,11 @@ export default function Master({ children }: MasterProps) {
                 path: link.path,
             })),
         )
-        .find((link) => url === link.path || url.startsWith(`${link.path}/`));
+        .find(
+            (link) =>
+                currentPath === link.path ||
+                currentPath.startsWith(`${link.path}/`),
+        );
 
     return (
         <>

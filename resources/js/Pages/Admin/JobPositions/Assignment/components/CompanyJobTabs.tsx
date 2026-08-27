@@ -22,7 +22,7 @@ import UploadJdDialog from "./UploadJdDialog";
 import type { CompanyWithJobs } from "../../../Types/company";
 import { Badge } from "@/components/ui/badge";
 import { PinOff } from "lucide-react";
-import { EllipsisVertical, Eye, Upload, RefreshCw } from "lucide-react";
+import { EllipsisVertical, Eye, Upload, RefreshCw, FileUp } from "lucide-react";
 interface JobWithPivot {
     id: number;
     name: string;
@@ -117,11 +117,14 @@ export default function CompanyJobTabs({ companies }: Props) {
                         onValueChange={(value) => {
                             setActiveCompanyId(value);
                         }}
-                        className="w-full space-y-2 pt-2"
+                        className="space-y-2 pt-2"
                     >
                         {/* Horizontal Tab Track Container */}
                         <div className="w-full border-b overflow-x-auto scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-                            <TabsList className="bg-transparent p-0 gap-4 whitespace-nowrap min-w-max">
+                            <TabsList
+                                variant="line"
+                                className=" p-0 gap-4 whitespace-nowrap "
+                            >
                                 {filteredCompanies.map((company) => (
                                     <TabsTrigger
                                         key={company.id}
@@ -134,7 +137,7 @@ export default function CompanyJobTabs({ companies }: Props) {
                             </TabsList>
                         </div>
 
-                        <ScrollArea className="max-h-118 overflow-y-auto pr-2">
+                        <ScrollArea className="max-h-125 overflow-y-auto pr-3">
                             {filteredCompanies.map((company) => (
                                 <TabsContent
                                     key={company.id}
@@ -188,7 +191,6 @@ export default function CompanyJobTabs({ companies }: Props) {
                                                             {job.document ? (
                                                                 <Button
                                                                     size="sm"
-                                                                    variant="secondary"
                                                                     className="gap-2"
                                                                     onClick={() => {
                                                                         setViewDialog(
@@ -207,6 +209,7 @@ export default function CompanyJobTabs({ companies }: Props) {
                                                             ) : (
                                                                 <Button
                                                                     size="sm"
+                                                                    variant="ghost"
                                                                     className="gap-2"
                                                                     onClick={() => {
                                                                         setUploadDialog(
@@ -217,7 +220,7 @@ export default function CompanyJobTabs({ companies }: Props) {
                                                                         );
                                                                     }}
                                                                 >
-                                                                    <Upload className="size-4" />
+                                                                    <FileUp className="size-4" />
                                                                     Upload JD
                                                                 </Button>
                                                             )}
@@ -272,7 +275,7 @@ export default function CompanyJobTabs({ companies }: Props) {
                                                                                 );
                                                                             }}
                                                                         >
-                                                                            <Upload className="mr-2 size-4" />
+                                                                            <FileUp className="mr-2 size-4" />
                                                                             Upload
                                                                             JD
                                                                         </DropdownMenuItem>

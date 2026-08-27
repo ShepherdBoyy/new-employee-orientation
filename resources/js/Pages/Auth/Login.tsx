@@ -200,7 +200,7 @@ export default function Login() {
                                 {/* Header */}
                                 <motion.div variants={itemVariants}>
                                     <h1 className="text-center text-3xl font-medium tracking-tight lg:text-left">
-                                        Welcome back
+                                        Let's get you started
                                     </h1>
 
                                     <p className="mt-2 text-center text-sm text-muted-foreground lg:text-left">
