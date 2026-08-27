@@ -3,7 +3,9 @@ import { Head, useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 
-import StepIndicator, { STEPS } from "./components/acknowledgement/StepIndicator";
+import StepIndicator, {
+    STEPS,
+} from "./components/acknowledgement/StepIndicator";
 import ReviewStep from "./components/acknowledgement/ReviewStep";
 import NameSignatureStep from "./components/acknowledgement/NameSignatureStep";
 import PhotoConsentStep from "./components/acknowledgement/PhotoConsentStep";
@@ -79,9 +81,12 @@ export default function Acknowledgement({ user, progress }: Props) {
                     <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
                         <ShieldCheck className="h-5 w-5" />
                     </div>
-                    <h1 className="text-xl font-semibold tracking-tight">Final Acknowledgement</h1>
+                    <h1 className="text-xl font-semibold tracking-tight">
+                        Final Acknowledgement
+                    </h1>
                     <p className="text-sm text-muted-foreground">
-                        Please complete the steps below to finish your orientation.
+                        Please complete the steps below to finish your
+                        orientation.
                     </p>
                 </div>
 
@@ -97,8 +102,12 @@ export default function Acknowledgement({ user, progress }: Props) {
                             fullName={data.full_name}
                             fullNameError={errors.full_name}
                             signatureError={errors.signature}
-                            onFullNameChange={(value) => setData("full_name", value)}
-                            onSignatureChange={(value) => setData("signature", value ?? "")}
+                            onFullNameChange={(value) =>
+                                setData("full_name", value)
+                            }
+                            onSignatureChange={(value) =>
+                                setData("signature", value ?? "")
+                            }
                         />
                     )}
 
@@ -110,14 +119,20 @@ export default function Acknowledgement({ user, progress }: Props) {
                             consentError={errors.consented}
                             onOpenCamera={handleRequestCamera}
                             onRetake={handleRetakePhoto}
-                            onConsentChange={(checked) => setData("consented", checked)}
+                            onConsentChange={(checked) =>
+                                setData("consented", checked)
+                            }
                         />
                     )}
                 </div>
 
-                {/* Navigation */}
-                <div className="mt-6 flex items-center justify-between">
-                    <Button variant="outline" onClick={back} disabled={step === 0}>
+                <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <Button
+                        variant="outline"
+                        onClick={back}
+                        disabled={step === 0}
+                        className="w-full sm:w-auto"
+                    >
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back
                     </Button>
@@ -125,7 +140,10 @@ export default function Acknowledgement({ user, progress }: Props) {
                     {step < STEPS.length - 1 ? (
                         <Button
                             onClick={next}
-                            disabled={step === 1 && !canProceedFromNameSignature}
+                            disabled={
+                                step === 1 && !canProceedFromNameSignature
+                            }
+                            className="w-full sm:w-auto"
                         >
                             Next
                             <ArrowRight className="ml-2 h-4 w-4" />
@@ -134,10 +152,12 @@ export default function Acknowledgement({ user, progress }: Props) {
                         <Button
                             onClick={handleSubmit}
                             disabled={!canSubmit || processing}
-                            className="bg-emerald-600 hover:bg-emerald-500"
+                            className="w-full bg-emerald-600 hover:bg-emerald-500 sm:w-auto"
                         >
                             <CheckCircle2 className="mr-2 h-4 w-4" />
-                            {processing ? "Submitting..." : "Submit Acknowledgement"}
+                            {processing
+                                ? "Submitting..."
+                                : "Submit Acknowledgement"}
                         </Button>
                     )}
                 </div>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Camera, RotateCcw, Check, X, VideoOff } from "lucide-react";
+import { RotateCcw, Check, X, VideoOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -31,8 +31,11 @@ export default function CameraCapture({ open, onCapture, onClose }: Props) {
     async function startCamera() {
         setError(null);
         try {
+            // Ask for a natural, widescreen feed rather than forcing a square
+            // crop — the browser will letterbox it as needed, so nothing
+            // ends up over-zoomed regardless of window shape.
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 1280 } },
+                video: { facingMode: "user", width: { ideal: 1920 }, height: { ideal: 1080 } },
                 audio: false,
             });
             streamRef.current = stream;
@@ -55,7 +58,8 @@ export default function CameraCapture({ open, onCapture, onClose }: Props) {
         if (!video || !canvas) return;
 
         // Crop to a centered square so the captured photo matches the
-        // circular guide the employee saw on screen.
+        // guide the employee saw on screen, regardless of the feed's
+        // native (usually widescreen) aspect ratio.
         const size = Math.min(video.videoWidth, video.videoHeight);
         const offsetX = (video.videoWidth - size) / 2;
         const offsetY = (video.videoHeight - size) / 2;
@@ -97,34 +101,40 @@ export default function CameraCapture({ open, onCapture, onClose }: Props) {
     return createPortal(
         <div className="fixed inset-0 z-100 flex flex-col bg-black">
             {/* Top bar */}
-            <div className="flex shrink-0 items-center justify-between px-4 py-3 sm:px-6">
-                <p className="text-sm font-medium text-white">
+            <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between bg-linear-to-b from-black/60 to-transparent px-4 py-3.5 sm:px-6">
+                <p className="text-sm font-medium tracking-tight text-white">
                     {captured ? "Review your photo" : "Position your face in the guide"}
                 </p>
                 <button
                     onClick={handleClose}
-                    className="rounded-full bg-white/10 p-2 text-white/80 transition hover:bg-white/20 hover:text-white"
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/80 backdrop-blur-md transition hover:bg-white/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
                     aria-label="Close camera"
                 >
                     <X className="h-4 w-4" />
                 </button>
             </div>
 
-            {/* Camera / preview area */}
-            <div className="relative flex flex-1 items-center justify-center overflow-hidden">
+            <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-black">
                 {error ? (
                     <div className="flex flex-col items-center gap-3 px-6 text-center">
-                        <VideoOff className="h-8 w-8 text-white/40" />
-                        <p className="max-w-xs text-sm text-white/70">{error}</p>
-                        <Button variant="secondary" size="sm" onClick={startCamera}>
-                            Try Again
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5">
+                            <VideoOff className="h-5 w-5 text-white/40" />
+                        </div>
+                        <p className="max-w-xs text-sm leading-relaxed text-white/60">{error}</p>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={startCamera}
+                            className="mt-1 rounded-full bg-white/10 text-white hover:bg-white/20"
+                        >
+                            Try again
                         </Button>
                     </div>
                 ) : captured ? (
                     <img
                         src={captured}
                         alt="Captured photo"
-                        className="h-full w-full max-w-md object-cover sm:aspect-square sm:h-auto sm:rounded-3xl"
+                        className="max-h-full max-w-full object-contain"
                     />
                 ) : (
                     <>
@@ -133,69 +143,32 @@ export default function CameraCapture({ open, onCapture, onClose }: Props) {
                             autoPlay
                             playsInline
                             muted
-                            className="h-full w-full scale-x-[-1] object-cover"
+                            className="max-h-full max-w-full scale-x-[-1] object-contain"
                         />
-
-                        {/* Face guide overlay */}
-                        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                            <div className="relative flex h-[70vw] max-h-105 w-[70vw] max-w-105 items-center justify-center sm:h-95 sm:w-95">
-                                <svg
-                                    viewBox="0 0 300 300"
-                                    className="h-full w-full drop-shadow-[0_0_0_9999px_rgba(0,0,0,0.55)]"
-                                    style={{ overflow: "visible" }}
-                                >
-                                    <defs>
-                                        <mask id="face-mask">
-                                            <rect x="-9999" y="-9999" width="20000" height="20000" fill="white" />
-                                            <ellipse cx="150" cy="150" rx="105" ry="135" fill="black" />
-                                        </mask>
-                                    </defs>
-                                    <rect
-                                        x="-9999"
-                                        y="-9999"
-                                        width="20000"
-                                        height="20000"
-                                        fill="rgba(0,0,0,0.55)"
-                                        mask="url(#face-mask)"
-                                    />
-                                    <ellipse
-                                        cx="150"
-                                        cy="150"
-                                        rx="105"
-                                        ry="135"
-                                        fill="none"
-                                        stroke="white"
-                                        strokeWidth="3"
-                                        strokeDasharray="10 8"
-                                        opacity="0.9"
-                                    />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <p className="pointer-events-none absolute bottom-28 left-0 right-0 text-center text-xs text-white/70 sm:bottom-32">
-                            Align your face within the outline, then tap capture
-                        </p>
                     </>
                 )}
             </div>
 
             {/* Controls */}
-            <div className="flex shrink-0 items-center justify-center gap-6 px-6 pb-8 pt-4 sm:pb-10">
+            <div className="relative z-10 flex shrink-0 items-center justify-center gap-4 bg-linear-to-t from-black via-black/95 to-transparent px-6 pb-8 pt-6 sm:pb-10">
                 {captured ? (
                     <>
                         <Button
                             variant="secondary"
                             size="lg"
                             onClick={handleRetake}
-                            className="gap-2"
+                            className="gap-2 rounded-full bg-white/10 text-white hover:bg-white/20"
                         >
                             <RotateCcw className="h-4 w-4" />
                             Retake
                         </Button>
-                        <Button size="lg" onClick={handleConfirm} className="gap-2 bg-emerald-600 hover:bg-emerald-500">
+                        <Button
+                            size="lg"
+                            onClick={handleConfirm}
+                            className="gap-2 rounded-full bg-emerald-600 shadow-lg shadow-emerald-950/40 hover:bg-emerald-500"
+                        >
                             <Check className="h-4 w-4" />
-                            Use This Photo
+                            Use this photo
                         </Button>
                     </>
                 ) : (
@@ -203,9 +176,9 @@ export default function CameraCapture({ open, onCapture, onClose }: Props) {
                         <button
                             onClick={handleCapture}
                             aria-label="Capture photo"
-                            className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/80 bg-white/20 transition active:scale-95 sm:h-18 sm:w-18"
+                            className="group flex h-16 w-16 items-center justify-center rounded-full border-4 border-white/80 bg-white/10 backdrop-blur transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
                         >
-                            <span className="h-12 w-12 rounded-full bg-white sm:h-14 sm:w-14" />
+                            <span className="h-12 w-12 rounded-full bg-white transition group-hover:scale-95" />
                         </button>
                     )
                 )}
