@@ -34,32 +34,52 @@ class UserController extends Controller
 
     public function index(Request $request): Response
     {
-
-        $employees = User::where("role", "employee")
+        $baseQuery = User::query()
+            ->where("role", "employee")
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->input('search');
-                
                 $query->where(function ($q) use ($search) {
-                    // Search in job position attributes (e.g., title, description)
                     $q->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('email', 'like', '%' . $search . '%');
+                        ->orWhere('email', 'like', '%' . $search . '%');
                 });
             })
             ->when($request->filled('company_id'), function ($query) use ($request) {
                 $query->where('company_id', $request->input('company_id'));
+            });
+        
+        $stats = [
+            "total" => (clone $baseQuery)->count(),
+            "acknowledged" => (clone $baseQuery)->whereHas("orientationAcknowledgement")->count(),
+            "in_progress" => (clone $baseQuery)
+                ->whereDoesntHave("orientationAcknowledgement")
+                ->whereHas("folderCompletions")
+                ->count(),
+            "not_started" => (clone $baseQuery)
+                ->whereDoesntHave("orientationAcknowledgement")
+                ->whereDoesntHave("folderCompletions")
+                ->count()
+        ];
+
+        $employees = (clone $baseQuery)
+            ->when($request->filled("status"), function ($query) use ($request) {
+                match ($request->input("status")) {
+                    "acknowledged" => $query->whereHas("orientationAcknowledgement"),
+                    "in_progress" => $query->whereDoesntHave("orientationAcknowledgement")->whereHas("folderCompletions"),
+                    "not_progress" => $query->whereDoesntHave("orientationAcknowledgement")->whereDoesntHave("folderCompletions"),
+                    default => $query
+                };
             })
             ->with("company", "jobPosition")
             ->latest()
             ->paginate(6)
-            // Optional: appends search query parameters to pagination links automatically
-            ->withQueryString() 
+            ->withQueryString()
             ->through(function (User $employee) {
                 $totalFolders = $employee->company
                     ? $employee->company->foldersForEmployee($employee)->count()
                     : 0;
-                    
+
                 $completedFolders = $employee->folderCompletions()->count();
-                
+
                 $status = match (true) {
                     $employee->hasAcknowledgedOrientation() => "acknowledged",
                     $completedFolders > 0 => "in_progress",
@@ -78,13 +98,14 @@ class UserController extends Controller
                     "status" => $status
                 ];
             });
-            
-        $companies = Company::with("jobs:id,name")
-            ->get(["id", "name"]);
+
+        $companies = Company::with("jobs:id,name")->get(["id", "name"]);
 
         return Inertia::render("Admin/Users/Employees", [
             "employees" => $employees,
             "companies" => $companies,
+            "stats" => $stats,
+            // "filters" => $request->only(["search", "company_id", "status"])
         ]);
     }
 
