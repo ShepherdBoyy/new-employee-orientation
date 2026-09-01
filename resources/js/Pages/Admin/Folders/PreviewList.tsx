@@ -1,14 +1,16 @@
-import { Link, router } from '@inertiajs/react'
-import { ArrowLeft } from 'lucide-react'
-import PreviewFolderCard, { type PreviewFolder } from "./components/PreviewFolderCard"
+import { Link, router } from "@inertiajs/react";
+import { ArrowLeft } from "lucide-react";
+import PreviewFolderCard, {
+    type PreviewFolder,
+} from "./components/PreviewFolderCard";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select'
-import { useState } from 'react'
+} from "@/components/ui/select";
+import { useState } from "react";
 
 interface Company {
     id: number;
@@ -17,37 +19,32 @@ interface Company {
 }
 
 interface Props {
-    folders: PreviewFolder[]
-    company: Company
-    employeeType: "field" | "non_field"
+    folders: PreviewFolder[];
+    company: Company;
+    employeeType: "field" | "non_field";
 }
 
 export default function PreviewList({ folders, company, employeeType }: Props) {
-    const [selectedType, setSelectedType] = useState<"field" | "non_field">(employeeType)
+    const [selectedType, setSelectedType] = useState<"field" | "non_field">(
+        employeeType,
+    );
 
     function handleSelectType(value: string) {
-        const type = value as "field" | "non_field"
-        setSelectedType(type)
+        const type = value as "field" | "non_field";
+        setSelectedType(type);
 
         const params = new URLSearchParams({
             company_id: String(company.id),
             employee_type: type,
-        })
-        router.visit(`/admin/folders/preview-list?${params.toString()}`)
+        });
+        router.visit(`/admin/folders/preview-list?${params.toString()}`);
     }
 
-    const typeLabel = selectedType === "field" ? "Field-Based" : "Non-Field"
+    const typeLabel = selectedType === "field" ? "Field-Based" : "Non-Field";
 
     return (
         <div className="flex min-h-screen w-full flex-col bg-zinc-950">
             <div className="flex shrink-0 items-center justify-between bg-indigo-600 px-6 py-2.5 text-sm text-white">
-                <div className="flex items-center gap-2">
-                    <span className="font-medium">Admin Preview</span>
-                    <span className="text-indigo-300">—</span>
-                    <span className="text-indigo-200">
-                        {company.name} · {typeLabel}
-                    </span>
-                </div>
                 <Link
                     href={`/admin/folders/${company.slug}`}
                     className="inline-flex items-center gap-1.5 text-indigo-200 hover:text-white"
@@ -55,6 +52,13 @@ export default function PreviewList({ folders, company, employeeType }: Props) {
                     <ArrowLeft className="h-4 w-4" />
                     Back to folders
                 </Link>
+                <div className="flex items-center gap-2">
+                    <span className="font-medium">Admin Preview</span>
+                    <span className="text-indigo-300">—</span>
+                    <span className="text-indigo-200">
+                        {company.name} · {typeLabel}
+                    </span>
+                </div>
             </div>
 
             <div className="mx-auto w-full max-w-5xl flex-1 space-y-8 px-6 py-12">
@@ -70,7 +74,10 @@ export default function PreviewList({ folders, company, employeeType }: Props) {
                         </p>
                     </div>
 
-                    <Select value={selectedType} onValueChange={handleSelectType}>
+                    <Select
+                        value={selectedType}
+                        onValueChange={handleSelectType}
+                    >
                         <SelectTrigger className="w-56 border-zinc-700 bg-zinc-900 text-white">
                             <SelectValue placeholder="View as employee type" />
                         </SelectTrigger>
@@ -84,7 +91,11 @@ export default function PreviewList({ folders, company, employeeType }: Props) {
                 {folders.length > 0 ? (
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {folders.map((folder, index) => (
-                            <PreviewFolderCard key={folder.id} folder={folder} index={index} />
+                            <PreviewFolderCard
+                                key={folder.id}
+                                folder={folder}
+                                index={index}
+                            />
                         ))}
                     </div>
                 ) : (
@@ -94,5 +105,5 @@ export default function PreviewList({ folders, company, employeeType }: Props) {
                 )}
             </div>
         </div>
-    )
+    );
 }
