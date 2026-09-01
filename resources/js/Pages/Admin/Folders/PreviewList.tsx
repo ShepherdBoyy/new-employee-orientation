@@ -56,7 +56,7 @@ export default function PreviewList({ folders, company, employeeType }: Props) {
                     <span className="font-medium">Admin Preview</span>
                     <span className="text-indigo-300">—</span>
                     <span className="text-indigo-200">
-                        {company.name} · {typeLabel}
+                        {company.name}
                     </span>
                 </div>
             </div>
