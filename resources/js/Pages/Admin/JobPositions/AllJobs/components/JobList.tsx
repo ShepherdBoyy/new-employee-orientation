@@ -14,7 +14,8 @@ import {
     EmptyTitle,
     EmptyDescription,
 } from "@/components/ui/empty";
-import { CheckLine } from "lucide-react";
+import { motion } from "motion/react";
+import { itemVariants, listItemVariants, listVariants } from "@/motion";
 
 type Props = {
     jobs: JobPosition[];
@@ -49,7 +50,10 @@ export default function JobList({
     }
     return (
         <>
-            <div className="overflow-hidden rounded-xl border">
+            <motion.div
+                variants={itemVariants}
+                className="overflow-hidden rounded-xl border"
+            >
                 <Table>
                     <TableHeader className="">
                         <TableRow>
@@ -87,7 +91,7 @@ export default function JobList({
                         ))}
                     </TableBody>
                 </Table>
-            </div>
+            </motion.div>
         </>
     );
 }

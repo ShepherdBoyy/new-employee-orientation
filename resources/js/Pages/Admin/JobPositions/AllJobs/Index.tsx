@@ -12,7 +12,13 @@ import DeleteSelectedJobs from "./components/forms/DeleteSelectedJobs";
 import AppPagination from "../../../../Layout/Pagination";
 import type { Paginated } from "../../Types/job-position";
 import { useDebouncedCallback } from "use-debounce";
-
+import {
+    itemVariants,
+    listItemVariants,
+    listVariants,
+    pageVariants,
+} from "@/motion";
+import { motion } from "motion/react";
 type Props = {
     jobs: Paginated<JobPosition>;
 };
@@ -74,48 +80,69 @@ function Index({ jobs }: Props) {
     const handleFilterChange = (value: JobSortOption) => {
         setFilter(value);
 
-        router.get("/admin/job-positions",
+        router.get(
+            "/admin/job-positions",
             {
                 search: search || undefined,
                 filter: value,
-                page: 1
+                page: 1,
             },
             {
                 preserveState: true,
                 preserveScroll: true,
-                replace: true
-            }
-        )
-    }
+                replace: true,
+            },
+        );
+    };
 
     return (
-        <>
-            <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-semibold tracking-tight">
-                            Job Positions
-                        </h1>
-                        <p className="text-sm text-muted-foreground mt-1">
-                            Reusable roles that can later be assigned to one or
-                            more companies.
-                        </p>
-                    </div>
+        <motion.div
+            variants={pageVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-4"
+        >
+            {/* Page Header */}
+            <motion.div
+                variants={itemVariants}
+                className="flex items-center justify-between"
+            >
+                <div>
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        Job Positions
+                    </h1>
+
+                    <p className="mt-1 text-sm text-muted-foreground">
+                        Reusable roles that can later be assigned to one or more
+                        companies.
+                    </p>
                 </div>
+            </motion.div>
+
+            {/* Divider */}
+            <motion.div variants={itemVariants}>
                 <Separator />
-            </div>
+            </motion.div>
 
-            <ToolbarJob
-                search={search}
-                onSearchChange={handleSearchChange} // Pass the wrapper function here
-                selectedCount={selectedJobIds.length}
-                onDeleteSelected={() => setDeleteSelectedOpen(true)}
-                onCreate={() => setCreateOpen(true)}
-                filter={filter}
-                onFilterChange={handleFilterChange}
-            />
+            {/* Toolbar */}
+            <motion.div variants={itemVariants}>
+                <ToolbarJob
+                    search={search}
+                    onSearchChange={handleSearchChange}
+                    selectedCount={selectedJobIds.length}
+                    onDeleteSelected={() => setDeleteSelectedOpen(true)}
+                    onCreate={() => setCreateOpen(true)}
+                    filter={filter}
+                    onFilterChange={handleFilterChange}
+                />
 
-            <CreateJobDialog open={createOpen} onOpenChange={setCreateOpen} />
+                <CreateJobDialog
+                    open={createOpen}
+                    onOpenChange={setCreateOpen}
+                />
+            </motion.div>
+
+            {/* Job List */}
             <JobList
                 allSelected={allSelected}
                 onToggleAll={handleToggleAll}
@@ -125,6 +152,7 @@ function Index({ jobs }: Props) {
                 onEdit={setEditingJob}
                 onDelete={setDeletingJob}
             />
+
             <AppPagination
                 from={jobs.from}
                 to={jobs.to}
@@ -134,19 +162,16 @@ function Index({ jobs }: Props) {
                 onPrevious={jobs?.prev_page_url}
                 onNext={jobs?.next_page_url}
                 onPageChange={(page) => {
-                    // 1. Get existing query parameters from the current URL
                     const params = new URLSearchParams(window.location.search);
 
-                    // 2. Set or update the page parameter
                     params.set("page", page);
 
-                    // 3. Convert params back to a plain object for Inertia's data option
                     const queryData = Object.fromEntries(params.entries());
 
                     router.visit(window.location.pathname, {
                         data: queryData,
-                        preserveState: true, // Optional: keeps component state if desired
-                        preserveScroll: true, // Optional: keeps scroll position
+                        preserveState: true,
+                        preserveScroll: true,
                     });
                 }}
             />
@@ -156,6 +181,7 @@ function Index({ jobs }: Props) {
                 job={editingJob}
                 onClose={() => setEditingJob(null)}
             />
+
             {deletingJob && (
                 <DeleteJobDialog
                     job={deletingJob}
@@ -163,13 +189,14 @@ function Index({ jobs }: Props) {
                     onConfirm={handleDelete}
                 />
             )}
+
             <DeleteSelectedJobs
                 ids={selectedJobIds}
                 setIds={setSelectedJobIds}
                 open={deleteSelectedOpen}
                 onClose={() => setDeleteSelectedOpen(false)}
             />
-        </>
+        </motion.div>
     );
 }
 

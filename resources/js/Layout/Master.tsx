@@ -31,7 +31,52 @@ type MasterProps = {
     name: string;
     email: string;
 };
+const sidebarVariants = {
+    hidden: {
+        x: -16,
+        opacity: 0,
+    },
+    visible: {
+        x: 0,
+        opacity: 1,
+        transition: {
+            duration: 0.25,
+            ease: "easeOut",
+        },
+    },
+};
 
+const panelVariants = {
+    hidden: {
+        x: -12,
+        opacity: 0,
+    },
+    visible: {
+        x: 0,
+        opacity: 1,
+        transition: {
+            duration: 0.22,
+            ease: "easeOut",
+            delay: 0.08,
+        },
+    },
+};
+
+const shellVariants = {
+    hidden: {
+        y: 8,
+        opacity: 0,
+    },
+    visible: {
+        y: 0,
+        opacity: 1,
+        transition: {
+            duration: 0.28,
+            ease: "easeOut",
+            delay: 0.12,
+        },
+    },
+};
 export default function Master({ children }: MasterProps) {
     const user = usePage().props.auth.user as MasterProps;
     const { props, url } = usePage<PageProps>();
@@ -60,35 +105,36 @@ export default function Master({ children }: MasterProps) {
             <TooltipProvider>
                 <div className="">
                     <SidebarProvider className="h-svh overflow-hidden bg-linear-to-r from-slate-900 via-slate-800 to-slate-900">
-                        <AppSidebar />
+                        <motion.div
+                            variants={sidebarVariants}
+                            initial="hidden"
+                            animate="visible"
+                            className="shrink-0"
+                        >
+                            <AppSidebar />
+                        </motion.div>
                         <div className="flex flex-1 min-h-0 gap-3 p-2">
                             <AnimatePresence mode="wait">
                                 {company && (
                                     <motion.div
                                         key={showPresentationPanel}
-                                        initial={{
-                                            x: -24,
-                                            opacity: 0,
-                                        }}
-                                        animate={{
-                                            x: 0,
-                                            opacity: 1,
-                                        }}
-                                        exit={{
-                                            x: -24,
-                                            opacity: 0,
-                                        }}
-                                        transition={{
-                                            duration: 0.22,
-                                            ease: "easeOut",
-                                        }}
+                                        variants={panelVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                        exit="hidden"
+                                        className="shrink-0"
                                     >
                                         <PresentationPanel />
                                     </motion.div>
                                 )}
                             </AnimatePresence>
 
-                            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border bg-background shadow-xl">
+                            <motion.div
+                                variants={shellVariants}
+                                initial="hidden"
+                                animate="visible"
+                                className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border bg-background shadow-xl"
+                            >
                                 <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-background px-6">
                                     <div className="flex items-center gap-3">
                                         <SidebarTrigger />
@@ -187,11 +233,25 @@ export default function Master({ children }: MasterProps) {
                                 </header>
 
                                 <main className="flex-1 overflow-y-auto px-6 py-6">
-                                    {children}
+                                    <AnimatePresence mode="wait">
+                                        <motion.div
+                                            key={currentPath}
+                                            initial={{ opacity: 0, y: 8 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -4 }}
+                                            transition={{
+                                                duration: 0.18,
+                                                ease: "easeOut",
+                                            }}
+                                            className="h-full"
+                                        >
+                                            {children}
+                                        </motion.div>
+                                    </AnimatePresence>
                                 </main>
 
                                 <Toaster />
-                            </div>
+                            </motion.div>
                         </div>
                     </SidebarProvider>
                 </div>

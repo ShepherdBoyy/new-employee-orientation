@@ -17,6 +17,13 @@ import CompanyCard from "./component/CompanyCard";
 import { Separator } from "@/components/ui/separator";
 import type { CompanyWithJobCount } from "../Types/company";
 import { toast } from "sonner";
+import {
+    itemVariants,
+    listItemVariants,
+    listVariants,
+    pageVariants,
+} from "@/motion";
+import { motion } from "motion/react";
 interface Props {
     companies: CompanyWithJobCount[];
 }
@@ -83,8 +90,16 @@ function CompaniesIndex({ companies }: Props) {
     return (
         <>
             {companies.length > 0 ? (
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between">
+                <motion.div
+                    variants={pageVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="space-y-8"
+                >
+                    <motion.div
+                        className="flex items-center justify-between"
+                        variants={itemVariants}
+                    >
                         <div>
                             <h1 className="text-2xl font-semibold tracking-tight">
                                 Company
@@ -94,39 +109,49 @@ function CompaniesIndex({ companies }: Props) {
                                 or more companies.
                             </p>
                         </div>
-                    </div>
-                    <Separator />
-                    <div className="">
-                        <CreateCompanyDialog
-                            open={createOpen}
-                            onOpenChange={(open) => {
-                                setCreateOpen(open);
+                        <div className="pt-2">
+                            <CreateCompanyDialog
+                                open={createOpen}
+                                onOpenChange={(open) => {
+                                    setCreateOpen(open);
 
-                                if (!open) {
-                                    createForm.reset();
-                                    createForm.clearErrors();
-                                }
-                            }}
-                            form={createForm}
-                            onSubmit={handleCreate}
-                            onClose={() => setCreateOpen(false)}
-                        />
-                    </div>
-
-                    <div className="grid lg:grid-cols-3 gap-4 mt-4">
-                        {companies.map((company) => (
-                            <CompanyCard
-                                key={company.id}
-                                company={company}
-                                onEdit={(company) => {
-                                    setEditingCompany(company);
+                                    if (!open) {
+                                        createForm.reset();
+                                        createForm.clearErrors();
+                                    }
                                 }}
-                                onDelete={(company) => {
-                                    setCompanyToDelete(company);
-                                }}
+                                form={createForm}
+                                onSubmit={handleCreate}
+                                onClose={() => setCreateOpen(false)}
                             />
+                        </div>
+                    </motion.div>
+
+                    <motion.div variants={itemVariants}>
+                        <Separator />
+                    </motion.div>
+
+                    <motion.div
+                        className="grid lg:grid-cols-3 gap-4 mt-4"
+                        variants={listVariants}
+                    >
+                        {companies.map((company) => (
+                            <motion.div
+                                key={company.id}
+                                variants={listItemVariants}
+                            >
+                                <CompanyCard
+                                    company={company}
+                                    onEdit={(company) => {
+                                        setEditingCompany(company);
+                                    }}
+                                    onDelete={(company) => {
+                                        setCompanyToDelete(company);
+                                    }}
+                                />
+                            </motion.div>
                         ))}
-                    </div>
+                    </motion.div>
 
                     {/* Edit */}
                     <EditCompanyDialog
@@ -145,7 +170,7 @@ function CompaniesIndex({ companies }: Props) {
                         onClose={() => setCompanyToDelete(null)}
                         onConfirm={confirmDelete}
                     />
-                </div>
+                </motion.div>
             ) : (
                 <Empty className="h-full">
                     <EmptyHeader>
