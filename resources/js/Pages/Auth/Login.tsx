@@ -96,79 +96,8 @@ export default function Login() {
             animate="visible"
         >
             <div className="grid min-h-screen lg:grid-cols-2">
-                {/* LEFT SIDE */}
                 <motion.div
                     variants={leftPanelVariants}
-                    className="relative hidden overflow-hidden bg-linear-to-br from-slate-950 via-slate-900 to-slate-800 text-white lg:flex rounded-lg -ml-2"
-                >
-                    {/* Background decoration */}
-                    <div className="absolute inset-0 overflow-hidden">
-                        <div className="absolute -top-32 -right-32 size-96 rounded-full bg-white/5 blur-3xl" />
-
-                        <div className="absolute -bottom-32 -left-32 size-96 rounded-full bg-sky-400/10 blur-3xl" />
-
-                        <div className="absolute top-1/2 left-1/2 size-125 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-300/5 blur-[120px]" />
-                    </div>
-
-                    {/* Brand */}
-                    <div className="relative flex w-full flex-col">
-                        <motion.div
-                            variants={logoVariants}
-                            className="flex items-center gap-3 p-10"
-                        >
-                            <div className="flex size-11 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/10 backdrop-blur">
-                                <Rotate3d
-                                    size={24}
-                                    absoluteStrokeWidth
-                                    strokeWidth={1.3}
-                                />
-                            </div>
-
-                            <div>
-                                <span className="block font-medium tracking-wide">
-                                    NEO
-                                </span>
-
-                                <span className="text-xs text-white/40">
-                                    New Employee Orientation
-                                </span>
-                            </div>
-                        </motion.div>
-
-                        {/* Hero */}
-                        <motion.div
-                            variants={contentVariants}
-                            className="relative mt-auto max-w-2xl p-10 pb-16 xl:p-16 xl:pb-20"
-                        >
-                            <motion.p
-                                variants={itemVariants}
-                                className="text-xs font-medium uppercase tracking-[0.3em] text-white/40"
-                            >
-                                New Employee Orientation
-                            </motion.p>
-
-                            <motion.h1
-                                variants={itemVariants}
-                                className="mt-6 max-w-xl text-5xl font-medium leading-[1.15] tracking-tight xl:text-6xl"
-                            >
-                                Everything you need to get started.
-                            </motion.h1>
-
-                            <motion.p
-                                variants={itemVariants}
-                                className="mt-6 max-w-lg text-base leading-relaxed text-white/60"
-                            >
-                                Access onboarding materials, orientation
-                                modules, and company resources — all in one
-                                place.
-                            </motion.p>
-                        </motion.div>
-                    </div>
-                </motion.div>
-
-                {/* RIGHT SIDE */}
-                <motion.div
-                    variants={rightPanelVariants}
                     className="flex min-h-screen items-center justify-center bg-slate-50/60 px-6 py-12 sm:px-10 lg:bg-background lg:px-16"
                 >
                     <Form
@@ -286,6 +215,77 @@ export default function Login() {
                         )}
                     </Form>
                 </motion.div>
+                {/* LEFT SIDE */}
+                <motion.div
+                    variants={rightPanelVariants}
+                    className="relative hidden overflow-hidden bg-linear-to-br from-slate-950 via-slate-900 to-slate-800 text-white lg:flex rounded-lg -ml-2"
+                >
+                    {/* Background decoration */}
+                    <div className="absolute inset-0 overflow-hidden">
+                        <div className="absolute -top-32 -right-32 size-96 rounded-full bg-white/5 blur-3xl" />
+
+                        <div className="absolute -bottom-32 -left-32 size-96 rounded-full bg-sky-400/10 blur-3xl" />
+
+                        <div className="absolute top-1/2 left-1/2 size-125 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-300/5 blur-[120px]" />
+                    </div>
+
+                    {/* Brand */}
+                    <div className="relative flex w-full flex-col">
+                        <motion.div
+                            variants={logoVariants}
+                            className="flex items-center gap-3 p-10"
+                        >
+                            <div className="flex size-11 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/10 backdrop-blur">
+                                <Rotate3d
+                                    size={24}
+                                    absoluteStrokeWidth
+                                    strokeWidth={1.3}
+                                />
+                            </div>
+
+                            <div>
+                                <span className="block font-medium tracking-wide">
+                                    NEO
+                                </span>
+
+                                <span className="text-xs text-white/40">
+                                    New Employee Orientation
+                                </span>
+                            </div>
+                        </motion.div>
+
+                        {/* Hero */}
+                        <motion.div
+                            variants={contentVariants}
+                            className="relative mt-auto max-w-2xl p-10 pb-16 xl:p-16 xl:pb-20"
+                        >
+                            <motion.p
+                                variants={itemVariants}
+                                className="text-xs font-medium uppercase tracking-[0.3em] text-white/40"
+                            >
+                                New Employee Orientation
+                            </motion.p>
+
+                            <motion.h1
+                                variants={itemVariants}
+                                className="mt-6 max-w-xl text-5xl font-medium leading-[1.15] tracking-tight xl:text-6xl"
+                            >
+                                Everything you need to get started.
+                            </motion.h1>
+
+                            <motion.p
+                                variants={itemVariants}
+                                className="mt-6 max-w-lg text-base leading-relaxed text-white/60"
+                            >
+                                Access onboarding materials, orientation
+                                modules, and company resources — all in one
+                                place.
+                            </motion.p>
+                        </motion.div>
+                    </div>
+                </motion.div>
+
+                {/* RIGHT SIDE */}
             </div>
         </motion.div>
     );
