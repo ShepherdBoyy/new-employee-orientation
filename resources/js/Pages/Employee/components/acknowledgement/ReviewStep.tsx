@@ -21,12 +21,9 @@ export default function ReviewStep({ progress }: Props) {
     return (
         <div className="animate-in fade-in slide-in-from-right-2 space-y-4 duration-300">
             <div>
-                <h2 className="text-sm font-semibold">
-                    Modules Completed
-                </h2>
+                <h2 className="text-sm font-semibold">Modules Completed</h2>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                    Here's a summary of everything you've
-                    gone through.
+                    Here's a summary of everything you've gone through.
                 </p>
             </div>
             <div className="space-y-2">
@@ -50,10 +47,8 @@ export default function ReviewStep({ progress }: Props) {
                                     </p>
 
                                     <p className="mt-0.5 text-xs text-muted-foreground">
-                                        {item.slide_count}{" "}
-                                        slides ·{" "}
-                                        {item.topics.length}{" "}
-                                        topics
+                                        {item.topics.length} topics ·{" "}
+                                        {item.slide_count} slides
                                     </p>
                                 </div>
                                 <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
@@ -63,20 +58,16 @@ export default function ReviewStep({ progress }: Props) {
                         <CollapsibleContent>
                             <div className="border-t bg-muted/10 px-4 py-3">
                                 <div className="space-y-2">
-                                    {item.topics.map(
-                                        (topic, index) => (
-                                            <div
-                                                key={`${item.folder_id}-${index}`}
-                                                className="flex items-start gap-2.5 text-sm text-muted-foreground"
-                                            >
-                                                <span className="mt-2 size-1.5 shrink-0 rounded-full bg-muted-foreground/40" />
+                                    {item.topics.map((topic, index) => (
+                                        <div
+                                            key={`${item.folder_id}-${index}`}
+                                            className="flex items-start gap-2.5 text-sm text-muted-foreground"
+                                        >
+                                            <span className="mt-2 size-1.5 shrink-0 rounded-full bg-muted-foreground/40" />
 
-                                                <span>
-                                                    {topic}
-                                                </span>
-                                            </div>
-                                        ),
-                                    )}
+                                            <span>{topic}</span>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </CollapsibleContent>

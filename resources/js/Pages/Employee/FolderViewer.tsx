@@ -99,24 +99,32 @@ export default function FolderViewer({ folder, slides, isCompleted }: Props) {
     return (
         <div className="flex h-screen w-full flex-col overflow-hidden">
             {/* Top bar */}
-            <div className="grid shrink-0 grid-cols-3 items-center gap-4 border-b px-4 py-3 lg:px-6">
+            <div className="flex shrink-0 items-center justify-between border-b px-4 py-3 lg:px-6">
                 <Link
                     href="/orientation/folders"
                     className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
                 >
                     <ChevronLeft className="h-4 w-4" />
-                    Modules
+                    <span>Modules</span>
                 </Link>
+            </div>
 
-                <div className="flex justify-center">
-                    <Badge variant="secondary" className="font-normal">
-                        {currentSlide.topic_name}
-                    </Badge>
+            <div className="shrink-0 border-b bg-background px-4 py-3">
+                <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            Topic
+                        </p>
+
+                        <h1 className="text-sm lg:text-lg font-semibold">
+                            {currentSlide.topic_name}
+                        </h1>
+                    </div>
+
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                        {currentIndex + 1}/{slides.length}
+                    </span>
                 </div>
-
-                <p className="line-clamp-1 text-right text-sm font-medium text-muted-foreground">
-                    {folder.name}
-                </p>
             </div>
 
             {/* Progress bar */}
@@ -151,6 +159,7 @@ export default function FolderViewer({ folder, slides, isCompleted }: Props) {
                                         </p>
                                     )}
                                     <button
+                                
                                         onClick={() => goToIndex(index)}
                                         disabled={locked}
                                         className={cn(
