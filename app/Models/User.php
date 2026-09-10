@@ -125,8 +125,12 @@ class User extends Authenticatable
         $parts = preg_split("/\s+/", trim($fullName));
         $lastName = end($parts);
         $lastName = Str::lower(Str::slug($lastName, ""));
+        $randomDigits = random_int(1000, 9999);
 
-        return "{$lastName}-neo@" . now()->year;
+        return "{$lastName}-neo@" . now()->year . "-{$randomDigits}";
+
+        // uncomment if you want to test without random digits
+        // return "{$lastName}-neo@" . now()->year;
     }
 
     public function company(): BelongsTo
