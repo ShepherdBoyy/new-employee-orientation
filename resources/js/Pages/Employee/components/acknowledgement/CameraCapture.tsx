@@ -31,11 +31,12 @@ export default function CameraCapture({ open, onCapture, onClose }: Props) {
     async function startCamera() {
         setError(null);
         try {
-            // Ask for a natural, widescreen feed rather than forcing a square
-            // crop — the browser will letterbox it as needed, so nothing
-            // ends up over-zoomed regardless of window shape.
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "user", width: { ideal: 1920 }, height: { ideal: 1080 } },
+                video: {
+                    facingMode: "user",
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                },
                 audio: false,
             });
             streamRef.current = stream;
@@ -43,7 +44,9 @@ export default function CameraCapture({ open, onCapture, onClose }: Props) {
                 videoRef.current.srcObject = stream;
             }
         } catch {
-            setError("Could not access your camera. Please allow camera permission and try again.");
+            setError(
+                "Could not access your camera. Please allow camera permission and try again.",
+            );
         }
     }
 
@@ -57,9 +60,6 @@ export default function CameraCapture({ open, onCapture, onClose }: Props) {
         const canvas = canvasRef.current;
         if (!video || !canvas) return;
 
-        // Crop to a centered square so the captured photo matches the
-        // guide the employee saw on screen, regardless of the feed's
-        // native (usually widescreen) aspect ratio.
         const size = Math.min(video.videoWidth, video.videoHeight);
         const offsetX = (video.videoWidth - size) / 2;
         const offsetY = (video.videoHeight - size) / 2;
@@ -70,7 +70,6 @@ export default function CameraCapture({ open, onCapture, onClose }: Props) {
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
-        // Mirror horizontally to match the mirrored preview the user saw
         ctx.translate(size, 0);
         ctx.scale(-1, 1);
         ctx.drawImage(video, offsetX, offsetY, size, size, 0, 0, size, size);
@@ -103,7 +102,9 @@ export default function CameraCapture({ open, onCapture, onClose }: Props) {
             {/* Top bar */}
             <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between bg-linear-to-b from-black/60 to-transparent px-4 py-3.5 sm:px-6">
                 <p className="text-sm font-medium tracking-tight text-white">
-                    {captured ? "Review your photo" : "Position your face in the guide"}
+                    {captured
+                        ? "Review your photo"
+                        : "Position your face in the guide"}
                 </p>
                 <button
                     onClick={handleClose}
@@ -114,13 +115,15 @@ export default function CameraCapture({ open, onCapture, onClose }: Props) {
                 </button>
             </div>
 
-            <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-black">
+            <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-black p-4 pt-16 pb-4">
                 {error ? (
                     <div className="flex flex-col items-center gap-3 px-6 text-center">
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5">
                             <VideoOff className="h-5 w-5 text-white/40" />
                         </div>
-                        <p className="max-w-xs text-sm leading-relaxed text-white/60">{error}</p>
+                        <p className="max-w-xs text-sm leading-relaxed text-white/60">
+                            {error}
+                        </p>
                         <Button
                             variant="secondary"
                             size="sm"
@@ -130,22 +133,79 @@ export default function CameraCapture({ open, onCapture, onClose }: Props) {
                             Try again
                         </Button>
                     </div>
-                ) : captured ? (
-                    <img
-                        src={captured}
-                        alt="Captured photo"
-                        className="max-h-full max-w-full object-contain"
-                    />
                 ) : (
-                    <>
-                        <video
-                            ref={videoRef}
-                            autoPlay
-                            playsInline
-                            muted
-                            className="max-h-full max-w-full scale-x-[-1] object-contain"
-                        />
-                    </>
+                    <div className="relative aspect-square w-full max-w-[min(88vw,62vh,480px)] overflow-hidden rounded-[2rem] bg-zinc-900 shadow-2xl">
+                        {captured ? (
+                            <img
+                                src={captured}
+                                alt="Captured photo"
+                                className="h-full w-full object-cover"
+                            />
+                        ) : (
+                            <>
+                                <video
+                                    ref={videoRef}
+                                    autoPlay
+                                    playsInline
+                                    muted
+                                    className="h-full w-full scale-x-[-1] object-cover"
+                                />
+
+                                {/* Face guide overlay — aligned to the exact same square box */}
+                                <div className="pointer-events-none absolute inset-0">
+                                    <svg
+                                        viewBox="0 0 300 300"
+                                        className="h-full w-full"
+                                        style={{ overflow: "visible" }}
+                                    >
+                                        <defs>
+                                            <mask id="face-mask">
+                                                <rect
+                                                    x="0"
+                                                    y="0"
+                                                    width="300"
+                                                    height="300"
+                                                    fill="white"
+                                                />
+                                                <ellipse
+                                                    cx="150"
+                                                    cy="145"
+                                                    rx="100"
+                                                    ry="128"
+                                                    fill="black"
+                                                />
+                                            </mask>
+                                        </defs>
+                                        <rect
+                                            x="0"
+                                            y="0"
+                                            width="300"
+                                            height="300"
+                                            fill="rgba(0,0,0,0.55)"
+                                            mask="url(#face-mask)"
+                                        />
+                                        <ellipse
+                                            cx="150"
+                                            cy="145"
+                                            rx="100"
+                                            ry="128"
+                                            fill="none"
+                                            stroke="white"
+                                            strokeWidth="3"
+                                            strokeDasharray="10 8"
+                                            opacity="0.9"
+                                        />
+                                    </svg>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
+
+                {!captured && !error && (
+                    <p className="pointer-events-none absolute bottom-2 left-0 right-0 text-center text-xs text-white/70">
+                        Align your face within the outline, then tap capture
+                    </p>
                 )}
             </div>
 
@@ -186,6 +246,6 @@ export default function CameraCapture({ open, onCapture, onClose }: Props) {
 
             <canvas ref={canvasRef} className="hidden" />
         </div>,
-        document.body
+        document.body,
     );
 }
