@@ -31,8 +31,6 @@ export default function JobCard({
     selected,
     onToggle,
 }: Props) {
-
-    console.log(job);
     return (
         <>
             <TableRow

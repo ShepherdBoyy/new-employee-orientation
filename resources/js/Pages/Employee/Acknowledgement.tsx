@@ -9,8 +9,9 @@ import StepIndicator, {
 import ReviewStep from "./components/acknowledgement/ReviewStep";
 import NameSignatureStep from "./components/acknowledgement/NameSignatureStep";
 import PhotoConsentStep from "./components/acknowledgement/PhotoConsentStep";
-import CameraPermission from "./components/acknowledgement/CameraPersmission";
+import CameraPermission from "./components/acknowledgement/CameraPermission";
 import CameraCapture from "./components/acknowledgement/CameraCapture";
+import EmployeeLayout from "@/Layout/EmployeeLayout";
 
 interface ProgressItem {
     folder_id: number;
@@ -72,10 +73,8 @@ export default function Acknowledgement({ user, progress }: Props) {
     const canSubmit = data.photo.length > 0 && data.consented;
 
     return (
-        <>
-            <Head title="Final Acknowledgement" />
-
-            <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-6 py-10">
+        <EmployeeLayout>
+            <div className="mx-auto flex w-full max-w-2xl flex-col px-6 py-10">
                 {/* Header */}
                 <div className="mb-6 space-y-1 text-center">
                     <div className="mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -174,6 +173,6 @@ export default function Acknowledgement({ user, progress }: Props) {
                 onCapture={handlePhotoCaptured}
                 onClose={() => setCameraOpen(false)}
             />
-        </>
+        </EmployeeLayout>
     );
 }
