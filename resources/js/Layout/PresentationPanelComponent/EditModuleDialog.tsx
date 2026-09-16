@@ -45,11 +45,6 @@ export default function EditModuleDialog({
             ...data,
             isLinkActive: isCurrentlyViewing,
         }));
-        console.log({
-            currentPath: window.location.pathname,
-            itemPath,
-            module,
-        });
         // 2. Then execute the put request normally
         form.put(`/admin/folders/${module.id}`, {
             preserveScroll: true,
