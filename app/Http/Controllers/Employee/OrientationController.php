@@ -56,7 +56,10 @@ class OrientationController extends Controller
     {
         $user = Auth::user()->load(["company", "jobPosition"]);
 
-        $document = Document::select('file_path')->where('company_id', $user->company->id)->first();
+        $document = Document::select('file_path')
+        ->where('company_id', $user->company->id)
+        ->where('job_position_id', $user->jobPosition->id)
+        ->first();
 
         if ($user->hasAcknowledgedOrientation()) {
             return redirect()->route("employee.completed");
@@ -96,7 +99,7 @@ class OrientationController extends Controller
                 "name" => $user->name,
                 "companyName" => $user->company?->name,
                 "jobPosition" => $user->jobPosition?->name,
-                "jd_path" => $document->file_path
+                "jd_path" => $document?->file_path
             ],
         ]);
     }
