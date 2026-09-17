@@ -54,12 +54,7 @@ class OrientationController extends Controller
 
     public function index(): Response|RedirectResponse
     {
-        $user = Auth::user()->load(["company", "jobPosition"]);
-
-        $document = Document::select('file_path')
-        ->where('company_id', $user->company->id)
-        ->where('job_position_id', $user->jobPosition->id)
-        ->first();
+        $user = Auth::user()->load(["company.document", "jobPosition"]);
 
         if ($user->hasAcknowledgedOrientation()) {
             return redirect()->route("employee.completed");
@@ -92,6 +87,8 @@ class OrientationController extends Controller
             ];
         });
 
+        $document = $user->company->document->where('job_position_id', $user->jobPosition->id)->first()?->file_path;
+
         return Inertia::render("Employee/FolderList", [
             "folders" => $folderList,
             "allCompleted" => $user->hasCompletedAllFolders(),
@@ -99,7 +96,7 @@ class OrientationController extends Controller
                 "name" => $user->name,
                 "companyName" => $user->company?->name,
                 "jobPosition" => $user->jobPosition?->name,
-                "jd_path" => $document?->file_path
+                "jd_path" => $document
             ],
         ]);
     }
