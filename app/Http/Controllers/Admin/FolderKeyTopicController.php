@@ -23,30 +23,6 @@ class FolderKeyTopicController extends Controller
             ->withCount("slides")
             ->ordered()
             ->get();
-        
-        $sibling = null;
-
-        if ($folder->isTypeSpecific()) {
-            $siblingType = $folder->employee_type === "field" ? "non_field" : "field";
-
-            $siblingFolder = Folder::forCompany($company->id)
-                ->forEmployeeType($siblingType)
-                ->first();
-
-            if ($siblingFolder) {
-                $sibling = [
-                    "id" => $siblingFolder->id,
-                    "slug" => $siblingFolder->slug,
-                    "name" => $siblingFolder->name,
-                    "employee_type" => $siblingFolder->employee_type,
-                    "topics" => $siblingFolder->keyTopics()
-                        ->with("folder:id,name,slug") 
-                        ->withCount("slides")
-                        ->ordered()
-                        ->get()
-                ];
-            }
-        }
 
         return Inertia::render("Admin/Topics/Index", [
             "company" => $company,
@@ -54,11 +30,9 @@ class FolderKeyTopicController extends Controller
                 "id" => $folder->id,
                 "slug" => $folder->slug,
                 "name" => $folder->name,
-                "is_type_specific" => $folder->isTypeSpecific(),
                 "employee_type" => $folder->employee_type
             ],
             "topics" => $topics,
-            "sibling" => $sibling,
             ...PresentationPanelData::build($company)
         ]);
     }

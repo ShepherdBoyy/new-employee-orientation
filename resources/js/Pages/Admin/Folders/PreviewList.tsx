@@ -40,8 +40,6 @@ export default function PreviewList({ folders, company, employeeType }: Props) {
         router.visit(`/admin/folders/preview-list?${params.toString()}`);
     }
 
-    const typeLabel = selectedType === "field" ? "Field-Based" : "Non-Field";
-
     return (
         <div className="flex min-h-screen w-full flex-col bg-zinc-950">
             <div className="flex shrink-0 items-center justify-between bg-indigo-600 px-6 py-2.5 text-sm text-white">

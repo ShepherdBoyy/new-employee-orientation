@@ -30,14 +30,14 @@ class FolderController extends Controller
         $validated = $request->validate([
             "name" => ["required", "string", "max:255"],
             "company_id" => ["required", "exists:companies,id"],
+            "employee_type" => ["required", "in:field,non_field,both"]
         ]);
 
-        $lastOrder = Folder::forCompany($validated["company_id"])
-            ->companyWide()
-            ->max("order") ?? 0;
+        $lastOrder = Folder::forCompany($validated["company_id"])->max("order") ?? 0;
 
         Folder::create([
             "company_id" => $validated["company_id"],
+            "employee_type" => $validated["employee_type"],
             "name" => $validated["name"],
             "order" => $lastOrder + 1
         ]);
@@ -49,33 +49,21 @@ class FolderController extends Controller
     {
         $validated = $request->validate([
             'name' => ["required", "string", "max:255"],
+            "employee_type" => ["required", "in:field,non_field,both"]
         ]);
 
-        $folder->update(["name" => $validated["name"]]);
+        $folder->update($validated);
 
         $company = Company::findOrFail($folder->company_id);
 
         if ($request->isLinkActive) {
-            return redirect()->route('admin.folders.topics.index', [
-                'company' => $company->slug,
-                'folder' => $folder->slug,
-            ])->with('success', 'Folder deleted successfully.');
+            return redirect()->route("admin.folders.topics.index", [
+                "company" => $company->slug,
+                "folder" => $folder->slug
+            ])->with("success", "Folder deleted successfully");
         }
 
         return back()->with("success", "Folder updated successfully");
-    }
-
-    public function updateJobSpecific(Request $request, Company $company): RedirectResponse
-    {
-        $validated = $request->validate([
-            "name" => ["required", "string", "max:255"],
-        ]);
-
-        Folder::where("company_id", $company->id)
-            ->whereNotNull("employee_type")
-            ->update(["name" => $validated["name"]]);
-
-        return back()->with("success", "Module updated successfully");
     }
 
     public function reorder(Request $request): RedirectResponse
@@ -83,21 +71,14 @@ class FolderController extends Controller
         $validated = $request->validate([
             "company_id" => ["required", "exists:companies,id"],
             "items" => ["required", "array"],
-            "items.*.type" => ["required", "in:folder,job-specific"],
             "items.*.id" => ["nullable", "integer"],
             "items.*.order" => ["required", "integer", "min:1"]
         ]);
 
         foreach ($validated["items"] as $item) {
-            if ($item["type"] === "job-specific") {
-                Folder::where("company_id", $validated["company_id"])
-                    ->whereNotNull("employee_type")
-                    ->update(["order" => $item["order"]]);
-            } else {
-                Folder::where("id", $item["id"])
-                    ->where("company_id", $validated["company_id"])
-                    ->update(["order" => $item["order"]]);
-            }
+            Folder::where("id", $item["id"])
+                ->where("company_id", $validated["company_id"])
+                ->update(["order" => $item["order"]]);
         }
 
         return back()->with("success", "Folders reordered successfully");

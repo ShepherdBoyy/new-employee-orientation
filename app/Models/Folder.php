@@ -58,52 +58,6 @@ class Folder extends Model
         return $slug;
     }
 
-    public static function defaultCompanyModules(): array
-    {
-        return [
-            'Module 1 — Welcome & Company Overview',
-            'Module 2 — Employment Terms & HR Policies (DOLE-Aligned)',
-            'Module 3 — Workplace Safety & OSH Compliance (RA 11058)',
-            'Module 4 — Data Privacy & Confidentiality (RA 10173)',
-            'Module 6 — Product, Service, and Compliance Training',
-            'Module 7 — Anti-Harassment, Anti-Bullying, and Ethics',
-            'Module 8 — IT, Cybersecurity & Acceptable Use',
-        ];
-    }
-
-    public static function seedDefaultsForCompany(Company $company): void
-    {
-        $order = 0;
-
-        foreach (static::defaultCompanyModules() as $index => $name) {
-            $order++;
-
-            if ($index === 4) {
-                static::create([
-                    "company_id" => $company->id,
-                    "employee_type" => "field",
-                    "name" => "Module 5 - Job-Specific Training",
-                    "order" => $order
-                ]);
-
-                static::create([
-                    "company_id" => $company->id,
-                    "employee_type" => "non_field",
-                    "name" => "Module 5 - Job-Specific Training",
-                    "order" => $order
-                ]);
-
-                $order++;
-            }
-
-            static::create([
-                "company_id" => $company->id,
-                "name" => $name,
-                "order" => $order
-            ]);
-        }
-    }
-
     public function scopeOrdered($query): void
     {
         $query->orderBy("order");
@@ -114,27 +68,25 @@ class Folder extends Model
         $query->where("company_id", $companyId);
     }
 
-    public function scopeCompanyWide($query): void
+    public function scopeVisibleTo($query, string $employeeType): void
     {
-        $query->whereNull("employee_type");
+        $query->where(function ($q) use ($employeeType) {
+            $q->where("employee_type", "both")
+                ->orWhere("employee_type", $employeeType);
+        });
     }
 
-    public function scopeForEmployeeType($query, ?string $employeeType): void
+    public function isForBoth(): bool
     {
-        $query->where("employee_type", $employeeType);
+        return $this->employee_type === "both";
     }
 
-    public function isTypeSpecific(): bool
-    {
-        return $this->employee_type !== null;
-    }
-
-    public function isFieldTraining(): bool
+    public function isFieldOnly(): bool
     {
         return $this->employee_type === "field";
     }
 
-    public function isNonFieldTraining(): bool
+    public function isNonFieldOnly(): bool
     {
         return $this->employee_type === "non_field";
     }
