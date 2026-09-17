@@ -33,7 +33,6 @@ class SlideController extends Controller
                 'slug' => $folder->slug,
                 'company' => $folder->company,
                 'employee_type' => $folder->employee_type,
-                'is_type_specific'  => $folder->isTypeSpecific(),
             ],
             'topic' => $keyTopic,
             'slides' => $slides->map(fn($slide) => [
@@ -148,10 +147,6 @@ class SlideController extends Controller
 
     private function storagePath(Folder $folder, FolderKeyTopic $topic): string
     {
-        $base = $folder->isTypeSpecific()
-            ? "folders/" . $folder->company->slug . "/job-type/" . $folder->employee_type . "/" . $folder->slug
-            : "folders/" . $folder->company->slug . "/" . $folder->slug;
-
-        return $base . "/" . str($topic->label)->slug();
+        return "folders/" . $folder->company->slug . "/" . $folder->slug . "/" . str($topic->label)->slug();
     }
 }

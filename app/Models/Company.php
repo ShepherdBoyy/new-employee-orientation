@@ -51,22 +51,15 @@ class Company extends Model
 
     public function foldersForEmployee(User $user): Collection
     {
-        $companyWide = Folder::forCompany($user->company_id)
-            ->companyWide()
-            ->get();
-
-        $typeSpecific = collect();
+        $query = Folder::forCompany($user->company_id)->ordered();
 
         if ($user->jobPosition) {
-            $typeSpecific = Folder::forCompany($user->company_id)
-                ->forEmployeeType($user->jobPosition->employee_type)
-                ->get();
+            $query->visibleTo($user->jobPosition->employee_type);
+        } else {
+            $query->where("employee_type", "both");
         }
 
-        return $companyWide
-            ->concat($typeSpecific)
-            ->sortBy("order")
-            ->values();
+        return $query->get()->values();
     }
 
     public function users(): HasMany

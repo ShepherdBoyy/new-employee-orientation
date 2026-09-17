@@ -54,7 +54,6 @@ Route::middleware("test")->group(function () {
         Route::put("/folders/{folder}", [FolderController::class, "update"])->name("folders.update");
         Route::patch("/folders/reorder", [FolderController::class, "reorder"])->name("folders.reorder");
         Route::delete("/folders/{folder}", [FolderController::class, "destroy"])->name("folders.destroy");
-        Route::put("/folders/{company}/job-specific", [FolderController::class, "updateJobSpecific"])->name("folders.job-specific.update");
         Route::get("/folders/{company:slug}", [FolderController::class, "companyIndex"])->name("folders.company");
 
         // Preview
