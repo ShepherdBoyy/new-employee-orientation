@@ -24,6 +24,7 @@ export interface ModuleNav {
     slug: string;
     order: number;
     key_topics_count: number;
+    employee_type: "field" | "non_field" | "both";
 }
 
 export interface JobSpecificSummary {

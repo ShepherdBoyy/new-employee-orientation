@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { Link } from "@inertiajs/react";
 import {
     EllipsisVertical,
-    Folder,
     GripVertical,
     Pencil,
     Trash2,
@@ -32,6 +31,7 @@ export interface SelectedModule {
     name: string;
     slug: string;
     companySlug: string;
+    employeeType: "field" | "non_field" | "both";
 }
 
 interface Props {
@@ -65,10 +65,9 @@ export default function ModuleItem({
         name: module.name,
         slug: module.slug,
         companySlug: company.slug,
+        employeeType: module.employee_type,
     };
 
-    // While actively dragging, this becomes an invisible placeholder —
-    // the DragOverlay clone is what visually follows the pointer instead.
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
@@ -120,7 +119,7 @@ export default function ModuleItem({
 
                         <ItemDescription
                             className={cn(
-                                "mt-0.5 truncate text-[12px]",
+                                "mt-0.5 flex items-center gap-1.5 truncate text-[12px]",
                                 active ? "text-slate-500" : "text-white/50",
                             )}
                         >

@@ -1,9 +1,5 @@
 import { router, usePage } from "@inertiajs/react";
-import type {
-    CompanyNav,
-    JobSpecificSummary,
-    ModuleNav,
-} from "./SideBarNav/navTypes";
+import type { CompanyNav, ModuleNav } from "./SideBarNav/navTypes";
 import { SelectedModule } from "./PresentationPanelComponent/ModuleItem";
 import { CirclePlus } from "lucide-react";
 import CreateFolderDialog from "@/Layout/PresentationPanelComponent/CreateModuleDialog";
@@ -12,8 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import DeleteModuleDialog from "./PresentationPanelComponent/DeleteModuleDialog";
 import EditModuleDialog from "./PresentationPanelComponent/EditModuleDialog";
 import ModuleItem from "./PresentationPanelComponent/ModuleItem";
-import ModuleJobItem from "./PresentationPanelComponent/ModuleJobItem";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     DndContext,
     DragOverlay,
@@ -30,15 +25,10 @@ import {
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-type GridItem =
-    | { type: "folder"; id: number; folder: ModuleNav }
-    | { type: "job-specific"; id: "job-specific" };
-
 export interface PageProps {
     company: CompanyNav;
-    companyWideFolders?: ModuleNav[];
-    jobSpecificSummary: JobSpecificSummary | null;
-    activeFolder?: { slug: string; is_type_specific ?: boolean };
+    folders?: ModuleNav[];
+    activeFolder?: { slug: string };
     [key: string]: unknown;
 }
 
@@ -48,46 +38,19 @@ export default function PresentationPanel() {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-    const [activeItem, setActiveItem] = useState<GridItem | null>(null);
+    const [activeItem, setActiveItem] = useState<ModuleNav | null>(null);
     const [module, setModule] = useState<SelectedModule | null>(null);
 
-    const companyWideFolders = props.companyWideFolders;
-    const jobSpecificSummary = props.jobSpecificSummary;
+    const folders = props.folders;
     const company = props.company;
-
-    const buildItems = useCallback(
-        (folders: ModuleNav[]): GridItem[] => {
-            const items: GridItem[] = folders.map((folder) => ({
-                type: "folder",
-                id: folder.id,
-                folder,
-            }));
-
-            if (jobSpecificSummary) {
-                const insertAt = folders.filter(
-                    (f) => f.order < jobSpecificSummary.order,
-                ).length;
-
-                items.splice(insertAt, 0, {
-                    type: "job-specific",
-                    id: "job-specific",
-                });
-            }
-
-            return items;
-        },
-        [jobSpecificSummary],
-    );
 
     const segments = url.split("/");
     const activeModuleSlug = segments[4];
-    const [items, setItems] = useState<GridItem[]>(() =>
-        buildItems(companyWideFolders ?? []),
-    );
+    const [items, setItems] = useState<ModuleNav[]>(() => folders ?? []);
 
     useEffect(() => {
-        setItems(buildItems(companyWideFolders ?? []));
-    }, [companyWideFolders, buildItems]);
+        setItems(folders ?? []);
+    }, [folders]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -121,8 +84,7 @@ export default function PresentationPanel() {
             {
                 company_id: company.id,
                 items: reordered.map((item, index) => ({
-                    type: item.type,
-                    id: item.type === "folder" ? item.id : null,
+                    id: item.id,
                     order: index + 1,
                 })),
             },
@@ -139,11 +101,6 @@ export default function PresentationPanel() {
     }
 
     if (!company) return null;
-
-    const jobPositionsPath = `/admin/folders/${company.slug}/job-positions`;
-    const isJobSpecificActive =
-        url === jobPositionsPath ||
-        props.activeFolder?.is_type_specific === true;
 
     return (
         <>
@@ -242,30 +199,15 @@ export default function PresentationPanel() {
                             strategy={verticalListSortingStrategy}
                         >
                             <div className="space-y-1 pb-4 pr-2">
-                                {items.map((item) => {
-                                    if (item.type === "job-specific") {
-                                        if (!jobSpecificSummary) {
-                                            return null;
-                                        }
-
-                                        return (
-                                            <ModuleJobItem
-                                                key={item.id}
-                                                company={company}
-                                                summary={jobSpecificSummary}
-                                                active={isJobSpecificActive}
-                                            />
-                                        );
-                                    }
-
+                                {items.map((folder) => {
                                     const active =
-                                        item.folder.slug === activeModuleSlug;
+                                        folder.slug === activeModuleSlug;
 
                                     return (
                                         <ModuleItem
-                                            key={item.id}
+                                            key={folder.id}
                                             company={company}
-                                            module={item.folder}
+                                            module={folder}
                                             active={active}
                                             onEdit={(module) => {
                                                 setModule(module);
@@ -285,27 +227,15 @@ export default function PresentationPanel() {
                             dropAnimation={{ duration: 180, easing: "ease" }}
                         >
                             {activeItem ? (
-                                activeItem.type === "job-specific" ? (
-                                    jobSpecificSummary && (
-                                        <div className="shadow-2xl rounded-lg">
-                                            <ModuleJobItem
-                                                company={company}
-                                                summary={jobSpecificSummary}
-                                                active={false}
-                                            />
-                                        </div>
-                                    )
-                                ) : (
-                                    <div className="shadow-2xl rounded-lg">
-                                        <ModuleItem
-                                            company={company}
-                                            module={activeItem.folder}
-                                            active={false}
-                                            onEdit={() => {}}
-                                            onDelete={() => {}}
-                                        />
-                                    </div>
-                                )
+                                <div className="shadow-2xl rounded-lg">
+                                    <ModuleItem
+                                        company={company}
+                                        module={activeItem}
+                                        active={false}
+                                        onEdit={() => {}}
+                                        onDelete={() => {}}
+                                    />
+                                </div>
                             ) : null}
                         </DragOverlay>
                     </DndContext>
