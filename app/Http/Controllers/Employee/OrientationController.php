@@ -8,6 +8,7 @@ use App\Models\Folder;
 use App\Models\FolderCompletion;
 use App\Models\OrientationAcknowledgement;
 use App\Models\User;
+use App\Models\Document;
 use App\Notifications\OrientationCompleted;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -55,6 +56,8 @@ class OrientationController extends Controller
     {
         $user = Auth::user()->load(["company", "jobPosition"]);
 
+        $document = Document::select('file_path')->where('company_id', $user->company->id)->first();
+
         if ($user->hasAcknowledgedOrientation()) {
             return redirect()->route("employee.completed");
         }
@@ -92,7 +95,8 @@ class OrientationController extends Controller
             "user" => [
                 "name" => $user->name,
                 "companyName" => $user->company?->name,
-                "jobPosition" => $user->jobPosition?->name
+                "jobPosition" => $user->jobPosition?->name,
+                "jd_path" => $document->file_path
             ],
         ]);
     }
