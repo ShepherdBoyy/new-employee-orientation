@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Head, useForm } from "@inertiajs/react";
+import { Head, router, useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 
@@ -24,12 +24,20 @@ interface ProgressItem {
 interface Props {
     user: { name: string };
     progress: ProgressItem[];
+    jdPath: string | null;
+    jdViewed: boolean;
 }
 
-export default function Acknowledgement({ user, progress }: Props) {
+export default function Acknowledgement({
+    user,
+    progress,
+    jdPath,
+    jdViewed,
+}: Props) {
     const [step, setStep] = useState(0);
     const [permissionPromptOpen, setPermissionPromptOpen] = useState(false);
     const [cameraOpen, setCameraOpen] = useState(false);
+    const [hasViewedJd, setHasViewedJd] = useState(jdViewed);
 
     const { data, setData, post, processing, errors } = useForm({
         full_name: "",
@@ -50,6 +58,16 @@ export default function Acknowledgement({ user, progress }: Props) {
         post("/orientation/acknowledgement");
     }
 
+    function handleViewJd() {
+        if (hasViewedJd) return;
+        setHasViewedJd(true);
+        router.post(
+            "/orientation/jd/viewed",
+            {},
+            { preserveScroll: true, preserveState: true },
+        );
+    }
+
     function handleRequestCamera() {
         setPermissionPromptOpen(true);
     }
@@ -68,6 +86,7 @@ export default function Acknowledgement({ user, progress }: Props) {
         handleRequestCamera();
     }
 
+    const canProceedFromReview = !jdPath || hasViewedJd;
     const canProceedFromNameSignature =
         data.full_name.trim().length > 0 && data.signature.length > 0;
     const canSubmit = data.photo.length > 0 && data.consented;
@@ -93,7 +112,14 @@ export default function Acknowledgement({ user, progress }: Props) {
 
                 {/* Card */}
                 <div className="rounded-2xl border bg-card p-6 shadow-sm">
-                    {step === 0 && <ReviewStep progress={progress} />}
+                    {step === 0 && (
+                        <ReviewStep
+                            progress={progress}
+                            jdPath={jdPath}
+                            jdViewed={hasViewedJd}
+                            onViewJd={handleViewJd}
+                        />
+                    )}
 
                     {step === 1 && (
                         <NameSignatureStep
@@ -140,7 +166,8 @@ export default function Acknowledgement({ user, progress }: Props) {
                         <Button
                             onClick={next}
                             disabled={
-                                step === 1 && !canProceedFromNameSignature
+                                (step === 0 && !canProceedFromReview) ||
+                                (step === 1 && !canProceedFromNameSignature)
                             }
                             className="w-full sm:w-auto"
                         >

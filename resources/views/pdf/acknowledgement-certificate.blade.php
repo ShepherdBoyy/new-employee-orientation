@@ -330,6 +330,26 @@
                 @endforeach
             </div>
 
+            @if ($hasJobDescription)
+                <div class="modules-wrap">
+                    <div class="module-card">
+                        <div class="module-header">Job Description / KPI</div>
+                        <table class="topics-table">
+                            <tr>
+                                <td class="topic-text-cell">
+                                    Reviewed on {{ $jdViewedAt ?? '—' }}
+                                </td>
+                                <td class="topic-check-cell">
+                                    <div class="checkmark-wrap">
+                                        <span class="checkmark">&#10003;</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            @endif
+
             <div class="statement">
                 This certifies that the employee has completed the orientation program, including all modules listed
                 above. The employee hereby acknowledges receipt and understanding of the information presented during

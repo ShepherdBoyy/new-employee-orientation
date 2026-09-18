@@ -8,7 +8,6 @@ use App\Models\Folder;
 use App\Models\FolderCompletion;
 use App\Models\OrientationAcknowledgement;
 use App\Models\User;
-use App\Models\Document;
 use App\Notifications\OrientationCompleted;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -50,6 +49,17 @@ class OrientationController extends Controller
         }
 
         return redirect()->route("employee.folders.index");
+    }
+
+    public function markJdViewed(): RedirectResponse
+    {
+        $user = Auth::user();
+
+        if ($user->jd_viewed_at === null) {
+            $user->update(["jd_viewed_at" => now()]);
+        }
+
+        return back();
     }
 
     public function index(): Response|RedirectResponse
@@ -96,7 +106,8 @@ class OrientationController extends Controller
                 "name" => $user->name,
                 "companyName" => $user->company?->name,
                 "jobPosition" => $user->jobPosition?->name,
-                "jd_path" => $document
+                "jd_path" => $document,
+                "jd_viewed" => $user->hasViewedJobDescription()
             ],
         ]);
     }
@@ -168,7 +179,7 @@ class OrientationController extends Controller
 
     public function acknowledgement(): Response|RedirectResponse
     {
-        $user = Auth::user();
+        $user = Auth::user()->load("company.document", "jobPosition");
 
         if (!$user->hasCompletedAllFolders()) {
             return redirect()->route("employee.folders.index");
@@ -180,7 +191,9 @@ class OrientationController extends Controller
 
         return Inertia::render("Employee/Acknowledgement", [
             "user" => $user->only("name"),
-            "progress" => $user->orientationProgress()
+            "progress" => $user->orientationProgress(),
+            "jdPath" => $user->jobDescriptionPath(),
+            "jdViewed" => $user->hasViewedJobDescription()
         ]);
     }
 
@@ -190,6 +203,10 @@ class OrientationController extends Controller
 
         if (!$user->hasCompletedAllFolders()) {
             return back()->withErrors(["error" => "You must complete all modules first"]);
+        }
+
+        if ($user->jobDescriptionPath() !== null && !$user->hasViewedJobDescription()) {
+            return back()->withErrors(["error" => "You must view your Job Description/KPI first"]);
         }
 
         if ($user->hasAcknowledgedOrientation()) {
