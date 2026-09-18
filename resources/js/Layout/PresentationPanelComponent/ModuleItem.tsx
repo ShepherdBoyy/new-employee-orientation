@@ -8,12 +8,7 @@ import {
 } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
 import { Link } from "@inertiajs/react";
-import {
-    EllipsisVertical,
-    GripVertical,
-    Pencil,
-    Trash2,
-} from "lucide-react";
+import { EllipsisVertical, GripVertical, Pencil, Trash2 } from "lucide-react";
 import type { CompanyNav, ModuleNav } from "../SideBarNav/navTypes";
 import { Button } from "@/components/ui/button";
 import { useSortable } from "@dnd-kit/sortable";
@@ -31,7 +26,7 @@ export interface SelectedModule {
     name: string;
     slug: string;
     companySlug: string;
-    employeeType: "field" | "non_field" | "both";
+    employee_type: "field" | "non_field" | "both";
 }
 
 interface Props {
@@ -65,7 +60,7 @@ export default function ModuleItem({
         name: module.name,
         slug: module.slug,
         companySlug: company.slug,
-        employeeType: module.employee_type,
+        employee_type: module.employee_type,
     };
 
     const style = {
