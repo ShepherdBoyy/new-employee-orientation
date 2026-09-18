@@ -37,12 +37,12 @@ function CompaniesIndex({ companies }: Props) {
     const createForm = useForm({
         name: "",
         logo_path: null as File | null,
-        header_theme: null,
+        header_theme: "",
     });
     const editForm = useForm({
         name: "",
         logo_path: null as File | null,
-        header_theme: null,
+        header_theme: "",
     });
 
     function handleCreate(e: React.FormEvent) {
@@ -64,7 +64,14 @@ function CompaniesIndex({ companies }: Props) {
 
     function handleUpdate(e: React.FormEvent) {
         e.preventDefault();
-        editForm.put(`/admin/companies/${editingCompany?.id}`, {
+
+        editForm.transform((data) => ({
+            ...data,
+            _method: "put",
+        }));
+
+        editForm.post(`/admin/companies/${editingCompany?.id}`, {
+            forceFormData: true,
             onSuccess: (message) => {
                 setEditingCompany(null);
                 toast.success(message.props.success, {
@@ -73,7 +80,7 @@ function CompaniesIndex({ companies }: Props) {
             },
         });
     }
-
+    
     function confirmDelete() {
         if (!companyToDelete) return;
         router.delete(`/admin/companies/${companyToDelete.id}`, {
