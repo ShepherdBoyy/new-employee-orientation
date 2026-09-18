@@ -20,7 +20,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { Badge } from "@/components/ui/badge";
 export interface SelectedModule {
     id: number;
     name: string;
@@ -36,7 +36,6 @@ interface Props {
     onDelete: (module: SelectedModule) => void;
     active: boolean;
 }
-
 export default function ModuleItem({
     company,
     module,
@@ -70,6 +69,12 @@ export default function ModuleItem({
         visibility: isDragging ? ("hidden" as const) : ("visible" as const),
     };
 
+    const module_type =
+        module.employee_type === "field"
+            ? "Field Based"
+            : module.employee_type === "non_field"
+              ? "Non-Field"
+              : "All Employees";
     return (
         <div ref={setNodeRef} style={style}>
             <Item
@@ -114,13 +119,28 @@ export default function ModuleItem({
 
                         <ItemDescription
                             className={cn(
-                                "mt-0.5 flex items-center gap-1.5 truncate text-[12px]",
+                                "mt-1 flex items-center gap-2 text-[12px]",
                                 active ? "text-slate-500" : "text-white/50",
                             )}
                         >
-                            {module.key_topics_count} topics
+                            <Badge
+                                variant="secondary"
+                                className={cn(
+                                    "h-5 rounded-md px-1.5 text-[10px] font-medium",
+                                    active
+                                        ? "bg-slate-100 text-slate-600"
+                                        : "bg-white/10 text-white/70",
+                                )}
+                            >
+                                {module_type}
+                            </Badge>
+
+                            <span className="text-slate-300/60">•</span>
+
+                            <span>{module.key_topics_count} topics</span>
                         </ItemDescription>
                     </ItemContent>
+                    {/*  */}
                 </Link>
 
                 <ItemActions>
