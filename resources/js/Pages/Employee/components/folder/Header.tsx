@@ -1,5 +1,6 @@
 import { Building2, BriefcaseBusiness, FileText, Sparkles } from "lucide-react";
 import type { OnboardingUser } from "../../Types";
+import { router } from "@inertiajs/react";
 import { useState } from "react";
 
 type Props = {
@@ -7,7 +8,19 @@ type Props = {
 };
 
 export default function Header({ user }: Props) {
-    const [hasClicked, setHasClicked] = useState(false);
+    const [hasClicked, setHasClicked] = useState(user.jd_viewed);
+
+    function handleViewJd() {
+        if (hasClicked) return;
+
+        setHasClicked(true);
+
+        router.post(
+            "/orientation/jd/viewed",
+            {},
+            { preserveScroll: true, preserveState: true },
+        );
+    }
 
     return (
         <div className="relative overflow-hidden rounded-2xl border bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 text-white">
@@ -51,18 +64,20 @@ export default function Header({ user }: Props) {
                                 {user.companyName}
                             </span>
                         </div>
-                        {user.jd_path && 
-                            <a href={`/storage/${user?.jd_path}`} target="_blank">
-                                <div 
-                                    onClick={() => setHasClicked(true)}
+                        {user.jd_path && (
+                            <a
+                                href={`/storage/${user?.jd_path}`}
+                                target="_blank"
+                            >
+                                <div
+                                    onClick={handleViewJd}
                                     className="relative flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 backdrop-blur cursor-pointer select-none"
                                 >
                                     <FileText className="h-4 w-4 text-mist-50" />
                                     <span className="text-sm font-light">
                                         Job Description/KPI
                                     </span>
-                                    
-                                    {/* Pinging indicator (only shows if hasClicked is false) */}
+
                                     {!hasClicked && (
                                         <span className="absolute -top-1 -right-1 flex size-3">
                                             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
@@ -71,7 +86,7 @@ export default function Header({ user }: Props) {
                                     )}
                                 </div>
                             </a>
-                        }
+                        )}
                     </div>
                 </div>
             </div>

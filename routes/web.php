@@ -89,6 +89,7 @@ Route::middleware("test")->group(function () {
         Route::get("/", [OrientationController::class, "welcome"])->name("welcome");
         Route::post("/begin", [OrientationController::class, "beginOrientation"])->name("begin");
         Route::get("/folders", [OrientationController::class, "index"])->name("folders.index");
+        Route::post("/jd/viewed", [OrientationController::class, "markJdViewed"])->name("jd.viewed");
         Route::get("/folders/{folder:slug}", [OrientationController::class, "showFolder"])->name("folders.show");
         Route::post("/folders/{folder}/complete", [OrientationController::class, "completeFolder"])->name("folders.complete");
         Route::get("/acknowledgement", [OrientationController::class, "acknowledgement"])->name("acknowledgement");

@@ -3,7 +3,7 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { CheckCircle2, ChevronDown } from "lucide-react";
+import { CheckCircle2, ChevronDown, FileText } from "lucide-react";
 
 interface ProgressItem {
     folder_id: number;
@@ -15,9 +15,17 @@ interface ProgressItem {
 
 interface Props {
     progress: ProgressItem[];
+    jdPath: string | null;
+    jdViewed: boolean;
+    onViewJd: () => void;
 }
 
-export default function ReviewStep({ progress }: Props) {
+export default function ReviewStep({
+    progress,
+    jdPath,
+    jdViewed,
+    onViewJd,
+}: Props) {
     return (
         <div className="animate-in fade-in slide-in-from-right-2 space-y-4 duration-300">
             <div>
@@ -74,6 +82,51 @@ export default function ReviewStep({ progress }: Props) {
                     </Collapsible>
                 ))}
             </div>
+
+            {jdPath && (
+                <>
+                    <div>
+                        <h2 className="text-sm font-semibold">
+                            Job Description / KPI
+                        </h2>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                            Make sure you've reviewed the responsibilities and
+                            expectations for your role.
+                        </p>
+                    </div>
+
+                    <a
+                        href={`/storage/${jdPath}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={onViewJd}
+                        className="flex items-center gap-3 rounded-xl border bg-background px-4 py-3 transition-colors hover:bg-muted/40"
+                    >
+                        <div
+                            className={`flex size-8 shrink-0 items-center justify-center rounded-full ${
+                                jdViewed
+                                    ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400"
+                                    : "bg-muted text-muted-foreground"
+                            }`}
+                        >
+                            {jdViewed ? (
+                                <CheckCircle2 className="size-4" />
+                            ) : (
+                                <FileText className="size-4" />
+                            )}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium">
+                                Job Description / KPI
+                            </p>
+                            <p className="mt-0.5 text-xs text-muted-foreground">
+                                {jdViewed ? "Viewed" : "Tap to open and review"}
+                            </p>
+                        </div>
+                    </a>
+                </>
+            )}
         </div>
     );
 }
