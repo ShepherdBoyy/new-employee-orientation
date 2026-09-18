@@ -46,7 +46,7 @@ class UserController extends Controller
             ->when($request->filled('company_id'), function ($query) use ($request) {
                 $query->where('company_id', $request->input('company_id'));
             });
-        
+
         $stats = [
             "total" => (clone $baseQuery)->count(),
             "acknowledged" => (clone $baseQuery)->whereHas("orientationAcknowledgement")->count(),
@@ -214,16 +214,24 @@ class UserController extends Controller
             "timestamp" => now()->toDateTimeString()
         ]);
 
-        $folders = $user->company->foldersForEmployee($user)->load("keyTopics");
+        $folders = $user->company->foldersForEmployee($user)->load("keyTopics.slides");
 
-        $modules = $folders->map(fn($folder) => [
-            "name" => $folder->name,
-            "key_topics" => $folder->keyTopics
-                ->sortBy("order")
-                ->pluck("label")
-                ->values()
-                ->toArray()
-        ]);
+        $modules = $folders
+            ->map(function ($folder) {
+                $keyTopics = $folder->keyTopics
+                    ->filter(fn($topic) => $topic->slides->isNotEmpty())
+                    ->sortBy("order")
+                    ->pluck("label")
+                    ->values()
+                    ->toArray();
+                
+                return [
+                    "name" => $folder->name,
+                    "key_topics" => $keyTopics
+                ];
+            })
+            ->filter(fn($module) => !empty($module["key_topics"]))
+            ->values();
 
         $signaturePath = Storage::disk("private")->path($acknowledgement->getRawOriginal("signature_path"));
         $photoPath = Storage::disk("private")->path($acknowledgement->getRawOriginal("photo_path"));
