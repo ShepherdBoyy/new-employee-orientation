@@ -64,12 +64,7 @@ function CompaniesIndex({ companies }: Props) {
 
     function handleUpdate(e: React.FormEvent) {
         e.preventDefault();
-        editForm.transform((data) => ({
-            ...data,
-            _method: "put",
-        }));
-        editForm.post(`/admin/companies/${editingCompany?.id}`, {
-            forceFormData: true,
+        editForm.put(`/admin/companies/${editingCompany?.id}`, {
             onSuccess: (message) => {
                 setEditingCompany(null);
                 toast.success(message.props.success, {
