@@ -50,9 +50,9 @@ class CompanyController extends Controller
     public function update(Request $request, Company $company): RedirectResponse
     {
         $validated = $request->validate([
-            "name" => ["sometimes", "string", "max:255"],
+            "name" => ["required", "string", "max:255"],
             "logo_path" => ["nullable", "image", "max:3048"],
-            "header_theme" => ["sometimes", "string"]
+            "header_theme" => ["required", "string"]
         ]);
 
         $logoPath = $company->logo_path;
