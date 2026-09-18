@@ -21,7 +21,8 @@ class User extends Authenticatable
         "role",
         "job_position_id",
         "expires_at",
-        "welcome_viewed_at"
+        "welcome_viewed_at",
+        "jd_viewed_at"
     ];
 
     protected $hidden = [
@@ -35,7 +36,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             "expires_at" => "datetime",
             "role" => "string",
-            "welcome_viewed_at" => "datetime"
+            "welcome_viewed_at" => "datetime",
+            "jd_viewed_at" => "datetime"
         ];
     }
 
@@ -89,6 +91,27 @@ class User extends Authenticatable
                     ->exists();
     }
 
+    public function jobDescriptionPath(): ?string
+    {
+        if (!$this->company || !$this->jobPosition) {
+            return null;
+        }
+
+        if (!$this->relationLoaded("company") || !$this->company->relationLoaded("document")) {
+            $this->load("company.document");
+        }
+
+        return $this->company->document
+            ->where("job_position_id", $this->jobPosition->id)
+            ->first()
+            ?->file_path;
+    }
+
+    public function hasViewedJobDescription(): bool
+    {
+        return $this->jd_viewed_at !== null;
+    }
+
     public function orientationProgress(): array
     {
         if (!$this->isEmployee()) {
@@ -127,10 +150,10 @@ class User extends Authenticatable
         $lastName = Str::lower(Str::slug($lastName, ""));
         $randomDigits = random_int(1000, 9999);
 
-        return "{$lastName}-neo@" . now()->year . "-{$randomDigits}";
+        // return "{$lastName}-neo@" . now()->year . "-{$randomDigits}";
 
         // uncomment if you want to test without random digits <lastname>-neo@<currentYear>
-        // return "{$lastName}-neo@" . now()->year;
+        return "{$lastName}-neo@" . now()->year;
     }
 
     public function company(): BelongsTo

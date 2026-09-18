@@ -238,7 +238,9 @@ class UserController extends Controller
             "signaturePath" => $signaturePath,
             "photoPath" => $photoPath,
             "hrAdminName" => Auth::user()->name,
-            "generatedAt" => now()->format("F j, Y \\a\\t g:i A")
+            "generatedAt" => now()->format("F j, Y \\a\\t g:i A"),
+            "hasJobDescription" => $user->jobDescriptionPath() !== null,
+            "jdViewedAt" => $user->jd_viewed_at?->format("F j, Y g:i A"),
         ]);
 
         $filename = Str::slug($user->name) . "-orientation-acknowledgement.pdf";
