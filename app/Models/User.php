@@ -150,7 +150,7 @@ class User extends Authenticatable
         $lastName = Str::lower(Str::slug($lastName, ""));
         $randomDigits = random_int(1000, 9999);
 
-        return "{$lastName}-neo@" . now()->year . "-{$randomDigits}";
+        return "{$lastName}-neo@" . "{$randomDigits}";
 
         // uncomment if you want to test without random digits <lastname>-neo@<currentYear>
         // return "{$lastName}-neo@" . now()->year;
