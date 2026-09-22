@@ -99,13 +99,17 @@ class UserController extends Controller
                 ];
             });
 
-        $companies = Company::with("jobs:id,name")->get(["id", "name"]);
+        $companies = Company::with(["jobs" => function ($query) {
+            $query->select("job_positions.id", "job_positions.name")
+                ->whereHas("document", function ($q) {
+                    $q->whereColumn("documents.company_id", "company_job_position.company_id");
+                });
+        }])->get(["id", "name"]);
 
         return Inertia::render("Admin/Users/Employees", [
             "employees" => $employees,
             "companies" => $companies,
             "stats" => $stats,
-            // "filters" => $request->only(["search", "company_id", "status"])
         ]);
     }
 

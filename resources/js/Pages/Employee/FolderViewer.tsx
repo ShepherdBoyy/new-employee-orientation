@@ -214,6 +214,7 @@ export default function FolderViewer({ folder, slides, isCompleted }: Props) {
                                 src={currentSlide.file_url}
                                 className="max-h-[55vh] max-w-full rounded-xl object-contain sm:max-h-[60vh] lg:max-h-[65vh]"
                                 controls
+                                controlsList="nodownload"
                                 autoPlay
                                 onEnded={() => isLast && setReachedEnd(true)}
                             />
