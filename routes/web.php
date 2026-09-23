@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\FolderController;
 use App\Http\Controllers\Admin\FolderKeyTopicController;
 use App\Http\Controllers\Admin\JobPositionController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
@@ -20,7 +20,11 @@ Route::middleware("test")->group(function () {
     Route::get("/logout", [AuthController::class, "logout"])->name("logout");
     
     Route::prefix("admin")->name("admin.")->group(function () {
-        Route::get("/dashboard", [AdminController::class, "index"])->name("dashboard");
+        Route::get("/profile", [ProfileController::class, "index"])->name("profile.index");
+        Route::put("/profile", [ProfileController::class, "updateDetails"])->name("profile.update");
+        Route::put("/profile/password", [ProfileController::class, "updatePassword"])->name("profile.password.update");
+        Route::post("/profile/signature", [ProfileController::class, "updateSignature"])->name("profile.signature.update");
+        Route::delete("/profile/signature", [ProfileController::class, "removeSignature"])->name("profile.signature.destroy");
 
         // Notifications
         Route::get("/notifications", [NotificationController::class, "index"])->name("notifications.index");

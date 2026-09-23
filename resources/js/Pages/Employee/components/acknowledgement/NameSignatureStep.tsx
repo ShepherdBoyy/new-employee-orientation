@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import SignaturePad from "./SignaturePad";
+import SignaturePad from "@/components/SignaturePad";
 import { Check } from "lucide-react";
 
 interface Props {
