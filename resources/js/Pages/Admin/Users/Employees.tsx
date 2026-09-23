@@ -48,6 +48,7 @@ import {
 import AppPagination from "@/Layout/Pagination";
 import EmployeeFilters from "./components/EmployeeFilters";
 import type { Paginated } from "../Types/job-position";
+import { EmployeeDetailsDrawer } from "./components/EmployeeDetailsDrawer";
 export interface Employee {
     id: number;
     name: string;
@@ -255,7 +256,6 @@ function Employees({ employees: initialEmployees, companies }: Props) {
             },
         );
     };
-    console.log(availablePositions)
     return (
         <>
             <div className="w-full space-y-6">
@@ -469,18 +469,25 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                                 </SelectTrigger>
                                 <SelectContent position="popper">
                                     {availablePositions.length === 0 ? (
-                                        <div>Make sure Job Positions has JD</div>
+                                        <div className="px-3 py-6 text-center">
+                                            <p className="text-sm font-medium text-foreground">
+                                                No job positions available
+                                            </p>
+                                            <p className="mt-1 text-xs text-muted-foreground">
+                                                Make sure the job position has a
+                                                JD/document uploaded.
+                                            </p>
+                                        </div>
                                     ) : (
-                                        ""
+                                        availablePositions.map((position) => (
+                                            <SelectItem
+                                                key={position.id}
+                                                value={String(position.id)}
+                                            >
+                                                {position.name}
+                                            </SelectItem>
+                                        ))
                                     )}
-                                    {availablePositions.map((position) => (
-                                        <SelectItem
-                                            key={position.id}
-                                            value={String(position.id)}
-                                        >
-                                            {position.name}
-                                        </SelectItem>
-                                    ))}
                                 </SelectContent>
                             </Select>
                             {errors.job_position_id && (

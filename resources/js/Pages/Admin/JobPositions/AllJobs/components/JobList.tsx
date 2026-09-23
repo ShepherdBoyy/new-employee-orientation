@@ -15,7 +15,7 @@ import {
     EmptyDescription,
 } from "@/components/ui/empty";
 import { motion } from "motion/react";
-import { itemVariants, listItemVariants, listVariants } from "@/motion";
+import { listVariants } from "@/motion";
 
 type Props = {
     jobs: JobPosition[];
@@ -36,6 +36,7 @@ export default function JobList({
     allSelected,
     onToggleAll,
 }: Props) {
+    const MotionTableBody = motion.create(TableBody);
     if (!jobs.length) {
         return (
             <Empty className="h-full">
@@ -48,50 +49,50 @@ export default function JobList({
             </Empty>
         );
     }
-    return (
-        <>
-            <motion.div
-                variants={itemVariants}
-                className="overflow-hidden rounded-xl border"
-            >
-                <Table>
-                    <TableHeader className="">
-                        <TableRow>
-                            <TableHead>
-                                <Checkbox
-                                    checked={allSelected}
-                                    onCheckedChange={onToggleAll}
-                                />
-                            </TableHead>
-                            <TableHead>Job Position</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead />
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {jobs.map((job) => (
-                            <JobCard
-                                key={job.id}
-                                job={job}
-                                selected={selected.includes(job.id)}
-                                onToggle={() => {
-                                    const exists = selected.includes(job.id);
 
-                                    onSelectionChange(
-                                        exists
-                                            ? selected.filter(
-                                                  (id) => id !== job.id,
-                                              )
-                                            : [...selected, job.id],
-                                    );
-                                }}
-                                onEdit={onEdit}
-                                onDelete={onDelete}
+    return (
+        <div className="overflow-hidden rounded-xl border">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>
+                            <Checkbox
+                                checked={allSelected}
+                                onCheckedChange={onToggleAll}
                             />
-                        ))}
-                    </TableBody>
-                </Table>
-            </motion.div>
-        </>
+                        </TableHead>
+
+                        <TableHead>Job Position</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead />
+                    </TableRow>
+                </TableHeader>
+
+                <MotionTableBody
+                    variants={listVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    {jobs.map((job) => (
+                        <JobCard
+                            key={job.id}
+                            job={job}
+                            selected={selected.includes(job.id)}
+                            onToggle={() => {
+                                const exists = selected.includes(job.id);
+
+                                onSelectionChange(
+                                    exists
+                                        ? selected.filter((id) => id !== job.id)
+                                        : [...selected, job.id],
+                                );
+                            }}
+                            onEdit={onEdit}
+                            onDelete={onDelete}
+                        />
+                    ))}
+                </MotionTableBody>
+            </Table>
+        </div>
     );
 }

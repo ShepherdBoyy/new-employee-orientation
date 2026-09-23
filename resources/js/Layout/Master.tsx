@@ -232,7 +232,7 @@ export default function Master({ children }: MasterProps) {
                                     </div>
                                 </header>
 
-                                <main className="flex-1 overflow-y-auto px-6 py-6">
+                                <main className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-6">
                                     <AnimatePresence mode="wait">
                                         <motion.div
                                             key={currentPath}

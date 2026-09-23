@@ -33,11 +33,9 @@ export const listVariants = {
         },
     },
 };
-
 export const listItemVariants = {
     hidden: {
         opacity: 0,
-        y: 6,
     },
     visible: {
         opacity: 1,

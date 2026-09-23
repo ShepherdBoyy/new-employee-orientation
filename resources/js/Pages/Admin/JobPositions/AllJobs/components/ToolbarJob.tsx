@@ -40,61 +40,52 @@ export default function ToolbarJob({
               : null;
 
     return (
-        <div className="flex items-center justify-between gap-4 py-4">
-            <InputGroup className="h-9 max-w-2xl">
-                <InputGroupInput
-                    value={search}
-                    onChange={(e) => onSearchChange(e.target.value)}
-                    placeholder="Search job positions..."
-                />
+        <div className="flex items-center justify-between">
+            <div className="flex flex-1 items-center gap-3">
+                <InputGroup className="h-9 max-w-2xl">
+                    <InputGroupInput
+                        value={search}
+                        onChange={(e) => onSearchChange(e.target.value)}
+                        placeholder="Search job positions..."
+                    />
 
-                <InputGroupAddon>
-                    <SearchIcon />
-                </InputGroupAddon>
-            </InputGroup>
-
-            <div className="flex items-center gap-2">
-                {selectedCount > 0 && (
-                    <>
-                        <span className="text-sm text-muted-foreground">
-                            {selectedCount} selected
-                        </span>
-
-                        <Button
-                            variant="destructive"
-                            onClick={onDeleteSelected}
-                        >
-                            <Trash />
-                            Delete {selectedCount} jobs
-                        </Button>
-                    </>
-                )}
-
+                    <InputGroupAddon>
+                        <SearchIcon />
+                    </InputGroupAddon>
+                </InputGroup>
                 <JobSort sort={filter} onSortChange={onFilterChange} />
-
-                {hasFilter && filterLabel && (
-                    <Badge
-                        variant="secondary"
-                        className="h-9 gap-1 rounded-md px-3"
-                    >
-                        {filterLabel}
-
-                        <button
-                            type="button"
+                <div className="flex items-center gap-1">
+                    {hasFilter && filterLabel && (
+                        <Button
+                            variant="ghost"
+                            className="h-9 gap-1.5 px-2.5 text-muted-foreground hover:text-foreground"
                             onClick={() => onFilterChange("all")}
-                            className="ml-1 rounded-sm opacity-60 transition-opacity hover:opacity-100"
-                            aria-label={`Clear ${filterLabel} filter`}
                         >
                             <X className="size-3.5" />
-                        </button>
-                    </Badge>
-                )}
+                            Clear filters
+                        </Button>
+                    )}
+                    {selectedCount > 0 && (
+                        <>
+                            <span className="text-sm text-muted-foreground">
+                                {selectedCount} selected
+                            </span>
 
-                <Button size="lg" onClick={onCreate}>
-                    <Plus className="size-4" />
-                    New Job Position
-                </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={onDeleteSelected}
+                            >
+                                <Trash />
+                                Delete {selectedCount} jobs
+                            </Button>
+                        </>
+                    )}
+                </div>
             </div>
+            <Button size="lg" onClick={onCreate}>
+                <Plus className="size-4" />
+                New Job Position
+            </Button>
         </div>
     );
 }
