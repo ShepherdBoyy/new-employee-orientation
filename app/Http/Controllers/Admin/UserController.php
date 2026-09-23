@@ -240,6 +240,11 @@ class UserController extends Controller
         $signaturePath = Storage::disk("private")->path($acknowledgement->getRawOriginal("signature_path"));
         $photoPath = Storage::disk("private")->path($acknowledgement->getRawOriginal("photo_path"));
 
+        $hrAdmin = Auth::user();
+        $hrSignaturePath = $hrAdmin->hasSignature()
+            ? Storage::disk("private")->path($hrAdmin->signature_path)
+            : null;
+
         $pdf = Pdf::loadView("pdf.acknowledgement-certificate", [
             "employeeName" => $user->name,
             "jobPosition" => $user->jobPosition?->name,
@@ -249,7 +254,8 @@ class UserController extends Controller
             "fullNameConfirmation" => $acknowledgement->full_name_confirmation,
             "signaturePath" => $signaturePath,
             "photoPath" => $photoPath,
-            "hrAdminName" => Auth::user()->name,
+            "hrAdminName" => $hrAdmin->name,
+            "hrSignaturePath" => $hrSignaturePath,
             "generatedAt" => now()->format("F j, Y \\a\\t g:i A"),
             "hasJobDescription" => $user->jobDescriptionPath() !== null,
             "jdViewedAt" => $user->jd_viewed_at?->format("F j, Y g:i A"),
