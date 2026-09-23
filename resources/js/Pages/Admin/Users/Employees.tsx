@@ -255,6 +255,7 @@ function Employees({ employees: initialEmployees, companies }: Props) {
             },
         );
     };
+    console.log(availablePositions)
     return (
         <>
             <div className="w-full space-y-6">
@@ -467,6 +468,11 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                                     />
                                 </SelectTrigger>
                                 <SelectContent position="popper">
+                                    {availablePositions.length === 0 ? (
+                                        <div>Make sure Job Positions has JD</div>
+                                    ) : (
+                                        ""
+                                    )}
                                     {availablePositions.map((position) => (
                                         <SelectItem
                                             key={position.id}
