@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\EmployeesExport;
 use App\Http\Controllers\Controller;
 use App\Mail\EmployeeWelcomeMail;
 use App\Models\Company;
@@ -17,6 +18,7 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Log;
+use Maatwebsite\Excel\Facades\Excel;
 use Mail;
 
 class UserController extends Controller
@@ -264,5 +266,12 @@ class UserController extends Controller
         $filename = Str::slug($user->name) . "-orientation-acknowledgement.pdf";
 
         return $pdf->stream($filename);
+    }
+
+    public function exportEmployees()
+    {
+        $filename = "employees-" . now()->format("Y-m-d") . ".xlsx";
+
+        return Excel::download(new EmployeesExport, $filename);
     }
 }

@@ -87,6 +87,7 @@ Route::middleware("test")->group(function () {
         Route::delete("/users/{user}", [UserController::class, "destroy"])->name("users.destroy");
         Route::get("/users/employees/{user}/progress", [UserController::class, "progress"])->name("users.employees.progress");
         Route::get("/users/employees/{user}/acknowledgement/pdf", [UserController::class, "exportAcknowledgementPdf"])->name("users.employees.acknowledgement-pdf");
+        Route::get("/users/employees/export", [UserController::class, "exportEmployees"])->name("users.employees.export");
     });
 
     Route::middleware(["expiry"])->prefix("orientation")->name("employee.")->group(function () {
