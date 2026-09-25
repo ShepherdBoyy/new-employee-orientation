@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Company;
+use App\Models\Document;
 use App\Models\Folder;
 use App\Models\FolderKeyTopic;
 use App\Models\JobPosition;
@@ -28,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Relation::morphMap([
             "company" => Company::class,
+            "document" => Document::class,
             "folder" => Folder::class,
             "topic" => FolderKeyTopic::class,
             "slide" => Slide::class,

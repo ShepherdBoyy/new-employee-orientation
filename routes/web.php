@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\FolderController;
 use App\Http\Controllers\Admin\FolderKeyTopicController;
@@ -25,6 +26,8 @@ Route::middleware("test")->group(function () {
         Route::put("/profile/password", [ProfileController::class, "updatePassword"])->name("profile.password.update");
         Route::post("/profile/signature", [ProfileController::class, "updateSignature"])->name("profile.signature.update");
         Route::delete("/profile/signature", [ProfileController::class, "removeSignature"])->name("profile.signature.destroy");
+
+        Route::get("/audit-trail", [AuditLogController::class, "index"])->name("audit-trail.index");
 
         // Notifications
         Route::get("/notifications", [NotificationController::class, "index"])->name("notifications.index");
