@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\EmployeeWelcomeMail;
 use App\Models\Company;
 use App\Models\User;
+use App\Support\AuditLogger;
 use Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
@@ -141,6 +142,14 @@ class UserController extends Controller
             Mail::to($user->email)->send(new EmployeeWelcomeMail($user, $plainPassword));
         }
 
+        AuditLogger::record(
+            "created",
+            ucfirst($user->role) . " \"{$user->name}\" ({$user->email}) was created",
+            $user,
+            [],
+            $user->only(["name", "email", "role", "company_id", "job_position_id"]),
+        );
+
         return back()->with("success", "User created successfully");
     }
 
@@ -157,6 +166,8 @@ class UserController extends Controller
             "job_position_id" => ["nullable", "exists:job_positions,id"]
         ]);
 
+        $oldValues = $user->only(["name", "email", "company_id", "job_position_id"]);
+
         $user->update([
             "name" => $validated["name"],
             "email" => $validated["email"],
@@ -164,11 +175,25 @@ class UserController extends Controller
             "job_position_id" => $user->isAdmin() ? null : ($validated["job_position_id"] ?? null)
         ]);
 
+        AuditLogger::record(
+            "updated",
+            ucfirst($user->role) . " \"{$user->name}\" was updated",
+            $user,
+            $oldValues,
+            $user->only(["name", "email", "company_id", "job_position_id"])
+        );
+
         return back()->with("success", "User updated successfully");
     }
 
     public function destroy(User $user): RedirectResponse
     {
+        AuditLogger::record(
+            "deleted",
+            ucfirst($user->role) . " \"{$user->name}\" ({$user->email}) was deleted",
+            $user
+        );
+
         $user->delete();
 
         return back()->with("success", "User deleted successfully");
@@ -213,12 +238,11 @@ class UserController extends Controller
 
         abort_if(!$acknowledgement, 404, "This employee has not submitted their acknowledgement yet");
 
-        Log::channel("sensitive_access")->info("Acknowledgement PDF exported", [
-            "admin_id" => auth()->id(),
-            "admin_email" => auth()->user()->email,
-            "employee_id" => $user->id,
-            "timestamp" => now()->toDateTimeString()
-        ]);
+        AuditLogger::record(
+            "exported",
+            "Exported acknowledgement PDF for \"{$user->name}\"",
+            $user
+        );
 
         $folders = $user->company->foldersForEmployee($user)->load("keyTopics.slides");
 
@@ -270,6 +294,8 @@ class UserController extends Controller
 
     public function exportEmployees()
     {
+        AuditLogger::record("exported", "Exported the employee list");
+
         $filename = "employees-" . now()->format("Y-m-d") . ".xlsx";
 
         return Excel::download(new EmployeesExport, $filename);

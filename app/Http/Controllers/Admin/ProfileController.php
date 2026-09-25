@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\AuditLogger;
 use App\Support\Base64FileStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -61,6 +62,12 @@ class ProfileController extends Controller
             "password" => $validated["password"]
         ]);
 
+        AuditLogger::record(
+            "updated",
+            "{$user->name} changed their password",
+            $user
+        );
+
         return back()->with("success", "Password updated successfully");
     }
 
@@ -71,6 +78,8 @@ class ProfileController extends Controller
         $validated = $request->validate([
             "signature" => ["required", "string"]
         ]);
+
+        $hadSignature = $user->hasSignature();
 
         if ($user->signature_path) {
             Storage::disk("private")->delete($user->signature_path);
@@ -84,6 +93,14 @@ class ProfileController extends Controller
 
         $user->update(["signature_path" => $path]);
 
+        AuditLogger::record(
+            $hadSignature ? "updated" : "created",
+            $hadSignature
+                ? "{$user->name} replaced their e-signature"
+                : "{$user->name} added an e-signature",
+            $user
+        );
+
         return back()->with("success", "Signature saved successfully");
     }
 
@@ -96,6 +113,12 @@ class ProfileController extends Controller
         }
 
         $user->update(["signature_path" => null]);
+
+        AuditLogger::record(
+            "deleted",
+            "{$user->name} remove their e-signature",
+            $user
+        );
 
         return back()->with("success", "Signature removed successfully");
     }

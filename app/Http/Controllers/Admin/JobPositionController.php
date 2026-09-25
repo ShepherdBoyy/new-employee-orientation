@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\JobPosition;
 use App\Models\Document;
+use App\Support\AuditLogger;
 use DB;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -46,6 +47,14 @@ class JobPositionController extends Controller
 
         $jobPosition = JobPosition::create($validated);
 
+        AuditLogger::record(
+            "created",
+            "Created job position \"{$jobPosition->name}\"",
+            $jobPosition,
+            [],
+            $jobPosition->only(["name", "employee_type"])
+        );
+
         return back()->with("success", "Job position created successfully");
     }
 
@@ -57,13 +66,32 @@ class JobPositionController extends Controller
             'employee_type' => ['required']
         ]);
 
-        $jobPosition->update(["name" => $validated["name"], 'employee_type' => $validated["employee_type"]]);
+        $oldValues = $jobPosition->only(["name", "employee_type"]);
+
+        $jobPosition->update([
+            "name" => $validated["name"],
+            'employee_type' => $validated["employee_type"]
+        ]);
+
+        AuditLogger::record(
+            "updated",
+            "Updated job position \"{$jobPosition->name}\"",
+            $jobPosition,
+            $oldValues,
+            $jobPosition->only(["name", "employee_type"])
+        );
 
         return back()->with("success", "Job position updated successfully");
     }
 
     public function destroy(JobPosition $jobPosition): RedirectResponse
     {
+        AuditLogger::record(
+            "deleted",
+            "Deleted job position \"{$jobPosition->name}\"",
+            $jobPosition
+        );
+
         $jobPosition->delete();
 
         return back()->with("success", "Job position deleted successfully");
@@ -71,6 +99,16 @@ class JobPositionController extends Controller
 
     public function destroyMultipleJobs(Request $request)
     {
+        $positions = JobPosition::whereIn("id", $request->ids)->get();
+
+        foreach ($positions as $position) {
+            AuditLogger::record(
+                "deleted",
+                "Deleted job position \"{$position->name}\" (bulk delete)",
+                $position
+            );
+        }
+
         JobPosition::destroy($request->ids);
 
         return back()->with("success", "Multiple job positions deleted successfully");
@@ -99,13 +137,11 @@ class JobPositionController extends Controller
 
         $filteredCompanies = $companies->map(function ($company) use ($documents) {
             $company->jobs->transform(function ($job) use ($company, $documents) {
-                // Find matching PDF for this exact Company + Job Position pair
                 $pdf = $documents->firstWhere(function ($item) use ($company, $job) {
                     return $item->company_id === $company->id
                         && $item->job_position_id === $job->id;
                 });
 
-                // Attach jd_pdf object directly to the job object
                 $job->document = $pdf ? [
                     'id' => $pdf->id,
                     'file_path' => $pdf->file_path,
@@ -135,9 +171,16 @@ class JobPositionController extends Controller
         ]);
 
         $companies = Company::whereIn('id', $request->company_ids)->get();
+        $jobNames = JobPosition::whereIn("id", $request->job_ids)->pluck("name")->implode(", ");
 
         foreach ($companies as $company) {
             $company->jobs()->syncWithoutDetaching($request->job_ids);
+
+            AuditLogger::record(
+                "updated",
+                "Assigned jobs position(s) [{$jobNames}] to company \"{$company->name}\"",
+                $company
+            );
         }
 
         return back()->with("success", "Job assigned successfully");
@@ -145,10 +188,19 @@ class JobPositionController extends Controller
 
     public function deleteAssignedJob($company_id, $job_id)
     {
+        $company = Company::find($company_id);
+        $jobPosition = JobPosition::find($job_id);
+
         DB::table('company_job_position')
             ->where('company_id', $company_id)
             ->where('job_position_id', $job_id)
             ->delete();
+
+        AuditLogger::record(
+            "updated",
+            "Unlinked job position \"{$jobPosition?->name}\" from company \"{$company?->name}\"",
+            $company
+        );
 
         return back()->with("success", "Job position unlinked successfully");
     }
@@ -164,17 +216,13 @@ class JobPositionController extends Controller
         if ($request->hasFile('pdf_file')) {
             $file = $request->file('pdf_file');
 
-            // 1. Upload to the 'public' disk inside a 'pdfs' folder
             $path = Storage::disk('public')->putFile('', $file);
 
-            // 2. Save records to the database
             $document = Document::updateOrCreate(
-                // 1. Search Criteria (What makes it unique?)
                 [
                     'company_id' => $request->company_id,
                     'job_position_id' => $request->job_position_id,
                 ],
-                // 2. Data to insert or update with
                 [
                     'file_path' => $path,
                     'orig_name' => $file->getClientOriginalName(),
@@ -182,16 +230,24 @@ class JobPositionController extends Controller
 
             );
 
-            // return back()->with('success', 'PDF uploaded and saved to database successfully!');
-            // Check if it was newly created or updated
             if ($document->wasRecentlyCreated) {
-                // It was a brand new record
+                AuditLogger::record(
+                    "created",
+                    "Uploaded Job Description \"{$document->orig_name}\" for company \"{$document->company?->name}\" / job position \"{$document->jobPosition?->name}\"",
+                    $document
+                );
+
                 return back()->with([
                     'success' => 'Document created successfully!',
                     'document' => $document
                 ]);
             } else {
-                // It already existed and was updated
+                AuditLogger::record(
+                    "updated",
+                    "Replaced Job Description with \"{$document->orig_name}\" for company \"{$document->company?->name}\" / job position \"{$document->jobPosition?->name}\"",
+                    $document
+                );
+
                 return back()->with([
                     'success' => 'Document updated successfully!',
                     'document' => $document
