@@ -48,18 +48,6 @@ export default function getNavLinks(companies: Company[]): NavItem[] {
                 },
             ],
         },
-
-        {
-            group: "Workspace",
-            links: [
-                ...companies.map((company) => ({
-                    logo_path: company.logo_path,
-                    title: company.name,
-                    path: `/admin/folders/${company.slug}`,
-                })),
-            ],
-        },
-
         {
             group: "Settings",
             links: [
@@ -69,6 +57,16 @@ export default function getNavLinks(companies: Company[]): NavItem[] {
                     title: "Event Logs",
                     path: "/admin/audit-trail",
                 },
+            ],
+        },
+        {
+            group: "Workspace",
+            links: [
+                ...companies.map((company) => ({
+                    logo_path: company.logo_path,
+                    title: company.name,
+                    path: `/admin/folders/${company.slug}`,
+                })),
             ],
         },
     ];
