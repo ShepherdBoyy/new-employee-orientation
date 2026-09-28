@@ -233,7 +233,7 @@ class JobPositionController extends Controller
             if ($document->wasRecentlyCreated) {
                 AuditLogger::record(
                     "created",
-                    "Uploaded Job Description \"{$document->orig_name}\" for company \"{$document->company?->name}\" / job position \"{$document->jobPosition?->name}\"",
+                    "Uploaded Job Description for \"{$document->jobPosition?->name}\" in \"{$document->company?->name}\" ",
                     $document
                 );
 
@@ -244,7 +244,7 @@ class JobPositionController extends Controller
             } else {
                 AuditLogger::record(
                     "updated",
-                    "Replaced Job Description with \"{$document->orig_name}\" for company \"{$document->company?->name}\" / job position \"{$document->jobPosition?->name}\"",
+                    "Replaced Job Description for company \"{$document->company?->name}\" / job position \"{$document->jobPosition?->name}\"",
                     $document
                 );
 

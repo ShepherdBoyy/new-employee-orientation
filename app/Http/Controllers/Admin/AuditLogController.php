@@ -31,7 +31,7 @@ class AuditLogController extends Controller
                 $query->whereDate("created_at", "<=", $request->input("date_to"));
             })
             ->latest("created_at")
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString()
             ->through(fn(AuditLog $log) => [
                 "id" => $log->id,
