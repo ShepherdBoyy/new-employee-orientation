@@ -7,6 +7,7 @@ export interface PickerPosition {
     name: string;
     has_folder: boolean;
     folder_slug: string | null;
+    type: string;
 }
 
 interface Props {

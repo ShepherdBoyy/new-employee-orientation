@@ -6,6 +6,8 @@ import {
     GitBranchPlus,
     ShieldCheck,
     UsersRound,
+    UserCog,
+    Logs,
 } from "lucide-react";
 
 export default function getNavLinks(companies: Company[]): NavItem[] {
@@ -46,6 +48,7 @@ export default function getNavLinks(companies: Company[]): NavItem[] {
                 },
             ],
         },
+
         {
             group: "Workspace",
             links: [
@@ -54,6 +57,18 @@ export default function getNavLinks(companies: Company[]): NavItem[] {
                     title: company.name,
                     path: `/admin/folders/${company.slug}`,
                 })),
+            ],
+        },
+
+        {
+            group: "Settings",
+            links: [
+                { icon: <UserCog />, title: "Profile", path: "/admin/profile" },
+                {
+                    icon: <Logs />,
+                    title: "Event Logs",
+                    path: "/admin/audit-trail",
+                },
             ],
         },
     ];

@@ -19,7 +19,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import PresentationPanel from "./PresentationPanel";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ChevronsUpDown, LogOut, ChevronRight } from "lucide-react";
+import {
+    ChevronsUpDown,
+    LogOut,
+    ChevronRight,
+    UserRound,
+    User,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type { PageProps } from "./PresentationPanel";
 import getNavLinks from "./SideBarNav/getNavLinks";
@@ -170,7 +176,7 @@ export default function Master({ children }: MasterProps) {
                                                 <SidebarMenuButton className="">
                                                     <Avatar>
                                                         <AvatarImage />
-                                                        <AvatarFallback className="rounded-lg">
+                                                        <AvatarFallback>
                                                             {user.name
                                                                 .slice(0, 2)
                                                                 .toUpperCase()}
@@ -214,18 +220,16 @@ export default function Master({ children }: MasterProps) {
                                                     </div>
                                                 </DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
+
                                                 <DropdownMenuItem
                                                     onClick={() =>
                                                         router.get("/logout")
                                                     }
                                                 >
-                                                    <Link
-                                                        href="/logout"
-                                                        className="flex gap-2 items-center justify-between"
-                                                    >
+                                                    <div className="flex gap-2 items-center justify-between">
                                                         <LogOut />
                                                         <span>Log out</span>
-                                                    </Link>
+                                                    </div>
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
