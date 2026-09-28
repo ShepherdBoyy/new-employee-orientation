@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { useForm, router } from "@inertiajs/react";
 import EmployeeTable from "./components/EmployeeTable";
-import { Plus, Trash2, Users2 } from "lucide-react";
+import { Plus, Trash2, Users2, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -169,7 +169,6 @@ function Employees({ employees: initialEmployees, companies }: Props) {
         setData("role", "employee");
         setDialogOpen(true);
     }
-
     function openEdit(employee: Employee) {
         setEditingEmployee(employee);
         setData({
@@ -183,7 +182,6 @@ function Employees({ employees: initialEmployees, companies }: Props) {
         });
         setDialogOpen(true);
     }
-
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (editingEmployee) {
@@ -256,6 +254,7 @@ function Employees({ employees: initialEmployees, companies }: Props) {
             },
         );
     };
+
     return (
         <>
             <div className="w-full space-y-6">
@@ -271,10 +270,27 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                         </p>
                     </div>
 
-                    <Button onClick={openCreate} className="shrink-0" size="lg">
-                        <Plus className="mr-2 size-4" />
-                        New Employee
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        <Button
+                            className="shrink-0"
+                            size="lg"
+                            variant="secondary"
+                            disabled={employees.data.length === 0}
+                        >
+                            <a href="/admin/users/employees/export">
+                                <FileDown className="size-4" />
+                            </a>
+                            Export
+                        </Button>
+                        <Button
+                            onClick={openCreate}
+                            className="shrink-0"
+                            size="lg"
+                        >
+                            <Plus className=" size-4" />
+                            New Employee
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
