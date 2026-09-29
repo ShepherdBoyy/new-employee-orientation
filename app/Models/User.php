@@ -160,7 +160,6 @@ class User extends Authenticatable
 
         // uncomment if you want to test without random digits <lastname>-neo@<currentYear>
         return "{$lastName}-neo@" . now()->year;
-        return "{$lastName}-neo@" . now()->year;
     }
 
     public function company(): BelongsTo
