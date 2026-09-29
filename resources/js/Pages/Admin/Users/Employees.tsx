@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { useForm, router } from "@inertiajs/react";
 import EmployeeTable from "./components/EmployeeTable";
-import { Plus, Trash2, Users2 } from "lucide-react";
+import { Plus, Trash2, Users2, FileDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,6 +48,7 @@ import {
 import AppPagination from "@/Layout/Pagination";
 import EmployeeFilters from "./components/EmployeeFilters";
 import type { Paginated } from "../Types/job-position";
+import { EmployeeDetailsDrawer } from "./components/EmployeeDetailsDrawer";
 export interface Employee {
     id: number;
     name: string;
@@ -168,7 +169,6 @@ function Employees({ employees: initialEmployees, companies }: Props) {
         setData("role", "employee");
         setDialogOpen(true);
     }
-
     function openEdit(employee: Employee) {
         setEditingEmployee(employee);
         setData({
@@ -182,7 +182,6 @@ function Employees({ employees: initialEmployees, companies }: Props) {
         });
         setDialogOpen(true);
     }
-
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (editingEmployee) {
@@ -255,6 +254,7 @@ function Employees({ employees: initialEmployees, companies }: Props) {
             },
         );
     };
+
     return (
         <>
             <div className="w-full space-y-6">
@@ -270,10 +270,27 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                         </p>
                     </div>
 
-                    <Button onClick={openCreate} className="shrink-0" size="lg">
-                        <Plus className="mr-2 size-4" />
-                        New Employee
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        <Button
+                            className="shrink-0"
+                            size="lg"
+                            variant="secondary"
+                            disabled={employees.data.length === 0}
+                        >
+                            <a href="/admin/users/employees/export">
+                                <FileDown className="size-4" />
+                            </a>
+                            Export
+                        </Button>
+                        <Button
+                            onClick={openCreate}
+                            className="shrink-0"
+                            size="lg"
+                        >
+                            <Plus className=" size-4" />
+                            New Employee
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -467,14 +484,26 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                                     />
                                 </SelectTrigger>
                                 <SelectContent position="popper">
-                                    {availablePositions.map((position) => (
-                                        <SelectItem
-                                            key={position.id}
-                                            value={String(position.id)}
-                                        >
-                                            {position.name}
-                                        </SelectItem>
-                                    ))}
+                                    {availablePositions.length === 0 ? (
+                                        <div className="px-3 py-6 text-center">
+                                            <p className="text-sm font-medium text-foreground">
+                                                No job positions available
+                                            </p>
+                                            <p className="mt-1 text-xs text-muted-foreground">
+                                                Make sure the job position has a
+                                                JD/document uploaded.
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        availablePositions.map((position) => (
+                                            <SelectItem
+                                                key={position.id}
+                                                value={String(position.id)}
+                                            >
+                                                {position.name}
+                                            </SelectItem>
+                                        ))
+                                    )}
                                 </SelectContent>
                             </Select>
                             {errors.job_position_id && (

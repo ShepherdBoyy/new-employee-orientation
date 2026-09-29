@@ -1,11 +1,12 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\FolderController;
 use App\Http\Controllers\Admin\FolderKeyTopicController;
 use App\Http\Controllers\Admin\JobPositionController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
@@ -20,7 +21,13 @@ Route::middleware("test")->group(function () {
     Route::get("/logout", [AuthController::class, "logout"])->name("logout");
     
     Route::prefix("admin")->name("admin.")->group(function () {
-        Route::get("/dashboard", [AdminController::class, "index"])->name("dashboard");
+        Route::get("/profile", [ProfileController::class, "index"])->name("profile.index");
+        Route::put("/profile", [ProfileController::class, "updateDetails"])->name("profile.update");
+        Route::put("/profile/password", [ProfileController::class, "updatePassword"])->name("profile.password.update");
+        Route::post("/profile/signature", [ProfileController::class, "updateSignature"])->name("profile.signature.update");
+        Route::delete("/profile/signature", [ProfileController::class, "removeSignature"])->name("profile.signature.destroy");
+
+        Route::get("/audit-trail", [AuditLogController::class, "index"])->name("audit-trail.index");
 
         // Notifications
         Route::get("/notifications", [NotificationController::class, "index"])->name("notifications.index");
@@ -83,6 +90,7 @@ Route::middleware("test")->group(function () {
         Route::delete("/users/{user}", [UserController::class, "destroy"])->name("users.destroy");
         Route::get("/users/employees/{user}/progress", [UserController::class, "progress"])->name("users.employees.progress");
         Route::get("/users/employees/{user}/acknowledgement/pdf", [UserController::class, "exportAcknowledgementPdf"])->name("users.employees.acknowledgement-pdf");
+        Route::get("/users/employees/export", [UserController::class, "exportEmployees"])->name("users.employees.export");
     });
 
     Route::middleware(["expiry"])->prefix("orientation")->name("employee.")->group(function () {

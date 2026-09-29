@@ -22,7 +22,8 @@ class User extends Authenticatable
         "job_position_id",
         "expires_at",
         "welcome_viewed_at",
-        "jd_viewed_at"
+        "jd_viewed_at",
+        "signature_path"
     ];
 
     protected $hidden = [
@@ -143,6 +144,11 @@ class User extends Authenticatable
         })->toArray();
     }
 
+    public function hasSignature(): bool
+    {
+        return $this->signature_path !== null;
+    }
+
     public static function generateDefaultPassword(string $fullName): string
     {
         $parts = preg_split("/\s+/", trim($fullName));
@@ -153,6 +159,7 @@ class User extends Authenticatable
         // return "{$lastName}-neo@" . "{$randomDigits}";
 
         // uncomment if you want to test without random digits <lastname>-neo@<currentYear>
+        return "{$lastName}-neo@" . now()->year;
         return "{$lastName}-neo@" . now()->year;
     }
 

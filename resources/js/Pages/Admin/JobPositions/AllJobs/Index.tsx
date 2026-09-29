@@ -12,12 +12,7 @@ import DeleteSelectedJobs from "./components/forms/DeleteSelectedJobs";
 import AppPagination from "../../../../Layout/Pagination";
 import type { Paginated } from "../../Types/job-position";
 import { useDebouncedCallback } from "use-debounce";
-import {
-    itemVariants,
-    listItemVariants,
-    listVariants,
-    pageVariants,
-} from "@/motion";
+import { itemVariants, pageVariants } from "@/motion";
 import { motion } from "motion/react";
 type Props = {
     jobs: Paginated<JobPosition>;

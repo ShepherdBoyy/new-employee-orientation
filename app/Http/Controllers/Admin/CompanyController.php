@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Support\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -38,11 +39,19 @@ class CompanyController extends Controller
                 ->store("logos", "public");
         }
 
-        Company::create([
+        $company = Company::create([
             "name" => $validated["name"],
             "logo_path" => $logoPath,
             "header_theme" => $validated["header_theme"]
         ]);
+
+        AuditLogger::record(
+            "created",
+            "Created company \"{$company->name}\"",
+            $company,
+            [],
+            $company->only(["name", "header_theme"])
+        );
 
         return back()->with("success", "Company created successfully");
     }
@@ -55,6 +64,7 @@ class CompanyController extends Controller
             "header_theme" => ["required", "string"]
         ]);
 
+        $oldValues = $company->only(["name", "header_theme"]);
         $logoPath = $company->logo_path;
 
         if ($request->hasFile("logo_path")) {
@@ -71,6 +81,14 @@ class CompanyController extends Controller
             "header_theme" => $validated["header_theme"]
         ]);
 
+        AuditLogger::record(
+            "updated",
+            "Updated company \"{$company->name}\"",
+            $company,
+            $oldValues,
+            $company->only(["name", "header_theme"])
+        );
+
         return back()->with("success", "Company updated successfully");
     }
 
@@ -79,6 +97,12 @@ class CompanyController extends Controller
         if ($company->logo_path) {
             Storage::disk('public')->delete($company->logo_path);
         }
+
+        AuditLogger::record(
+            "delete",
+            "Deleted company \"{$company->name}\"",
+            $company
+        );
 
         $company->delete();
 

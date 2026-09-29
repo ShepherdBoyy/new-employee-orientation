@@ -9,6 +9,7 @@ use App\Models\FolderCompletion;
 use App\Models\OrientationAcknowledgement;
 use App\Models\User;
 use App\Notifications\OrientationCompleted;
+use App\Support\Base64FileStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -228,13 +229,13 @@ class OrientationController extends Controller
             "consented" => ["required", "accepted"]
         ]);
 
-        $signaturePath = $this->storeBase64File(
+        $signaturePath = Base64FileStorage::store(
             $validated["signature"],
             "acknowledgements/signatures",
             $user->id . "_" . now()->timestamp . "_signature.png"
         );
 
-        $photoPath = $this->storeBase64File(
+        $photoPath = Base64FileStorage::store(
             $validated["photo"],
             "acknowledgements/photos",
             $user->id . "_" . now()->timestamp . "_photo.jpg"

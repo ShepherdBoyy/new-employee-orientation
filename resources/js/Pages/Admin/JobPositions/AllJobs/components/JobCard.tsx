@@ -1,20 +1,10 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import JobTableActions from "./JobActions";
-import { CircleArrowOutUpRight } from "lucide-react";
-import { Link } from "@inertiajs/react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { TableCell, TableRow } from "@/components/ui/table";
+import { TableCell } from "@/components/ui/table";
 import type { JobPosition } from "@/Pages/Admin/Types/job-position";
 import { Badge } from "@/components/ui/badge";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    CardDescription,
-    CardFooter,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { motion } from "motion/react";
+import { listItemVariants } from "@/motion";
 import { MapPin, Building2 } from "lucide-react";
 type Props = {
     selected: boolean;
@@ -33,11 +23,12 @@ export default function JobCard({
 }: Props) {
     return (
         <>
-            <TableRow
+            <motion.tr
+                variants={listItemVariants}
                 className={cn(
                     "group border-b transition-colors",
                     "hover:bg-muted/50",
-                    selected && "bg-primary/[0.04]",
+                    selected && "bg-primary/4",
                 )}
             >
                 <TableCell>
@@ -85,7 +76,7 @@ export default function JobCard({
                         onDelete={onDelete}
                     />
                 </TableCell>
-            </TableRow>
+            </motion.tr>
         </>
     );
 }

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\EmployeesExport;
 use App\Http\Controllers\Controller;
 use App\Mail\EmployeeWelcomeMail;
 use App\Models\Company;
 use App\Models\User;
+use App\Support\AuditLogger;
 use Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
@@ -17,6 +19,7 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Log;
+use Maatwebsite\Excel\Facades\Excel;
 use Mail;
 
 class UserController extends Controller
@@ -99,13 +102,17 @@ class UserController extends Controller
                 ];
             });
 
-        $companies = Company::with("jobs:id,name")->get(["id", "name"]);
+        $companies = Company::with(["jobs" => function ($query) {
+            $query->select("job_positions.id", "job_positions.name")
+                ->whereHas("document", function ($q) {
+                    $q->whereColumn("documents.company_id", "company_job_position.company_id");
+                });
+        }])->get(["id", "name"]);
 
         return Inertia::render("Admin/Users/Employees", [
             "employees" => $employees,
             "companies" => $companies,
             "stats" => $stats,
-            // "filters" => $request->only(["search", "company_id", "status"])
         ]);
     }
 
@@ -135,6 +142,14 @@ class UserController extends Controller
             Mail::to($user->email)->send(new EmployeeWelcomeMail($user, $plainPassword));
         }
 
+        AuditLogger::record(
+            "created",
+            ucfirst($user->role) . " \"{$user->name}\" ({$user->email}) was created",
+            $user,
+            [],
+            $user->only(["name", "email", "role", "company_id", "job_position_id"]),
+        );
+
         return back()->with("success", "User created successfully");
     }
 
@@ -151,6 +166,8 @@ class UserController extends Controller
             "job_position_id" => ["nullable", "exists:job_positions,id"]
         ]);
 
+        $oldValues = $user->only(["name", "email", "company_id", "job_position_id"]);
+
         $user->update([
             "name" => $validated["name"],
             "email" => $validated["email"],
@@ -158,11 +175,25 @@ class UserController extends Controller
             "job_position_id" => $user->isAdmin() ? null : ($validated["job_position_id"] ?? null)
         ]);
 
+        AuditLogger::record(
+            "updated",
+            ucfirst($user->role) . " \"{$user->name}\" was updated",
+            $user,
+            $oldValues,
+            $user->only(["name", "email", "company_id", "job_position_id"])
+        );
+
         return back()->with("success", "User updated successfully");
     }
 
     public function destroy(User $user): RedirectResponse
     {
+        AuditLogger::record(
+            "deleted",
+            ucfirst($user->role) . " \"{$user->name}\" ({$user->email}) was deleted",
+            $user
+        );
+
         $user->delete();
 
         return back()->with("success", "User deleted successfully");
@@ -207,12 +238,11 @@ class UserController extends Controller
 
         abort_if(!$acknowledgement, 404, "This employee has not submitted their acknowledgement yet");
 
-        Log::channel("sensitive_access")->info("Acknowledgement PDF exported", [
-            "admin_id" => auth()->id(),
-            "admin_email" => auth()->user()->email,
-            "employee_id" => $user->id,
-            "timestamp" => now()->toDateTimeString()
-        ]);
+        AuditLogger::record(
+            "exported",
+            "Exported acknowledgement PDF for \"{$user->name}\"",
+            $user
+        );
 
         $folders = $user->company->foldersForEmployee($user)->load("keyTopics.slides");
 
@@ -236,6 +266,11 @@ class UserController extends Controller
         $signaturePath = Storage::disk("private")->path($acknowledgement->getRawOriginal("signature_path"));
         $photoPath = Storage::disk("private")->path($acknowledgement->getRawOriginal("photo_path"));
 
+        $hrAdmin = Auth::user();
+        $hrSignaturePath = $hrAdmin->hasSignature()
+            ? Storage::disk("private")->path($hrAdmin->signature_path)
+            : null;
+
         $pdf = Pdf::loadView("pdf.acknowledgement-certificate", [
             "employeeName" => $user->name,
             "jobPosition" => $user->jobPosition?->name,
@@ -245,7 +280,8 @@ class UserController extends Controller
             "fullNameConfirmation" => $acknowledgement->full_name_confirmation,
             "signaturePath" => $signaturePath,
             "photoPath" => $photoPath,
-            "hrAdminName" => Auth::user()->name,
+            "hrAdminName" => $hrAdmin->name,
+            "hrSignaturePath" => $hrSignaturePath,
             "generatedAt" => now()->format("F j, Y \\a\\t g:i A"),
             "hasJobDescription" => $user->jobDescriptionPath() !== null,
             "jdViewedAt" => $user->jd_viewed_at?->format("F j, Y g:i A"),
@@ -254,5 +290,14 @@ class UserController extends Controller
         $filename = Str::slug($user->name) . "-orientation-acknowledgement.pdf";
 
         return $pdf->stream($filename);
+    }
+
+    public function exportEmployees()
+    {
+        AuditLogger::record("exported", "Exported the employee list");
+
+        $filename = "employees-" . now()->format("Y-m-d") . ".xlsx";
+
+        return Excel::download(new EmployeesExport, $filename);
     }
 }

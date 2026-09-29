@@ -33,7 +33,7 @@ export default function JobSort({ sort, onSortChange }: Props) {
             <DropdownMenuTrigger asChild>
                 <Button
                     variant={isFiltered ? "secondary" : "outline"}
-                    className="gap-2"
+                    className="gap-2 h-9"
                 >
                     <ListFilter className="size-4" />
                     {filterLabel}

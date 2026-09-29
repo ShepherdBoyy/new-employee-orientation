@@ -8,6 +8,7 @@ use App\Models\Folder;
 use App\Models\JobPosition;
 use App\Models\Slide;
 use App\Models\User;
+use App\Support\AuditLogger;
 use App\Support\PresentationPanelData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,12 +36,20 @@ class FolderController extends Controller
 
         $lastOrder = Folder::forCompany($validated["company_id"])->max("order") ?? 0;
 
-        Folder::create([
+        $folder = Folder::create([
             "company_id" => $validated["company_id"],
             "employee_type" => $validated["employee_type"],
             "name" => $validated["name"],
             "order" => $lastOrder + 1
         ]);
+
+        AuditLogger::record(
+            "created",
+            "Created folder \"{$folder->name}\"",
+            $folder,
+            [],
+            $folder->only(["name", "employee_type", "company_id"])
+        );
 
         return back()->with("success", "Folder created successfully");
     }
@@ -52,7 +61,17 @@ class FolderController extends Controller
             "employee_type" => ["required", "in:field,non_field,both"]
         ]);
 
+        $oldValues = $folder->only(["name", "employee_type"]);
+
         $folder->update($validated);
+
+        AuditLogger::record(
+            "updated",
+            "Updated folder \"{$folder->name}\"",
+            $folder,
+            $oldValues,
+            $folder->only(["name", "employee_type"]),
+        );
 
         $company = Company::findOrFail($folder->company_id);
 
@@ -91,6 +110,12 @@ class FolderController extends Controller
         });
 
         $company = Company::findOrFail($folder->company_id);
+
+        AuditLogger::record(
+            "deleted",
+            "Deleted folder \"{$folder->name}\"",
+            $folder
+        );
 
         $folder->delete();
 

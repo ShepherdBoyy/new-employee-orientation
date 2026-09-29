@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Folder;
 use App\Models\FolderKeyTopic;
+use App\Support\AuditLogger;
 use App\Support\PresentationPanelData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -45,10 +46,18 @@ class FolderKeyTopicController extends Controller
 
         $lastOrder = $folder->keyTopics()->max("order") ?? 0;
 
-        $folder->keyTopics()->create([
+        $topic = $folder->keyTopics()->create([
             'label' => $validated["label"],
             "order" => $lastOrder + 1
         ]);
+
+        AuditLogger::record(
+            "created",
+            "Created topic \"{$topic->label}\" in folder \"{$folder->name}\"",
+            $topic,
+            [],
+            ["label" => $topic->label, "folder_id" => $folder->id]
+        );
 
         return back()->with("success", "Topic created successfully");
     }
@@ -59,7 +68,17 @@ class FolderKeyTopicController extends Controller
             "label" => ["required", "string", "max:255"]
         ]);
 
+        $oldLabel = $topic->label;
+
         $topic->update(["label" => $validated["label"]]);
+
+        AuditLogger::record(
+            "updated",
+            "Renamed topic \"{$oldLabel}\" to \"{$topic->label}\"",
+            $topic,
+            ["label" => $oldLabel],
+            ["label" => $topic->label]
+        );
 
         return back()->with("success", "Topic updated successfully");
     }
@@ -83,6 +102,12 @@ class FolderKeyTopicController extends Controller
 
     public function destroy(FolderKeyTopic $topic): RedirectResponse
     {
+        AuditLogger::record(
+            "deleted",
+            "Deleted topic \"{$topic->label}\"",
+            $topic
+        );
+
         $topic->delete();
 
         return back()->with("success", "Topic deleted successfully");

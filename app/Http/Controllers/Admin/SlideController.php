@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\Folder;
 use App\Models\FolderKeyTopic;
 use App\Models\Slide;
+use App\Support\AuditLogger;
 use App\Support\PresentationPanelData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -61,8 +62,9 @@ class SlideController extends Controller
             ->where("folder_key_topic_id", $topic->id)
             ->max("order") ?? 0;
 
-
         $storageFolder = $this->storagePath($folder, $topic);
+
+        $uploadedCount = 0;
 
         foreach ($request->file("files") as $index => $file) {
             $type = str_starts_with($file->getMimeType(), "video")
@@ -78,7 +80,15 @@ class SlideController extends Controller
                 "file_path" => $path,
                 "order" => $lastOrder + $index + 1
             ]);
+
+            $uploadedCount++;
         }
+
+        AuditLogger::record(
+            "created",
+            "Uploaded {$uploadedCount} slide(s) to topic \"{$topic->label}\" in folder \"{$folder->name}\"",
+            $topic
+        );
 
         return back()->with("success", "Slides uploaded successfully");
     }
@@ -106,6 +116,12 @@ class SlideController extends Controller
 
         Storage::disk(config("filesystems.default"))
             ->delete($slide->file_path);
+
+        AuditLogger::record(
+            "deleted",
+            "Deleted a slide from folder \"{$folder->name}\"",
+            $slide
+        );
 
         $slide->delete();
 

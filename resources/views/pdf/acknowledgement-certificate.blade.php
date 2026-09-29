@@ -377,6 +377,9 @@
                     </td>
                     <td>
                         <div class="sign-box">
+                            @if ($hrSignaturePath)
+                                <img src="{{ $hrSignaturePath }}" class="sign-image">
+                            @endif
                             <p class="sign-caption">
                                 <strong>{{ $hrAdminName }}</strong><br>
                                 HR Administrator Signature
