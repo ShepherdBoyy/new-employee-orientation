@@ -30,7 +30,7 @@ class JobPositionController extends Controller
                 $query->where("employee_type", $request->input("filter"));
             })
             ->orderBy("name")
-            ->paginate(11)
+            ->paginate(10)
             ->withQueryString();
 
         return Inertia::render("Admin/JobPositions/AllJobs/Index", [

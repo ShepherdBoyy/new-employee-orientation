@@ -74,7 +74,7 @@ class UserController extends Controller
             })
             ->with("company", "jobPosition")
             ->latest()
-            ->paginate(6)
+            ->paginate(10)
             ->withQueryString()
             ->through(function (User $employee) {
                 $totalFolders = $employee->company
