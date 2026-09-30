@@ -254,7 +254,33 @@ function Employees({ employees: initialEmployees, companies }: Props) {
             },
         );
     };
+    const handlePageChange = (page: number) => {
+        router.get(
+            "/admin/users/employees",
+            {
+                page,
+                per_page: employees.per_page,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
 
+    const handlePerPageChange = (perPage: number) => {
+        router.get(
+            "/admin/users/employees",
+            {
+                page: 1,
+                per_page: perPage,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
     return (
         <>
             <div className="w-full space-y-6">
@@ -363,39 +389,11 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                     total={employees.total}
                     currentPage={employees.current_page}
                     lastPage={employees.last_page}
-                    onPrevious={employees?.prev_page_url}
-                    onNext={employees?.next_page_url}
                     perPage={employees.per_page}
-                    onPageChange={(page) => {
-                        const params = new URLSearchParams(
-                            window.location.search,
-                        );
-
-                        params.set("page", String(page));
-
-                        router.visit(window.location.pathname, {
-                            data: Object.fromEntries(params.entries()),
-                            preserveState: true,
-                            preserveScroll: true,
-                        });
-                    }}
-                    onPerPageChange={(perPage) => {
-                        const params = new URLSearchParams(
-                            window.location.search,
-                        );
-
-                        // Change the number of rows
-                        params.set("per_page", String(perPage));
-
-                        // Always go back to page 1
-                        params.set("page", "1");
-
-                        router.visit(window.location.pathname, {
-                            data: Object.fromEntries(params.entries()),
-                            preserveState: true,
-                            preserveScroll: true,
-                        });
-                    }}
+                    onPrevious={employees.prev_page_url}
+                    onNext={employees.next_page_url}
+                    onPageChange={handlePageChange}
+                    onPerPageChange={handlePerPageChange}
                 />
             </div>
 

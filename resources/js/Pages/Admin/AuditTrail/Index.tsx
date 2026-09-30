@@ -75,6 +75,7 @@ interface Props {
         action?: string;
         date_from?: string;
         date_to?: string;
+        per_page: number;
     };
 }
 
@@ -269,7 +270,33 @@ function AuditTrail({ logs, actions, filters }: Props) {
             },
         );
     }
+    const handlePageChange = (page: number) => {
+        router.get(
+            "/admin/audit-trail",
+            {
+                page,
+                per_page: filters.per_page,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
 
+    const handlePerPageChange = (perPage: number) => {
+        router.get(
+            "/admin/audit-trail",
+            {
+                page: 1,
+                per_page: perPage,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
     return (
         <div className="w-full space-y-6">
             {/* Header */}
@@ -605,36 +632,8 @@ function AuditTrail({ logs, actions, filters }: Props) {
                     perPage={logs.per_page}
                     onPrevious={logs.prev_page_url}
                     onNext={logs.next_page_url}
-                    onPageChange={(page) => {
-                        const params = new URLSearchParams(
-                            window.location.search,
-                        );
-
-                        params.set("page", String(page));
-
-                        router.visit(window.location.pathname, {
-                            data: Object.fromEntries(params.entries()),
-                            preserveState: true,
-                            preserveScroll: true,
-                        });
-                    }}
-                    onPerPageChange={(perPage) => {
-                        const params = new URLSearchParams(
-                            window.location.search,
-                        );
-
-                        // Change the number of rows
-                        params.set("per_page", String(perPage));
-
-                        // Always go back to page 1
-                        params.set("page", "1");
-
-                        router.visit(window.location.pathname, {
-                            data: Object.fromEntries(params.entries()),
-                            preserveState: true,
-                            preserveScroll: true,
-                        });
-                    }}
+                    onPageChange={handlePageChange}
+                    onPerPageChange={handlePerPageChange}
                 />
             )}
         </div>

@@ -138,7 +138,7 @@ export default function AppPagination({
                             <SelectValue />
                         </SelectTrigger>
 
-                        <SelectContent popover="hint">
+                        <SelectContent position="popper">
                             {perPageOptions.map((option) => (
                                 <SelectItem key={option} value={String(option)}>
                                     {option}

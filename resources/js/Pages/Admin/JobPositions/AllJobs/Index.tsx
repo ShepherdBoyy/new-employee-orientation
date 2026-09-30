@@ -90,6 +90,28 @@ function Index({ jobs }: Props) {
         );
     };
 
+    const onPageChange = (page: number) => {
+        router.get(
+            "/admin/job-positions",
+            { page, per_page: jobs.per_page },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
+
+    const handlePerPageChange = (perPage: number) => {
+        router.get(
+            "/admin/job-positions",
+            {
+                page: 1,
+                per_page: perPage,
+            },
+            { preserveState: true, preserveScroll: true },
+        );
+    };
+
     return (
         <motion.div
             variants={pageVariants}
@@ -157,32 +179,8 @@ function Index({ jobs }: Props) {
                 onPrevious={jobs?.prev_page_url}
                 onNext={jobs?.next_page_url}
                 perPage={jobs.per_page}
-                onPageChange={(page) => {
-                    const params = new URLSearchParams(window.location.search);
-
-                    params.set("page", String(page));
-
-                    router.visit(window.location.pathname, {
-                        data: Object.fromEntries(params.entries()),
-                        preserveState: true,
-                        preserveScroll: true,
-                    });
-                }}
-                onPerPageChange={(perPage) => {
-                    const params = new URLSearchParams(window.location.search);
-
-                    // Change the number of rows
-                    params.set("per_page", String(perPage));
-
-                    // Always go back to page 1
-                    params.set("page", "1");
-
-                    router.visit(window.location.pathname, {
-                        data: Object.fromEntries(params.entries()),
-                        preserveState: true,
-                        preserveScroll: true,
-                    });
-                }}
+                onPageChange={onPageChange}
+                onPerPageChange={handlePerPageChange}
             />
 
             {/* Forms */}
