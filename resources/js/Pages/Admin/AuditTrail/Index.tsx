@@ -64,6 +64,7 @@ interface Paginated<T> {
     last_page: number;
     prev_page_url: string | null;
     next_page_url: string | null;
+    per_page: number;
 }
 
 interface Props {
@@ -601,6 +602,7 @@ function AuditTrail({ logs, actions, filters }: Props) {
                     total={logs.total}
                     currentPage={logs.current_page}
                     lastPage={logs.last_page}
+                    perPage={logs.per_page}
                     onPrevious={logs.prev_page_url}
                     onNext={logs.next_page_url}
                     onPageChange={(page) => {
@@ -609,6 +611,23 @@ function AuditTrail({ logs, actions, filters }: Props) {
                         );
 
                         params.set("page", String(page));
+
+                        router.visit(window.location.pathname, {
+                            data: Object.fromEntries(params.entries()),
+                            preserveState: true,
+                            preserveScroll: true,
+                        });
+                    }}
+                    onPerPageChange={(perPage) => {
+                        const params = new URLSearchParams(
+                            window.location.search,
+                        );
+
+                        // Change the number of rows
+                        params.set("per_page", String(perPage));
+
+                        // Always go back to page 1
+                        params.set("page", "1");
 
                         router.visit(window.location.pathname, {
                             data: Object.fromEntries(params.entries()),

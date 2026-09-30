@@ -272,6 +272,7 @@ function Employees({ employees: initialEmployees, companies }: Props) {
 
                     <div className="flex items-center gap-3">
                         <Button
+                            asChild
                             className="shrink-0"
                             size="lg"
                             variant="secondary"
@@ -279,8 +280,8 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                         >
                             <a href="/admin/users/employees/export">
                                 <FileDown className="size-4" />
+                                Export
                             </a>
-                            Export
                         </Button>
                         <Button
                             onClick={openCreate}
@@ -364,22 +365,35 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                     lastPage={employees.last_page}
                     onPrevious={employees?.prev_page_url}
                     onNext={employees?.next_page_url}
+                    perPage={employees.per_page}
                     onPageChange={(page) => {
-                        // 1. Get existing query parameters from the current URL
                         const params = new URLSearchParams(
                             window.location.search,
                         );
 
-                        // 2. Set or update the page parameter
-                        params.set("page", page);
-
-                        // 3. Convert params back to a plain object for Inertia's data option
-                        const queryData = Object.fromEntries(params.entries());
+                        params.set("page", String(page));
 
                         router.visit(window.location.pathname, {
-                            data: queryData,
-                            preserveState: true, // Optional: keeps component state if desired
-                            preserveScroll: true, // Optional: keeps scroll position
+                            data: Object.fromEntries(params.entries()),
+                            preserveState: true,
+                            preserveScroll: true,
+                        });
+                    }}
+                    onPerPageChange={(perPage) => {
+                        const params = new URLSearchParams(
+                            window.location.search,
+                        );
+
+                        // Change the number of rows
+                        params.set("per_page", String(perPage));
+
+                        // Always go back to page 1
+                        params.set("page", "1");
+
+                        router.visit(window.location.pathname, {
+                            data: Object.fromEntries(params.entries()),
+                            preserveState: true,
+                            preserveScroll: true,
                         });
                     }}
                 />
