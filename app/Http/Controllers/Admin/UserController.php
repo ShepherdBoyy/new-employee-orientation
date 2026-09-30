@@ -37,6 +37,8 @@ class UserController extends Controller
 
     public function index(Request $request): Response
     {
+        $perPage = $request->query("per_page", 10);
+
         $baseQuery = User::query()
             ->where("role", "employee")
             ->when($request->filled('search'), function ($query) use ($request) {
@@ -74,7 +76,7 @@ class UserController extends Controller
             })
             ->with("company", "jobPosition")
             ->latest()
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString()
             ->through(function (User $employee) {
                 $totalFolders = $employee->company
@@ -102,17 +104,20 @@ class UserController extends Controller
                 ];
             });
 
-        $companies = Company::with(["jobs" => function ($query) {
-            $query->select("job_positions.id", "job_positions.name")
-                ->whereHas("document", function ($q) {
-                    $q->whereColumn("documents.company_id", "company_job_position.company_id");
-                });
-        }])->get(["id", "name"]);
+        $companies = Company::with([
+            "jobs" => function ($query) {
+                $query->select("job_positions.id", "job_positions.name")
+                    ->whereHas("document", function ($q) {
+                        $q->whereColumn("documents.company_id", "company_job_position.company_id");
+                    });
+            }
+        ])->get(["id", "name"]);
 
         return Inertia::render("Admin/Users/Employees", [
             "employees" => $employees,
             "companies" => $companies,
             "stats" => $stats,
+            "filters" => $request->only(["search", "per_page"])
         ]);
     }
 
@@ -254,7 +259,7 @@ class UserController extends Controller
                     ->pluck("label")
                     ->values()
                     ->toArray();
-                
+
                 return [
                     "name" => $folder->name,
                     "key_topics" => $keyTopics

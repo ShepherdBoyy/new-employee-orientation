@@ -16,9 +16,13 @@ import { itemVariants, pageVariants } from "@/motion";
 import { motion } from "motion/react";
 type Props = {
     jobs: Paginated<JobPosition>;
+    filters: {
+        search?: string;
+        per_page: number;
+    };
 };
 
-function Index({ jobs }: Props) {
+function Index({ jobs, filters }: Props) {
     function handleDelete() {
         if (!deletingJob) return;
 
@@ -32,7 +36,7 @@ function Index({ jobs }: Props) {
     const [deletingJob, setDeletingJob] = useState<JobPosition | null>(null);
     const [createOpen, setCreateOpen] = useState(false);
     const [selectedJobIds, setSelectedJobIds] = useState<number[]>([]);
-    const [search, setSearch] = useState("");
+    const [search, setSearch] = useState(filters.search ?? "");
     const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
     const [filter, setFilter] = useState<JobSortOption>(
         () =>

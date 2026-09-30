@@ -48,7 +48,6 @@ import {
 import AppPagination from "@/Layout/Pagination";
 import EmployeeFilters from "./components/EmployeeFilters";
 import type { Paginated } from "../Types/job-position";
-import { EmployeeDetailsDrawer } from "./components/EmployeeDetailsDrawer";
 export interface Employee {
     id: number;
     name: string;
@@ -64,10 +63,14 @@ export interface Employee {
 interface Props {
     employees: Paginated<Employee>;
     companies: CompanyWithJobs[];
+    filters: {
+        search?: string;
+        per_page: number;
+    };
 }
 
-function Employees({ employees: initialEmployees, companies }: Props) {
-    const [search, setSearch] = useState("");
+function Employees({ employees: initialEmployees, companies, filters }: Props) {
+    const [search, setSearch] = useState(filters.search ?? "");
     const [companyFilter, setCompanyFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
     const [employees, setEmployees] = useState(initialEmployees);
@@ -259,7 +262,7 @@ function Employees({ employees: initialEmployees, companies }: Props) {
             "/admin/users/employees",
             {
                 page,
-                per_page: employees.per_page,
+                per_page: filters.per_page,
             },
             {
                 preserveState: true,

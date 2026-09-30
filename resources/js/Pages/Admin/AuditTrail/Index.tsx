@@ -298,330 +298,352 @@ function AuditTrail({ logs, actions, filters }: Props) {
         );
     };
     return (
-        <div className="w-full space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-semibold tracking-tight">
-                        Audit Trail
-                    </h1>
+        <>
+            {" "}
+            <div className="w-full space-y-6">
+                {/* Header */}
+                <div className="flex items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-2xl font-semibold tracking-tight">
+                            Audit Trail
+                        </h1>
 
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        A chronological, unalterable record of who did what,
-                        when, and from where.
-                    </p>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            A chronological, unalterable record of who did what,
+                            when, and from where.
+                        </p>
+                    </div>
                 </div>
-            </div>
 
-            {/* Filters */}
-            <div className="flex flex-col gap-3">
-                <InputGroup className="h-9 max-w-2xl">
-                    <InputGroupInput
-                        value={search}
-                        onChange={(e) => handleSearchChange(e.target.value)}
-                        placeholder="Search by user or description..."
-                    />
+                {/* Filters */}
+                <div className="flex flex-col gap-3">
+                    <InputGroup className="h-9 max-w-2xl">
+                        <InputGroupInput
+                            value={search}
+                            onChange={(e) => handleSearchChange(e.target.value)}
+                            placeholder="Search by user or description..."
+                        />
 
-                    <InputGroupAddon>
-                        <SearchIcon />
-                    </InputGroupAddon>
-                </InputGroup>
+                        <InputGroupAddon>
+                            <SearchIcon />
+                        </InputGroupAddon>
+                    </InputGroup>
 
-                <div className="flex flex-wrap items-center gap-2">
-                    {/* Action */}
-                    <Select value={action} onValueChange={handleActionChange}>
-                        <SelectTrigger className="h-9 w-48">
-                            <SelectValue placeholder="Action" />
-                        </SelectTrigger>
-
-                        <SelectContent position="popper">
-                            <SelectItem value="all">All actions</SelectItem>
-
-                            {actions.map((a) => (
-                                <SelectItem key={a} value={a}>
-                                    {actionLabel(a)}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-
-                    {/* Date From */}
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className={[
-                                    "h-9 w-44 justify-start gap-2 px-3 text-left font-normal",
-                                    !dateFrom && "text-muted-foreground",
-                                ]
-                                    .filter(Boolean)
-                                    .join(" ")}
-                            >
-                                <CalendarDays className="size-3.5" />
-
-                                {dateFrom
-                                    ? formatDateLabel(dateFrom)
-                                    : "From date"}
-                            </Button>
-                        </PopoverTrigger>
-
-                        <PopoverContent align="start" className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={parseDate(dateFrom)}
-                                onSelect={handleDateFromChange}
-                                disabled={{
-                                    after: new Date(),
-                                }}
-                                initialFocus
-                            />
-                        </PopoverContent>
-                    </Popover>
-
-                    <span className="text-sm text-muted-foreground">to</span>
-
-                    {/* Date To */}
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className={[
-                                    "h-9 w-44 justify-start gap-2 px-3 text-left font-normal",
-                                    !dateTo && "text-muted-foreground",
-                                ]
-                                    .filter(Boolean)
-                                    .join(" ")}
-                            >
-                                <CalendarDays className="size-3.5" />
-
-                                {dateTo ? formatDateLabel(dateTo) : "To date"}
-                            </Button>
-                        </PopoverTrigger>
-
-                        <PopoverContent align="start" className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={parseDate(dateTo)}
-                                onSelect={handleDateToChange}
-                                disabled={{
-                                    before: parseDate(dateFrom),
-                                    after: new Date(),
-                                }}
-                                initialFocus
-                            />
-                        </PopoverContent>
-                    </Popover>
-
-                    {/* Clear */}
-                    {hasActiveFilters && (
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={clearFilters}
-                            className="h-9 gap-1.5 px-2.5 text-muted-foreground hover:text-foreground"
+                    <div className="flex flex-wrap items-center gap-2">
+                        {/* Action */}
+                        <Select
+                            value={action}
+                            onValueChange={handleActionChange}
                         >
-                            <X className="size-3.5" />
-                            Clear filters
-                        </Button>
-                    )}
+                            <SelectTrigger className="h-9 w-48">
+                                <SelectValue placeholder="Action" />
+                            </SelectTrigger>
+
+                            <SelectContent position="popper">
+                                <SelectItem value="all">All actions</SelectItem>
+
+                                {actions.map((a) => (
+                                    <SelectItem key={a} value={a}>
+                                        {actionLabel(a)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        {/* Date From */}
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    className={[
+                                        "h-9 w-44 justify-start gap-2 px-3 text-left font-normal",
+                                        !dateFrom && "text-muted-foreground",
+                                    ]
+                                        .filter(Boolean)
+                                        .join(" ")}
+                                >
+                                    <CalendarDays className="size-3.5" />
+
+                                    {dateFrom
+                                        ? formatDateLabel(dateFrom)
+                                        : "From date"}
+                                </Button>
+                            </PopoverTrigger>
+
+                            <PopoverContent
+                                align="start"
+                                className="w-auto p-0"
+                            >
+                                <Calendar
+                                    mode="single"
+                                    selected={parseDate(dateFrom)}
+                                    onSelect={handleDateFromChange}
+                                    disabled={{
+                                        after: new Date(),
+                                    }}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+
+                        <span className="text-sm text-muted-foreground">
+                            to
+                        </span>
+
+                        {/* Date To */}
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    className={[
+                                        "h-9 w-44 justify-start gap-2 px-3 text-left font-normal",
+                                        !dateTo && "text-muted-foreground",
+                                    ]
+                                        .filter(Boolean)
+                                        .join(" ")}
+                                >
+                                    <CalendarDays className="size-3.5" />
+
+                                    {dateTo
+                                        ? formatDateLabel(dateTo)
+                                        : "To date"}
+                                </Button>
+                            </PopoverTrigger>
+
+                            <PopoverContent
+                                align="start"
+                                className="w-auto p-0"
+                            >
+                                <Calendar
+                                    mode="single"
+                                    selected={parseDate(dateTo)}
+                                    onSelect={handleDateToChange}
+                                    disabled={{
+                                        before: parseDate(dateFrom),
+                                        after: new Date(),
+                                    }}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+
+                        {/* Clear */}
+                        {hasActiveFilters && (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={clearFilters}
+                                className="h-9 gap-1.5 px-2.5 text-muted-foreground hover:text-foreground"
+                            >
+                                <X className="size-3.5" />
+                                Clear filters
+                            </Button>
+                        )}
+                    </div>
                 </div>
-            </div>
 
-            {/* Table */}
-            <div className="overflow-hidden rounded-xl border bg-card">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Timestamp</TableHead>
-                            <TableHead>User</TableHead>
-                            <TableHead>Action</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead>IP Address</TableHead>
-                            <TableHead className="w-10" />
-                        </TableRow>
-                    </TableHeader>
+                {/* Table */}
+                <div className="overflow-hidden rounded-xl border bg-card">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Timestamp</TableHead>
+                                <TableHead>User</TableHead>
+                                <TableHead>Action</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead>IP Address</TableHead>
+                                <TableHead className="w-10" />
+                            </TableRow>
+                        </TableHeader>
 
-                    <TableBody>
-                        {logs.data.length > 0 ? (
-                            logs.data.map((log) => (
-                                <TableRow key={log.id}>
-                                    <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                                        {log.created_at}
-                                    </TableCell>
+                        <TableBody>
+                            {logs.data.length > 0 ? (
+                                logs.data.map((log) => (
+                                    <TableRow key={log.id}>
+                                        <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+                                            {log.created_at}
+                                        </TableCell>
 
-                                    <TableCell>
-                                        <div className="text-sm font-medium">
-                                            {log.user_name ?? "System"}
-                                        </div>
-
-                                        {log.user_role && (
-                                            <div className="text-xs capitalize text-muted-foreground">
-                                                {log.user_role}
+                                        <TableCell>
+                                            <div className="text-sm font-medium">
+                                                {log.user_name ?? "System"}
                                             </div>
-                                        )}
-                                    </TableCell>
 
-                                    <TableCell>
-                                        <Badge
-                                            variant="secondary"
-                                            className={
-                                                ACTION_VARIANT[log.action] ?? ""
-                                            }
-                                        >
-                                            {actionLabel(log.action)}
-                                        </Badge>
-                                    </TableCell>
+                                            {log.user_role && (
+                                                <div className="text-xs capitalize text-muted-foreground">
+                                                    {log.user_role}
+                                                </div>
+                                            )}
+                                        </TableCell>
 
-                                    <TableCell className="max-w-md truncate  ">
-                                        {log.description}
-                                    </TableCell>
-
-                                    <TableCell className="text-sm text-muted-foreground">
-                                        {log.ip_address ?? "—"}
-                                    </TableCell>
-
-                                    <TableCell>
-                                        {log.action === "updated" &&
-                                            (() => {
-                                                const changedFields =
-                                                    getChangedFields(log);
-
-                                                if (
-                                                    changedFields.length === 0
-                                                ) {
-                                                    return null;
+                                        <TableCell>
+                                            <Badge
+                                                variant="secondary"
+                                                className={
+                                                    ACTION_VARIANT[
+                                                        log.action
+                                                    ] ?? ""
                                                 }
+                                            >
+                                                {actionLabel(log.action)}
+                                            </Badge>
+                                        </TableCell>
 
-                                                return (
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                className="h-7 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
+                                        <TableCell className="max-w-md truncate  ">
+                                            {log.description}
+                                        </TableCell>
+
+                                        <TableCell className="text-sm text-muted-foreground">
+                                            {log.ip_address ?? "—"}
+                                        </TableCell>
+
+                                        <TableCell>
+                                            {log.action === "updated" &&
+                                                (() => {
+                                                    const changedFields =
+                                                        getChangedFields(log);
+
+                                                    if (
+                                                        changedFields.length ===
+                                                        0
+                                                    ) {
+                                                        return null;
+                                                    }
+
+                                                    return (
+                                                        <Popover>
+                                                            <PopoverTrigger
+                                                                asChild
                                                             >
-                                                                <FileDiff className="size-3.5" />
-                                                                View changes
-                                                            </Button>
-                                                        </PopoverTrigger>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className="h-7 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
+                                                                >
+                                                                    <FileDiff className="size-3.5" />
+                                                                    View changes
+                                                                </Button>
+                                                            </PopoverTrigger>
 
-                                                        <PopoverContent
-                                                            align="end"
-                                                            className="w-96 p-0"
-                                                        >
-                                                            <div className="flex max-h-[28rem] flex-col">
-                                                                {/* Header */}
-                                                                <div className="shrink-0 border-b px-4 py-3">
-                                                                    <p className="text-sm font-medium">
-                                                                        Changes
-                                                                    </p>
+                                                            <PopoverContent
+                                                                align="end"
+                                                                className="w-96 p-0"
+                                                            >
+                                                                <div className="flex max-h-[28rem] flex-col">
+                                                                    {/* Header */}
+                                                                    <div className="shrink-0 border-b px-4 py-3">
+                                                                        <p className="text-sm font-medium">
+                                                                            Changes
+                                                                        </p>
 
-                                                                    <p className="mt-0.5 text-xs text-muted-foreground">
-                                                                        The
-                                                                        fields
-                                                                        modified
-                                                                        by this
-                                                                        update.
-                                                                    </p>
-                                                                </div>
+                                                                        <p className="mt-0.5 text-xs text-muted-foreground">
+                                                                            The
+                                                                            fields
+                                                                            modified
+                                                                            by
+                                                                            this
+                                                                            update.
+                                                                        </p>
+                                                                    </div>
 
-                                                                {/* Scrollable changes */}
-                                                                <div className="min-h-0 overflow-y-auto p-4">
-                                                                    <div className="space-y-2">
-                                                                        {changedFields.map(
-                                                                            (
-                                                                                key,
-                                                                            ) => {
-                                                                                const oldValue =
-                                                                                    log
-                                                                                        .old_values?.[
-                                                                                        key
-                                                                                    ];
-
-                                                                                const newValue =
-                                                                                    log
-                                                                                        .new_values?.[
-                                                                                        key
-                                                                                    ];
-
-                                                                                return (
-                                                                                    <div
-                                                                                        key={
+                                                                    {/* Scrollable changes */}
+                                                                    <div className="min-h-0 overflow-y-auto p-4">
+                                                                        <div className="space-y-2">
+                                                                            {changedFields.map(
+                                                                                (
+                                                                                    key,
+                                                                                ) => {
+                                                                                    const oldValue =
+                                                                                        log
+                                                                                            .old_values?.[
                                                                                             key
-                                                                                        }
-                                                                                        className="rounded-lg border bg-muted/30 p-3"
-                                                                                    >
-                                                                                        <p className="mb-2 text-xs font-medium">
-                                                                                            {formatChangeKey(
-                                                                                                key,
-                                                                                            )}
-                                                                                        </p>
+                                                                                        ];
 
-                                                                                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-                                                                                            <div className="min-w-0">
-                                                                                                <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
-                                                                                                    Before
-                                                                                                </p>
+                                                                                    const newValue =
+                                                                                        log
+                                                                                            .new_values?.[
+                                                                                            key
+                                                                                        ];
 
-                                                                                                <p className="truncate rounded-md bg-background px-2 py-1.5 text-xs text-muted-foreground">
-                                                                                                    {formatChangeValue(
-                                                                                                        oldValue,
-                                                                                                    )}
-                                                                                                </p>
-                                                                                            </div>
+                                                                                    return (
+                                                                                        <div
+                                                                                            key={
+                                                                                                key
+                                                                                            }
+                                                                                            className="rounded-lg border bg-muted/30 p-3"
+                                                                                        >
+                                                                                            <p className="mb-2 text-xs font-medium">
+                                                                                                {formatChangeKey(
+                                                                                                    key,
+                                                                                                )}
+                                                                                            </p>
 
-                                                                                            <span className="text-muted-foreground">
-                                                                                                →
-                                                                                            </span>
+                                                                                            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                                                                                                <div className="min-w-0">
+                                                                                                    <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+                                                                                                        Before
+                                                                                                    </p>
 
-                                                                                            <div className="min-w-0">
-                                                                                                <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
-                                                                                                    After
-                                                                                                </p>
+                                                                                                    <p className="truncate rounded-md bg-background px-2 py-1.5 text-xs text-muted-foreground">
+                                                                                                        {formatChangeValue(
+                                                                                                            oldValue,
+                                                                                                        )}
+                                                                                                    </p>
+                                                                                                </div>
 
-                                                                                                <p className="truncate rounded-md bg-background px-2 py-1.5 text-xs font-medium">
-                                                                                                    {formatChangeValue(
-                                                                                                        newValue,
-                                                                                                    )}
-                                                                                                </p>
+                                                                                                <span className="text-muted-foreground">
+                                                                                                    →
+                                                                                                </span>
+
+                                                                                                <div className="min-w-0">
+                                                                                                    <p className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+                                                                                                        After
+                                                                                                    </p>
+
+                                                                                                    <p className="truncate rounded-md bg-background px-2 py-1.5 text-xs font-medium">
+                                                                                                        {formatChangeValue(
+                                                                                                            newValue,
+                                                                                                        )}
+                                                                                                    </p>
+                                                                                                </div>
                                                                                             </div>
                                                                                         </div>
-                                                                                    </div>
-                                                                                );
-                                                                            },
-                                                                        )}
+                                                                                    );
+                                                                                },
+                                                                            )}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                );
-                                            })()}
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                    );
+                                                })()}
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={6}
+                                        className="h-32 text-center"
+                                    >
+                                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                                            <ShieldAlert className="size-6" />
+
+                                            <p className="text-sm">
+                                                No audit entries found.
+                                            </p>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={6}
-                                    className="h-32 text-center"
-                                >
-                                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                                        <ShieldAlert className="size-6" />
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
 
-                                        <p className="text-sm">
-                                            No audit entries found.
-                                        </p>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                {/* Pagination */}
             </div>
-
-            {/* Pagination */}
             {logs.data.length > 0 && (
                 <AppPagination
                     from={logs.from}
@@ -636,7 +658,7 @@ function AuditTrail({ logs, actions, filters }: Props) {
                     onPerPageChange={handlePerPageChange}
                 />
             )}
-        </div>
+        </>
     );
 }
 
