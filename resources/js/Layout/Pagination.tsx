@@ -111,7 +111,7 @@ export default function AppPagination({
     };
 
     return (
-        <div className="flex flex-col gap-4 pt-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
             {/* Showing */}
             <div className="text-sm text-muted-foreground">
                 Showing{" "}
