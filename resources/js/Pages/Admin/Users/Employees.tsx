@@ -48,7 +48,6 @@ import {
 import AppPagination from "@/Layout/Pagination";
 import EmployeeFilters from "./components/EmployeeFilters";
 import type { Paginated } from "../Types/job-position";
-import { EmployeeDetailsDrawer } from "./components/EmployeeDetailsDrawer";
 export interface Employee {
     id: number;
     name: string;
@@ -64,10 +63,14 @@ export interface Employee {
 interface Props {
     employees: Paginated<Employee>;
     companies: CompanyWithJobs[];
+    filters: {
+        search?: string;
+        per_page: number;
+    };
 }
 
-function Employees({ employees: initialEmployees, companies }: Props) {
-    const [search, setSearch] = useState("");
+function Employees({ employees: initialEmployees, companies, filters }: Props) {
+    const [search, setSearch] = useState(filters.search ?? "");
     const [companyFilter, setCompanyFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
     const [employees, setEmployees] = useState(initialEmployees);
@@ -254,7 +257,33 @@ function Employees({ employees: initialEmployees, companies }: Props) {
             },
         );
     };
+    const handlePageChange = (page: number) => {
+        router.get(
+            "/admin/users/employees",
+            {
+                page,
+                per_page: filters.per_page,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
 
+    const handlePerPageChange = (perPage: number) => {
+        router.get(
+            "/admin/users/employees",
+            {
+                page: 1,
+                per_page: perPage,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
     return (
         <>
             <div className="w-full space-y-6">
@@ -272,6 +301,7 @@ function Employees({ employees: initialEmployees, companies }: Props) {
 
                     <div className="flex items-center gap-3">
                         <Button
+                            asChild
                             className="shrink-0"
                             size="lg"
                             variant="secondary"
@@ -279,8 +309,8 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                         >
                             <a href="/admin/users/employees/export">
                                 <FileDown className="size-4" />
+                                Export
                             </a>
-                            Export
                         </Button>
                         <Button
                             onClick={openCreate}
@@ -362,26 +392,11 @@ function Employees({ employees: initialEmployees, companies }: Props) {
                     total={employees.total}
                     currentPage={employees.current_page}
                     lastPage={employees.last_page}
-                    onPrevious={employees?.prev_page_url}
-                    onNext={employees?.next_page_url}
-                    onPageChange={(page) => {
-                        // 1. Get existing query parameters from the current URL
-                        const params = new URLSearchParams(
-                            window.location.search,
-                        );
-
-                        // 2. Set or update the page parameter
-                        params.set("page", page);
-
-                        // 3. Convert params back to a plain object for Inertia's data option
-                        const queryData = Object.fromEntries(params.entries());
-
-                        router.visit(window.location.pathname, {
-                            data: queryData,
-                            preserveState: true, // Optional: keeps component state if desired
-                            preserveScroll: true, // Optional: keeps scroll position
-                        });
-                    }}
+                    perPage={employees.per_page}
+                    onPrevious={employees.prev_page_url}
+                    onNext={employees.next_page_url}
+                    onPageChange={handlePageChange}
+                    onPerPageChange={handlePerPageChange}
                 />
             </div>
 

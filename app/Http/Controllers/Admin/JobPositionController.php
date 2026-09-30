@@ -20,6 +20,8 @@ class JobPositionController extends Controller
 
     public function index(Request $request)
     {
+        $perPage = $request->query("per_page", 10);
+
         $jobs = JobPosition::with('companies')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->input('search');
@@ -30,11 +32,12 @@ class JobPositionController extends Controller
                 $query->where("employee_type", $request->input("filter"));
             })
             ->orderBy("name")
-            ->paginate(11)
+            ->paginate($perPage)
             ->withQueryString();
 
         return Inertia::render("Admin/JobPositions/AllJobs/Index", [
             'jobs' => $jobs,
+            "filters" => $request->only(["search", "per_page"])
         ]);
     }
 

@@ -12,6 +12,8 @@ class AuditLogController extends Controller
 {
     public function index(Request $request): Response
     {
+        $perPage = $request->query("per_page", 10);
+
         $logs = AuditLog::query()
             ->when($request->filled("search"), function ($query) use ($request) {
                 $search = $request->input("search");
@@ -31,7 +33,7 @@ class AuditLogController extends Controller
                 $query->whereDate("created_at", "<=", $request->input("date_to"));
             })
             ->latest("created_at")
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString()
             ->through(fn(AuditLog $log) => [
                 "id" => $log->id,
@@ -55,7 +57,7 @@ class AuditLogController extends Controller
         return Inertia::render("Admin/AuditTrail/Index", [
             "logs" => $logs,
             "actions" => $actions,
-            "filters" => $request->only(["search", "action", "date_from", "date_to"])
+            "filters" => $request->only(["search", "action", "date_from", "date_to", "per_page"])
         ]);
     }
 }

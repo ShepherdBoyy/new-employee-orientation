@@ -16,9 +16,13 @@ import { itemVariants, pageVariants } from "@/motion";
 import { motion } from "motion/react";
 type Props = {
     jobs: Paginated<JobPosition>;
+    filters: {
+        search?: string;
+        per_page: number;
+    };
 };
 
-function Index({ jobs }: Props) {
+function Index({ jobs, filters }: Props) {
     function handleDelete() {
         if (!deletingJob) return;
 
@@ -32,7 +36,7 @@ function Index({ jobs }: Props) {
     const [deletingJob, setDeletingJob] = useState<JobPosition | null>(null);
     const [createOpen, setCreateOpen] = useState(false);
     const [selectedJobIds, setSelectedJobIds] = useState<number[]>([]);
-    const [search, setSearch] = useState("");
+    const [search, setSearch] = useState(filters.search ?? "");
     const [deleteSelectedOpen, setDeleteSelectedOpen] = useState(false);
     const [filter, setFilter] = useState<JobSortOption>(
         () =>
@@ -87,6 +91,28 @@ function Index({ jobs }: Props) {
                 preserveScroll: true,
                 replace: true,
             },
+        );
+    };
+
+    const onPageChange = (page: number) => {
+        router.get(
+            "/admin/job-positions",
+            { page, per_page: jobs.per_page },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
+
+    const handlePerPageChange = (perPage: number) => {
+        router.get(
+            "/admin/job-positions",
+            {
+                page: 1,
+                per_page: perPage,
+            },
+            { preserveState: true, preserveScroll: true },
         );
     };
 
@@ -156,19 +182,9 @@ function Index({ jobs }: Props) {
                 lastPage={jobs.last_page}
                 onPrevious={jobs?.prev_page_url}
                 onNext={jobs?.next_page_url}
-                onPageChange={(page) => {
-                    const params = new URLSearchParams(window.location.search);
-
-                    params.set("page", page);
-
-                    const queryData = Object.fromEntries(params.entries());
-
-                    router.visit(window.location.pathname, {
-                        data: queryData,
-                        preserveState: true,
-                        preserveScroll: true,
-                    });
-                }}
+                perPage={jobs.per_page}
+                onPageChange={onPageChange}
+                onPerPageChange={handlePerPageChange}
             />
 
             {/* Forms */}
