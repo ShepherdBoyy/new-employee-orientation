@@ -52,15 +52,30 @@ class OrientationController extends Controller
         return redirect()->route("employee.folders.index");
     }
 
-    public function markJdViewed(): RedirectResponse
+    public function uploadSignedJobDescription(Request $request): RedirectResponse
     {
         $user = Auth::user();
 
-        if ($user->jd_viewed_at === null) {
-            $user->update(["jd_viewed_at" => now()]);
+        abort_if($user->jobDescriptionPath() === null, 404, "No Job Description is assigned to your role");
+
+        if ($user->hasAcknowledgedOrientation()) {
+            return back()->withErrors(["error" => "Your acknowledgement has already been submitted and can no longer be changed"]);
         }
 
-        return back();
+        $request->validate(["signed_jd" => ["required", "file", "mimes:pdf", "max:10240"]]);
+
+        if ($user->signed_jd_path) {
+            Storage::disk("private")->delete($user->signed_jd_path);
+        }
+
+        $path = $request->file("signed_jd")->store("job-descriptions/signed", "private");
+
+        $user->update([
+            "signed_jd_path" => $path,
+            "signed_jd_uploaded_at" => now()
+        ]);
+
+        return back()->with("success", "Signed Job Description uploaded successfully");
     }
 
     public function index(): Response|RedirectResponse
@@ -108,7 +123,7 @@ class OrientationController extends Controller
                 "companyName" => $user->company?->name,
                 "jobPosition" => $user->jobPosition?->name,
                 "jd_path" => $document,
-                "jd_viewed" => $user->hasViewedJobDescription()
+                "signed_jd_submitted" => $user->hasSubmittedSignedJobDescription()
             ],
         ]);
     }
@@ -194,7 +209,7 @@ class OrientationController extends Controller
             "user" => $user->only("name"),
             "progress" => $user->orientationProgress(),
             "jdPath" => $user->jobDescriptionPath(),
-            "jdViewed" => $user->hasViewedJobDescription()
+            "signedJdSubmitted" => $user->hasSubmittedSignedJobDescription()
         ]);
     }
 
@@ -206,8 +221,8 @@ class OrientationController extends Controller
             return back()->withErrors(["error" => "You must complete all modules first"]);
         }
 
-        if ($user->jobDescriptionPath() !== null && !$user->hasViewedJobDescription()) {
-            return back()->withErrors(["error" => "You must view your Job Description/KPI first"]);
+        if ($user->jobDescriptionPath() !== null && !$user->hasSubmittedSignedJobDescription()) {
+            return back()->withErrors(["error" => "You must upload your signed Job Description/KPI first"]);
         }
 
         if ($user->hasAcknowledgedOrientation()) {
@@ -306,17 +321,5 @@ class OrientationController extends Controller
     public function locked(): Response
     {
         return Inertia::render("Employee/AccountExpired");
-    }
-
-    private function storeBase64File(string $base64, string $folder, string $filename): string
-    {
-        $data = preg_replace("/^data:\w+\/[a-zA-Z0-9.+-]+;base64,/", "", $base64);
-        $decoded = base64_decode($data);
-
-        $path = $folder . "/" . $filename;
-
-        Storage::disk("private")->put($path, $decoded);
-
-        return $path;
     }
 }

@@ -22,7 +22,8 @@ class User extends Authenticatable
         "job_position_id",
         "expires_at",
         "welcome_viewed_at",
-        "jd_viewed_at",
+        "signed_jd_path",
+        "signed_jd_uploaded_at",
         "signature_path"
     ];
 
@@ -38,7 +39,7 @@ class User extends Authenticatable
             "expires_at" => "datetime",
             "role" => "string",
             "welcome_viewed_at" => "datetime",
-            "jd_viewed_at" => "datetime"
+            "signed_jd_uploaded_at" => "datetime"
         ];
     }
 
@@ -108,9 +109,14 @@ class User extends Authenticatable
             ?->file_path;
     }
 
-    public function hasViewedJobDescription(): bool
+    public function hasSubmittedSignedJobDescription(): bool
     {
-        return $this->jd_viewed_at !== null;
+        return $this->signed_jd_path !== null;
+    }
+
+    public function hasSignature(): bool
+    {
+        return $this->signature_path !== null;
     }
 
     public function orientationProgress(): array
@@ -142,11 +148,6 @@ class User extends Authenticatable
                     ->toArray()
             ];
         })->toArray();
-    }
-
-    public function hasSignature(): bool
-    {
-        return $this->signature_path !== null;
     }
 
     public static function generateDefaultPassword(string $fullName): string

@@ -27,7 +27,7 @@ class EmployeesExport implements FromCollection, WithHeadings, WithMapping
             "Company",
             "Job Position",
             "Welcome Viewed At",
-            "JD Viewed At",
+            "Signed JD Uploaded At",
             "Progress",
             "Status",
             "Created At",

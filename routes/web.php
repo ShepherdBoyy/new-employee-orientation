@@ -90,6 +90,7 @@ Route::middleware("test")->group(function () {
         Route::delete("/users/{user}", [UserController::class, "destroy"])->name("users.destroy");
         Route::get("/users/employees/{user}/progress", [UserController::class, "progress"])->name("users.employees.progress");
         Route::get("/users/employees/{user}/acknowledgement/pdf", [UserController::class, "exportAcknowledgementPdf"])->name("users.employees.acknowledgement-pdf");
+        Route::get("/users/employees/{user}/signed-jd", [UserController::class, "downloadSignedJobDescription"])->name("users.employees.signed-jd");
         Route::get("/users/employees/export", [UserController::class, "exportEmployees"])->name("users.employees.export");
     });
 
@@ -97,7 +98,7 @@ Route::middleware("test")->group(function () {
         Route::get("/", [OrientationController::class, "welcome"])->name("welcome");
         Route::post("/begin", [OrientationController::class, "beginOrientation"])->name("begin");
         Route::get("/folders", [OrientationController::class, "index"])->name("folders.index");
-        Route::post("/jd/viewed", [OrientationController::class, "markJdViewed"])->name("jd.viewed");
+        Route::post("/jd/signed", [OrientationController::class, "uploadSignedJobDescription"])->name("jd.signed.upload");
         Route::get("/folders/{folder:slug}", [OrientationController::class, "showFolder"])->name("folders.show");
         Route::post("/folders/{folder}/complete", [OrientationController::class, "completeFolder"])->name("folders.complete");
         Route::get("/acknowledgement", [OrientationController::class, "acknowledgement"])->name("acknowledgement");

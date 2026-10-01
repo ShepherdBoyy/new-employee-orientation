@@ -18,7 +18,6 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
-use Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Mail;
 
@@ -231,10 +230,28 @@ class UserController extends Controller
             "folders" => $folderProgress,
             "acknowledgement" => $acknowledgement ? [
                 "acknowledged_at" => $acknowledgement->acknowledged_at->format("F j, Y g:i A"),
-            ] : null
+            ] : null,
+            "signed_jd_submitted" => $user->hasSubmittedSignedJobDescription(),
+            "signed_jd_uploaded_at" => $user->signed_jd_uploaded_at?->format("F j, Y g:i A")
         ]);
     }
 
+    public function downloadSignedJobDescription(User $user)
+    {
+        abort_unless($user->isEmployee(), 404);
+        abort_if(!$user->hasSubmittedSignedJobDescription(), 404, "This employee has not uploaded a signed Job Description yet");
+
+        AuditLogger::record(
+            "exported",
+            "Downloaded signed Job Description for \"{$user->name}\"",
+            $user
+        );
+
+        return Storage::disk("private")->download(
+            $user->signed_jd_path,
+            Str::slug($user->name) . "-signed-jd.pdf"
+        );
+    }
     public function exportAcknowledgementPdf(User $user)
     {
         abort_unless($user->isEmployee(), 404);
@@ -289,7 +306,7 @@ class UserController extends Controller
             "hrSignaturePath" => $hrSignaturePath,
             "generatedAt" => now()->format("F j, Y \\a\\t g:i A"),
             "hasJobDescription" => $user->jobDescriptionPath() !== null,
-            "jdViewedAt" => $user->jd_viewed_at?->format("F j, Y g:i A"),
+            "signedJdUploadedAt" => $user->signed_jd_uploaded_at?->format("F j, Y g:i A"),
         ]);
 
         $filename = Str::slug($user->name) . "-orientation-acknowledgement.pdf";

@@ -14,7 +14,8 @@ return new class extends Migration
             $table->string("name");
             $table->string("email")->unique();
             $table->timestamp("welcome_viewed_at")->nullable();
-            $table->timestamp("jd_viewed_at")->nullable();
+            $table->string("signed_jd_path")->nullable();
+            $table->timestamp("signed_jd_uploaded_at")->nullable();
             $table->string("signature_path")->nullable();
             $table->string("password");
             $table->enum("role", ["admin", "employee"]);
