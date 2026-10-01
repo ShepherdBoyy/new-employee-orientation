@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Head, router, useForm } from "@inertiajs/react";
+import { router, useForm, usePage } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 
@@ -25,19 +25,23 @@ interface Props {
     user: { name: string };
     progress: ProgressItem[];
     jdPath: string | null;
-    jdViewed: boolean;
+    signedJdSubmitted: boolean;
 }
 
 export default function Acknowledgement({
     user,
     progress,
     jdPath,
-    jdViewed,
+    signedJdSubmitted,
 }: Props) {
+    const { props: pageProps } = usePage<{ errors: Record<string, string> }>();
+
     const [step, setStep] = useState(0);
     const [permissionPromptOpen, setPermissionPromptOpen] = useState(false);
     const [cameraOpen, setCameraOpen] = useState(false);
-    const [hasViewedJd, setHasViewedJd] = useState(jdViewed);
+    const [hasSubmittedSignedJd, setHasSubmittedSignedJd] =
+        useState(signedJdSubmitted);
+    const [isUploadingSignedJd, setIsUploadingSignedJd] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
         full_name: "",
@@ -58,14 +62,18 @@ export default function Acknowledgement({
         post("/orientation/acknowledgement");
     }
 
-    function handleViewJd() {
-        if (hasViewedJd) return;
-        setHasViewedJd(true);
-        router.post(
-            "/orientation/jd/viewed",
-            {},
-            { preserveScroll: true, preserveState: true },
-        );
+    function handleUploadSignedJd(file: File) {
+        const formData = new FormData();
+        formData.append("signed_jd", file);
+
+        router.post("/orientation/jd/signed", formData, {
+            preserveScroll: true,
+            preserveState: true,
+            forceFormData: true,
+            onStart: () => setIsUploadingSignedJd(true),
+            onFinish: () => setIsUploadingSignedJd(false),
+            onSuccess: () => setHasSubmittedSignedJd(true),
+        });
     }
 
     function handleRequestCamera() {
@@ -86,7 +94,7 @@ export default function Acknowledgement({
         handleRequestCamera();
     }
 
-    const canProceedFromReview = !jdPath || hasViewedJd;
+    const canProceedFromReview = !jdPath || hasSubmittedSignedJd;
     const canProceedFromNameSignature =
         data.full_name.trim().length > 0 && data.signature.length > 0;
     const canSubmit = data.photo.length > 0 && data.consented;
@@ -116,8 +124,10 @@ export default function Acknowledgement({
                         <ReviewStep
                             progress={progress}
                             jdPath={jdPath}
-                            jdViewed={hasViewedJd}
-                            onViewJd={handleViewJd}
+                            signedJdSubmitted={hasSubmittedSignedJd}
+                            isUploadingSignedJd={isUploadingSignedJd}
+                            signedJdError={pageProps.errors?.signed_jd}
+                            onUploadSignedJd={handleUploadSignedJd}
                         />
                     )}
 

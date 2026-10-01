@@ -1,9 +1,16 @@
+import { useRef } from "react";
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { CheckCircle2, ChevronDown, FileText } from "lucide-react";
+import {
+    CheckCircle2,
+    ChevronDown,
+    FileText,
+    Loader2,
+    Upload,
+} from "lucide-react";
 
 interface ProgressItem {
     folder_id: number;
@@ -16,16 +23,32 @@ interface ProgressItem {
 interface Props {
     progress: ProgressItem[];
     jdPath: string | null;
-    jdViewed: boolean;
-    onViewJd: () => void;
+    signedJdSubmitted: boolean;
+    isUploadingSignedJd: boolean;
+    signedJdError?: string;
+    onUploadSignedJd: (file: File) => void;
 }
 
 export default function ReviewStep({
     progress,
     jdPath,
-    jdViewed,
-    onViewJd,
+    signedJdSubmitted,
+    isUploadingSignedJd,
+    signedJdError,
+    onUploadSignedJd,
 }: Props) {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+
+        if (file) {
+            onUploadSignedJd(file);
+        }
+
+        e.target.value = "";
+    }
+
     return (
         <div className="animate-in fade-in slide-in-from-right-2 space-y-4 duration-300">
             <div>
@@ -90,26 +113,28 @@ export default function ReviewStep({
                             Job Description / KPI
                         </h2>
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                            Make sure you've reviewed the responsibilities and
-                            expectations for your role.
+                            Download it from the header above, fill it out,
+                            sign it, then upload your signed copy here as a
+                            PDF.
                         </p>
                     </div>
 
-                    <a
-                        href={`/storage/${jdPath}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={onViewJd}
-                        className="flex items-center gap-3 rounded-xl border bg-background px-4 py-3 transition-colors hover:bg-muted/40"
+                    <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploadingSignedJd}
+                        className="flex w-full items-center gap-3 rounded-xl border bg-background px-4 py-3 text-left transition-colors hover:bg-muted/40 disabled:cursor-not-allowed disabled:opacity-70"
                     >
                         <div
                             className={`flex size-8 shrink-0 items-center justify-center rounded-full ${
-                                jdViewed
+                                signedJdSubmitted
                                     ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400"
                                     : "bg-muted text-muted-foreground"
                             }`}
                         >
-                            {jdViewed ? (
+                            {isUploadingSignedJd ? (
+                                <Loader2 className="size-4 animate-spin" />
+                            ) : signedJdSubmitted ? (
                                 <CheckCircle2 className="size-4" />
                             ) : (
                                 <FileText className="size-4" />
@@ -118,13 +143,33 @@ export default function ReviewStep({
 
                         <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-medium">
-                                Job Description / KPI
+                                Signed Job Description / KPI (PDF)
                             </p>
                             <p className="mt-0.5 text-xs text-muted-foreground">
-                                {jdViewed ? "Viewed" : "Tap to open and review"}
+                                {isUploadingSignedJd
+                                    ? "Uploading..."
+                                    : signedJdSubmitted
+                                      ? "Uploaded — tap to replace"
+                                      : "Tap to upload your signed PDF"}
                             </p>
                         </div>
-                    </a>
+
+                        <Upload className="size-4 shrink-0 text-muted-foreground" />
+                    </button>
+
+                    {signedJdError && (
+                        <p className="text-xs text-destructive">
+                            {signedJdError}
+                        </p>
+                    )}
+
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="application/pdf"
+                        onChange={handleFileChange}
+                        className="hidden"
+                    />
                 </>
             )}
         </div>

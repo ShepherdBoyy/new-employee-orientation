@@ -1,27 +1,11 @@
 import { Building2, BriefcaseBusiness, FileText, Sparkles } from "lucide-react";
 import type { OnboardingUser } from "../../Types";
-import { router } from "@inertiajs/react";
-import { useState } from "react";
 
 type Props = {
     user: OnboardingUser;
 };
 
 export default function Header({ user }: Props) {
-    const [hasClicked, setHasClicked] = useState(user.jd_viewed);
-
-    function handleViewJd() {
-        if (hasClicked) return;
-
-        setHasClicked(true);
-
-        router.post(
-            "/orientation/jd/viewed",
-            {},
-            { preserveScroll: true, preserveState: true },
-        );
-    }
-
     return (
         <div className="relative overflow-hidden rounded-2xl border bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 text-white">
             <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl" />
@@ -69,16 +53,13 @@ export default function Header({ user }: Props) {
                                 href={`/storage/${user?.jd_path}`}
                                 target="_blank"
                             >
-                                <div
-                                    onClick={handleViewJd}
-                                    className="relative flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 backdrop-blur cursor-pointer select-none"
-                                >
+                                <div className="relative flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 backdrop-blur cursor-pointer select-none">
                                     <FileText className="h-4 w-4 text-mist-50" />
                                     <span className="text-sm font-light">
                                         Job Description/KPI
                                     </span>
 
-                                    {!hasClicked && (
+                                    {!user.signed_jd_submitted && (
                                         <span className="absolute -top-1 -right-1 flex size-3">
                                             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
                                             <span className="relative inline-flex size-3 rounded-full bg-sky-500"></span>
@@ -88,6 +69,14 @@ export default function Header({ user }: Props) {
                             </a>
                         )}
                     </div>
+
+                    {user.jd_path && !user.signed_jd_submitted && (
+                        <p className="text-xs text-slate-400">
+                            Download this, fill it out, sign it, then upload
+                            your signed copy in the final acknowledgement
+                            step.
+                        </p>
+                    )}
                 </div>
             </div>
         </div>

@@ -12,7 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CheckCircle2, Circle, ShieldCheck, Download } from "lucide-react";
+import {
+    CheckCircle2,
+    Circle,
+    ShieldCheck,
+    Download,
+    FileText,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FolderProgress {
@@ -32,6 +38,8 @@ interface AcknowledgementInfo {
 interface ProgressResponse {
     folders: FolderProgress[];
     acknowledgement: AcknowledgementInfo | null;
+    signed_jd_submitted: boolean;
+    signed_jd_uploaded_at: string | null;
 }
 
 export interface Employee {
@@ -221,6 +229,43 @@ export default function EmployeeDetailDialog({ employee, onClose }: Props) {
                                                     data.acknowledgement
                                                         .acknowledged_at
                                                 }
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <Separator />
+
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="flex items-center gap-1.5 text-sm font-semibold">
+                                            <FileText className="h-4 w-4" />
+                                            Signed Job Description
+                                        </h3>
+                                        {data?.signed_jd_submitted && (
+                                            <a
+                                                href={`/admin/users/employees/${employee.id}/signed-jd`}
+                                            >
+                                                <Button size="sm">
+                                                    <Download className="mr-1.5 h-3.5 w-3.5" />
+                                                    Download
+                                                </Button>
+                                            </a>
+                                        )}
+                                    </div>
+
+                                    {!data?.signed_jd_submitted ? (
+                                        <p className="text-sm text-muted-foreground">
+                                            This employee has not uploaded a
+                                            signed Job Description yet.
+                                        </p>
+                                    ) : (
+                                        <div className="rounded-xl border bg-muted/20 p-3.5 text-xs">
+                                            <p className="text-muted-foreground">
+                                                Uploaded on
+                                            </p>
+                                            <p className="mt-0.5 font-medium text-foreground">
+                                                {data.signed_jd_uploaded_at}
                                             </p>
                                         </div>
                                     )}

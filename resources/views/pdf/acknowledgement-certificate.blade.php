@@ -337,7 +337,7 @@
                         <table class="topics-table">
                             <tr>
                                 <td class="topic-text-cell">
-                                    Reviewed on {{ $jdViewedAt ?? '—' }}
+                                    Signed copy submitted on {{ $signedJdUploadedAt ?? '—' }}
                                 </td>
                                 <td class="topic-check-cell">
                                     <div class="checkmark-wrap">

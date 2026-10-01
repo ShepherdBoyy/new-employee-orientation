@@ -9,5 +9,5 @@ export type OnboardingUser = {
     jobPosition: string;
     companyName: string;
     jd_path: string;
-    jd_viewed: boolean;
+    signed_jd_submitted: boolean;
 };
