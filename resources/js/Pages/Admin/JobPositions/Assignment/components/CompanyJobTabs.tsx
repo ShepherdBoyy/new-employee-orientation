@@ -74,6 +74,7 @@ export default function CompanyJobTabs({ companies }: Props) {
     ).length;
 
     const missingCount = totalJobs - uploadedCount;
+
     return (
         <>
             <Card className="w-full h-full flex flex-col ">
@@ -154,35 +155,48 @@ export default function CompanyJobTabs({ companies }: Props) {
                                                     >
                                                         {/* Job information */}
                                                         <div className="min-w-0 flex-1">
-                                                            <div className="flex items-center ">
-                                                                <p className="truncate text-sm font-medium">
-                                                                    {job.name}
-                                                                </p>
-                                                            </div>
+                                                            <div className="min-w-0 flex-1">
+                                                                <div className="flex items-center gap-2">
+                                                                    <p className="truncate text-sm font-medium">
+                                                                        {
+                                                                            job.name
+                                                                        }
+                                                                    </p>
+                                                                    •
+                                                                    <Badge
+                                                                        variant="secondary"
+                                                                        className="h-5 rounded-md px-1.5 text-[10px] font-medium"
+                                                                    >
+                                                                        {job.employee_type ===
+                                                                        "non_field"
+                                                                            ? "Non-Field"
+                                                                            : "Field-Based"}
+                                                                    </Badge>
+                                                                </div>
+                                                                <div className="mt-2 flex items-center gap-2">
+                                                                    {job.document ? (
+                                                                        <>
+                                                                            <span className="size-1.5 rounded-full bg-emerald-500" />
 
-                                                            <div className="mt-2 flex items-center gap-2">
-                                                                {job.document ? (
-                                                                    <>
-                                                                        <span className="size-1.5 rounded-full bg-emerald-500" />
+                                                                            <span className="text-xs text-muted-foreground">
+                                                                                Job
+                                                                                description
+                                                                                available
+                                                                            </span>
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <span className="size-1.5 rounded-full bg-amber-500" />
 
-                                                                        <span className="text-xs text-muted-foreground">
-                                                                            Job
-                                                                            description
-                                                                            available
-                                                                        </span>
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <span className="size-1.5 rounded-full bg-amber-500" />
-
-                                                                        <span className="text-xs text-muted-foreground">
-                                                                            Job
-                                                                            description
-                                                                            not
-                                                                            uploaded
-                                                                        </span>
-                                                                    </>
-                                                                )}
+                                                                            <span className="text-xs text-muted-foreground">
+                                                                                Job
+                                                                                description
+                                                                                not
+                                                                                uploaded
+                                                                            </span>
+                                                                        </>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
 

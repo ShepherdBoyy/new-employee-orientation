@@ -48,6 +48,7 @@ import {
 import AppPagination from "@/Layout/Pagination";
 import EmployeeFilters from "./components/EmployeeFilters";
 import type { Paginated } from "../Types/job-position";
+import EmployeeDetailsDrawer from "./components/EmployeeDetailsDrawer";
 export interface Employee {
     id: number;
     name: string;
@@ -83,6 +84,7 @@ function Employees({ employees: initialEmployees, companies, filters }: Props) {
     );
     const [viewingEmployee, setViewingEmployee] =
         useState<EmployeeDetail | null>(null);
+    const [drawerOpen, setDrawerOpen] = useState(false);
 
     useEffect(() => setEmployees(initialEmployees), [initialEmployees]);
 
@@ -378,7 +380,10 @@ function Employees({ employees: initialEmployees, companies, filters }: Props) {
                     <div className="rounded-xl  ">
                         <EmployeeTable
                             employees={filteredEmployee}
-                            onView={setViewingEmployee}
+                            onView={(employee) => {
+                                setViewingEmployee(employee);
+                                setDrawerOpen(true);
+                            }}
                             onEdit={openEdit}
                             onDelete={setDeletingEmployee}
                         />
@@ -582,9 +587,14 @@ function Employees({ employees: initialEmployees, companies, filters }: Props) {
                 </AlertDialogContent>
             </AlertDialog>
 
-            <EmployeeDetailDialog
+            {/* <EmployeeDetailDialog
                 employee={viewingEmployee}
                 onClose={() => setViewingEmployee(null)}
+            /> */}
+            <EmployeeDetailsDrawer
+                employee={viewingEmployee}
+                open={drawerOpen}
+                onOpenChange={setDrawerOpen}
             />
         </>
     );

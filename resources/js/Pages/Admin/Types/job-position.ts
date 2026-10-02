@@ -1,6 +1,7 @@
 import type { Company } from "./company";
 
 export type JobPosition = {
+    document: any;
     id: number;
     name: string;
     employee_type: string;
