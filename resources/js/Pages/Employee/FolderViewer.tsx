@@ -10,7 +10,6 @@ import {
     Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 interface Slide {
     id: number;
@@ -40,6 +39,14 @@ export default function FolderViewer({ folder, slides, isCompleted }: Props) {
     const [highestViewedIndex, setHighestViewedIndex] = useState(
         isCompleted ? slides.length - 1 : 0,
     );
+    const [watchedVideoIds, setWatchedVideoIds] = useState<Set<number>>(
+        () =>
+            new Set(
+                isCompleted
+                    ? slides.filter((s) => s.type === "video").map((s) => s.id)
+                    : [],
+            ),
+    );
 
     const currentSlide = slides[currentIndex];
     const previousSlide = currentIndex > 0 ? slides[currentIndex - 1] : null;
@@ -51,16 +58,26 @@ export default function FolderViewer({ folder, slides, isCompleted }: Props) {
         ? ((currentIndex + 1) / slides.length) * 100
         : 0;
 
+    const currentVideoBlocking =
+        currentSlide?.type === "video" && !watchedVideoIds.has(currentSlide.id);
+
+    function handleVideoEnded(slideId: number) {
+        setWatchedVideoIds((prev) => new Set(prev).add(slideId));
+    }
+
     function goToIndex(index: number) {
         if (index > highestViewedIndex) return;
         setCurrentIndex(index);
     }
 
     function goNext() {
+        if (currentVideoBlocking) return;
+
         if (isLast) {
             setReachedEnd(true);
             return;
         }
+
         const nextIndex = currentIndex + 1;
         setCurrentIndex(nextIndex);
         setHighestViewedIndex((prev) => Math.max(prev, nextIndex));
@@ -159,7 +176,6 @@ export default function FolderViewer({ folder, slides, isCompleted }: Props) {
                                         </p>
                                     )}
                                     <button
-                                
                                         onClick={() => goToIndex(index)}
                                         disabled={locked}
                                         className={cn(
@@ -216,7 +232,10 @@ export default function FolderViewer({ folder, slides, isCompleted }: Props) {
                                 controls
                                 controlsList="nodownload"
                                 autoPlay
-                                onEnded={() => isLast && setReachedEnd(true)}
+                                onEnded={() => {
+                                    handleVideoEnded(currentSlide.id);
+                                    if (isLast) setReachedEnd(true);
+                                }}
                             />
                         ) : (
                             <img
@@ -239,30 +258,47 @@ export default function FolderViewer({ folder, slides, isCompleted }: Props) {
                             Previous
                         </Button>
 
-                        {isLast ? (
-                            reachedEnd ? (
-                                <Button
-                                    onClick={handleComplete}
-                                    disabled={completing}
-                                    className="bg-emerald-600 hover:bg-emerald-500"
-                                >
-                                    <CheckCircle2 className="mr-2 h-4 w-4" />
-                                    {completing
-                                        ? "Completing..."
-                                        : "Complete Module"}
-                                </Button>
+                        <div className="flex flex-col items-end gap-1.5">
+                            {isLast ? (
+                                reachedEnd ? (
+                                    <Button
+                                        onClick={handleComplete}
+                                        disabled={completing}
+                                        className="bg-emerald-600 hover:bg-emerald-500"
+                                    >
+                                        <CheckCircle2 className="mr-2 h-4 w-4" />
+                                        {completing
+                                            ? "Completing..."
+                                            : "Complete Module"}
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={goNext}
+                                        disabled={currentVideoBlocking}
+                                        className="disabled:opacity-40"
+                                    >
+                                        Finish Viewing
+                                        <ArrowRight className="ml-2 h-4 w-4" />
+                                    </Button>
+                                )
                             ) : (
-                                <Button onClick={goNext}>
-                                    Finish Viewing
+                                <Button
+                                    variant="outline"
+                                    onClick={goNext}
+                                    disabled={currentVideoBlocking}
+                                    className="disabled:opacity-40"
+                                >
+                                    Next
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
-                            )
-                        ) : (
-                            <Button variant="outline" onClick={goNext}>
-                                Next
-                                <ArrowRight className="ml-2 h-4 w-4" />
-                            </Button>
-                        )}
+                            )}
+
+                            {currentVideoBlocking && (
+                                <p className="text-xs text-muted-foreground">
+                                    Finish watching the video to continue
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
