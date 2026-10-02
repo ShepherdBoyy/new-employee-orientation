@@ -20,7 +20,7 @@ import {
     ShieldCheck,
     Download,
     FileText,
-    FileUser,
+    UsersRound,
     Footprints,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -138,15 +138,6 @@ export default function EmployeeDetailsDrawer({
                                 </DrawerDescription>
                             </div>
                         </div>
-
-                        <Badge
-                            className={cn(
-                                "shrink-0 font-normal",
-                                statusMap[employee.status].className,
-                            )}
-                        >
-                            {statusMap[employee.status].label}
-                        </Badge>
                     </div>
 
                     <div className="flex flex-wrap gap-x-4 gap-y-1 pt-3 text-xs text-muted-foreground">
@@ -188,15 +179,15 @@ export default function EmployeeDetailsDrawer({
                             {/* Employee Information */}
                             <section className="space-y-3">
                                 <div>
-                                    <h3 className="flex items-center gap-1.5 text-sm font-semibold">
-                                        <FileUser
+                                    <h3 className="flex items-center text-base gap-1.5  font-semibold">
+                                        <UsersRound
                                             className="h-5 w-5"
                                             strokeWidth={1.6}
                                         />
                                         Employee Information
                                     </h3>
 
-                                    <p className="mt-2 text-xs text-muted-foreground">
+                                    <p className="mt-2  text-muted-foreground">
                                         Basic employee and assignment details.
                                     </p>
                                 </div>
@@ -254,7 +245,7 @@ export default function EmployeeDetailsDrawer({
                             <section className="space-y-3">
                                 <div className="flex items-center justify-between gap-3">
                                     <div>
-                                        <h3 className="flex items-center gap-1.5 text-sm font-semibold">
+                                        <h3 className="flex items-center gap-1.5 text-base font-semibold">
                                             <Footprints
                                                 className="h-5 w-5"
                                                 strokeWidth={1.6}
@@ -262,7 +253,7 @@ export default function EmployeeDetailsDrawer({
                                             Module Progress
                                         </h3>
 
-                                        <p className="mt-2 text-xs text-muted-foreground">
+                                        <p className="mt-2  text-muted-foreground">
                                             Track the employee's orientation
                                             modules.
                                         </p>
@@ -334,12 +325,12 @@ export default function EmployeeDetailsDrawer({
                             <section className="space-y-3">
                                 <div className="flex items-start justify-between gap-3">
                                     <div>
-                                        <h3 className="flex items-center gap-1.5 text-sm font-semibold">
+                                        <h3 className="flex items-center gap-1.5 text-base font-semibold">
                                             <ShieldCheck className="h-4 w-4" />
                                             Final Acknowledgement
                                         </h3>
 
-                                        <p className="mt-2 text-xs text-muted-foreground">
+                                        <p className="mt-2  text-muted-foreground">
                                             Employee's final orientation
                                             acknowledgement.
                                         </p>
@@ -381,32 +372,6 @@ export default function EmployeeDetailsDrawer({
                                                     }
                                                 </p>
                                             </div>
-
-                                            <div>
-                                                <p className="text-xs text-muted-foreground">
-                                                    Confirmed Name
-                                                </p>
-
-                                                <p className="mt-1 text-sm font-medium">
-                                                    {
-                                                        data.acknowledgement
-                                                            .full_name_confirmation
-                                                    }
-                                                </p>
-                                            </div>
-
-                                            <div className="sm:col-span-2">
-                                                <p className="text-xs text-muted-foreground">
-                                                    IP Address
-                                                </p>
-
-                                                <p className="mt-1 text-sm font-medium">
-                                                    {
-                                                        data.acknowledgement
-                                                            .ip_address
-                                                    }
-                                                </p>
-                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -418,12 +383,12 @@ export default function EmployeeDetailsDrawer({
                             <section className="space-y-3">
                                 <div className="flex items-start justify-between gap-3">
                                     <div>
-                                        <h3 className="flex items-center gap-1.5 text-sm font-semibold">
+                                        <h3 className="flex items-center gap-1.5 text-base font-semibold">
                                             <FileText className="h-4 w-4" />
                                             Signed Job Description
                                         </h3>
 
-                                        <p className="mt-2 text-xs text-muted-foreground">
+                                        <p className="mt-2 text-muted-foreground">
                                             Employee's signed job description
                                             submission.
                                         </p>

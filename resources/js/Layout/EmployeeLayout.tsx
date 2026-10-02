@@ -21,7 +21,7 @@ export default function EmployeeLayout({ children }: EmployeeLayoutProps) {
     const user = usePage().props.auth.user;
     return (
         <>
-            <nav className="h-16 border-b shrink-0  flex justify-between items-center px-10">
+            <nav className=" flex-1 h-16 border-b shrink-0  flex justify-between items-center px-10">
                 <div className="flex items-center gap-1">
                     <Rotate3d absoluteStrokeWidth strokeWidth={1.5} size={22} />
                     <p>NEO</p>
@@ -95,41 +95,9 @@ export default function EmployeeLayout({ children }: EmployeeLayoutProps) {
                 </DropdownMenu>
             </nav>
 
-            <main className="mx-auto w-full max-w-7xl flex-col p-4 lg:p-8">
+            <main className="mx-auto w-full max-w-7xl max-h-screen p-4 lg:p-8">
                 {children}
             </main>
-
-            {/* {openFAQ && (
-                <div className="fixed bottom-24 right-8 z-50 w-[380px] rounded-2xl border bg-background shadow-2xl">
-                    <div className="flex items-center justify-between border-b px-5 py-4">
-                        <div>
-                            <h3 className="font-semibold">
-                                Frequently Asked Questions
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                                Need help? Start here.
-                            </p>
-                        </div>
-
-                        <button onClick={() => setOpenFAQ(false)}>
-                            <X size={18} />
-                        </button>
-                    </div>
-
-                    <div className="max-h-125 overflow-y-auto p-5">
-                        FAQ Component goes here...
-                    </div>
-                </div>
-            )}
-
-            <FloatingFAQ />
-            <button
-                onClick={() => setOpenFAQ((prev) => !prev)}
-                className="fixed bottom-8 right-8 z-50 flex items-center gap-3 rounded-full bg-primary px-5 py-3 text-primary-foreground shadow-xl transition-all hover:scale-105 hover:shadow-2xl"
-            >
-                <MessageCircle size={20} />
-                <span className="font-medium">Need Help?</span>
-            </button> */}
         </>
     );
 }
