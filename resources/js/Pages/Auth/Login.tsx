@@ -253,7 +253,7 @@ export default function Login() {
                 {/* RIGHT PANEL */}
                 <motion.div
                     variants={rightPanelVariants}
-                    className="relative hidden overflow-hidden rounded-lg bg-linear-to-br from-slate-950 via-slate-900 to-slate-800 text-white lg:flex"
+                    className="relative hidden overflow-hidden bg-linear-to-br from-slate-950 via-slate-900 to-slate-800 text-white lg:flex"
                 >
                     {/* Background Decoration */}
                     <div className="absolute inset-0 overflow-hidden">
